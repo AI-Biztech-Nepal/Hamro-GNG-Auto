@@ -1,0 +1,46 @@
+{
+  "placeholderImages": [
+    {
+      "id": "hero-bike",
+      "description": "Premium sports bike on a clean road",
+      "imageUrl": "https://images.unsplash.com/photo-1622185135505-2d795003994a?q=80&w=1470&auto=format&fit=crop",
+      "imageHint": "orange motorcycle"
+    },
+    {
+      "id": "maintenance",
+      "description": "Professional bike maintenance and servicing",
+      "imageUrl": "https://images.unsplash.com/photo-1636761358760-101cabeeb699?q=80&w=1170&auto=format&fit=crop",
+      "imageHint": "motorcycle maintenance"
+    },
+    {
+      "id": "scooter-1",
+      "description": "Modern city scooter",
+      "imageUrl": "https://picsum.photos/seed/scooter1/600/400",
+      "imageHint": "modern scooter"
+    },
+    {
+      "id": "bike-2",
+      "description": "Naked street bike",
+      "imageUrl": "https://picsum.photos/seed/bike2/600/400",
+      "imageHint": "street motorcycle"
+    },
+    {
+      "id": "bike-3",
+      "description": "Cruiser motorcycle",
+      "imageUrl": "https://picsum.photos/seed/bike3/600/400",
+      "imageHint": "cruiser motorcycle"
+    },
+    {
+      "id": "showroom",
+      "description": "Modern bike showroom interior",
+      "imageUrl": "https://picsum.photos/seed/showroom1/1200/800",
+      "imageHint": "motorcycle showroom"
+    },
+    {
+      "id": "logo",
+      "description": "Hamro G&G Auto Enterprises Logo",
+      "imageUrl": "https://images.unsplash.com/photo-1777288411485-1eb05bd4a289?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "business logo"
+    }
+  ]
+}

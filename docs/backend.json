@@ -1,0 +1,178 @@
+
+{
+  "entities": {
+    "Vehicle": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Vehicle",
+      "type": "object",
+      "description": "Represents a single two-wheeler (bike or scooter) available for resale on the platform.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Vehicle entity."
+        },
+        "title": {
+          "type": "string",
+          "description": "A descriptive title for the vehicle listing."
+        },
+        "brand": {
+          "type": "string",
+          "description": "The manufacturer's brand of the vehicle."
+        },
+        "model": {
+          "type": "string",
+          "description": "The specific model of the vehicle."
+        },
+        "type": {
+          "type": "string",
+          "description": "The category of the vehicle ('bike', 'scooter')."
+        },
+        "year": {
+          "type": "number",
+          "description": "The manufacturing year."
+        },
+        "km_run": {
+          "type": "number",
+          "description": "Total kilometers run."
+        },
+        "price": {
+          "type": "number",
+          "description": "Selling price in NPR."
+        },
+        "description": {
+          "type": "string",
+          "description": "Detailed description."
+        },
+        "image_urls": {
+          "type": "array",
+          "description": "URLs to images.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "condition": {
+          "type": "string",
+          "description": "Overall condition."
+        },
+        "status": {
+          "type": "string",
+          "description": "Availability status ('available', 'sold')."
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "featured": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "title",
+        "brand",
+        "model",
+        "type",
+        "year",
+        "km_run",
+        "price",
+        "status",
+        "created_at"
+      ]
+    },
+    "Inquiry": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Inquiry",
+      "type": "object",
+      "description": "Stores lead generation submissions.",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "name",
+        "phone",
+        "message",
+        "created_at",
+        "status"
+      ]
+    },
+    "AdminRole": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "AdminRole",
+      "type": "object",
+      "description": "Defines an administrative user role.",
+      "properties": {
+        "email": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "super_admin"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "SiteSettings": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "SiteSettings",
+      "type": "object",
+      "description": "Global site configurations.",
+      "properties": {
+        "logo_url": { "type": "string" },
+        "business_name": { "type": "string" },
+        "contact_phone": { "type": "string" },
+        "contact_email": { "type": "string" },
+        "address": { "type": "string" },
+        "hero_image_url": { "type": "string" },
+        "service_image_url": { "type": "string" }
+      }
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "/vehicles/{vehicleId}": {
+      "schema": { "$ref": "#/backend/entities/Vehicle" },
+      "description": "Vehicle inventory."
+    },
+    "/inquiries/{inquiryId}": {
+      "schema": { "$ref": "#/backend/entities/Inquiry" },
+      "description": "Customer leads."
+    },
+    "/roles_admin/{userId}": {
+      "schema": { "$ref": "#/backend/entities/AdminRole" },
+      "description": "Admin authorization mapping."
+    },
+    "/settings/general": {
+      "schema": { "$ref": "#/backend/entities/SiteSettings" },
+      "description": "Global site settings."
+    },
+    "/visitors/{visitorId}": {
+      "schema": { "type": "object" },
+      "description": "Tracking for unique visitors/leads."
+    },
+    "/followups/{followupId}": {
+      "schema": { "type": "object" },
+      "description": "Administrative followup logs."
+    }
+  }
+}
