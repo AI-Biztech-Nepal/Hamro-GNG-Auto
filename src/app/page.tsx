@@ -7,33 +7,40 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Shield, Clock, CheckCircle, ArrowRight, Calendar, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { useFirestore, useCollection, useMemoFirebase, useDoc } from '@/firebase';
-import { collection, doc, query, limit, orderBy } from 'firebase/firestore';
+import { useFirestore, useMemoFirebase, useDoc } from '@/firebase';
+import { doc } from 'firebase/firestore';
 import { Vehicle } from '@/types/vehicle';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { fetchInventory } from '@/lib/inventory-api';
+import { useEffect, useState } from 'react';
 
 export default function Home() {
   const db = useFirestore();
-  
-  // High Performance Query: Limit to 8 most recent for featured section
-  const vehiclesQuery = useMemoFirebase(() => {
-    if (!db) return null;
-    return query(
-      collection(db, 'vehicles'),
-      orderBy('created_at', 'desc'),
-      limit(8)
-    );
-  }, [db]);
 
   const settingsRef = useMemoFirebase(() => {
     if (!db) return null;
     return doc(db, 'settings', 'general');
   }, [db]);
 
-  const { data: vehicles, isLoading } = useCollection<Vehicle>(vehiclesQuery);
   const { data: settings } = useDoc(settingsRef);
-  
-  const featuredVehicles = vehicles || [];
+
+  // Featured section pulls the 8 most recently added vehicles from the
+  // Auto-Stock-Manager backend (same source as /inventory), not Firestore.
+  const [featuredVehicles, setFeaturedVehicles] = useState<Vehicle[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchInventory()
+      .then(vehicles => { if (!cancelled) setFeaturedVehicles(vehicles.slice(0, 8)); })
+      .catch(err => {
+        console.error('Failed to load featured inventory:', err);
+        if (!cancelled) setFeaturedVehicles([]);
+      })
+      .finally(() => { if (!cancelled) setIsLoading(false); });
+    return () => { cancelled = true; };
+  }, []);
+
   const maintenancePlaceholder = PlaceHolderImages.find(img => img.id === 'maintenance')?.imageUrl;
   const serviceImage = settings?.service_image_url || maintenancePlaceholder || "https://picsum.photos/seed/service/800/600";
 

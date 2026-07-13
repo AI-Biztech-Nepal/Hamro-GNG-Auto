@@ -1,15 +1,14 @@
 
 "use client"
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { VehicleCard } from '@/components/inventory/VehicleCard';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search, Loader2 } from 'lucide-react';
 import { BRANDS } from '@/lib/constants';
-import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
-import { collection } from 'firebase/firestore';
 import { Vehicle } from '@/types/vehicle';
+import { fetchInventory } from '@/lib/inventory-api';
 
 export default function InventoryPage() {
   const [search, setSearch] = useState('');
@@ -17,19 +16,27 @@ export default function InventoryPage() {
   const [brandFilter, setBrandFilter] = useState('all');
   const [sortOrder, setSortOrder] = useState('latest');
 
-  const db = useFirestore();
-  const vehiclesQuery = useMemoFirebase(() => {
-    if (!db) return null;
-    return collection(db, 'vehicles');
-  }, [db]);
+  const [dbVehicles, setDbVehicles] = useState<Vehicle[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const { data: dbVehicles, isLoading } = useCollection<Vehicle>(vehiclesQuery);
+  useEffect(() => {
+    let cancelled = false;
+    setIsLoading(true);
+    fetchInventory()
+      .then(vehicles => { if (!cancelled) setDbVehicles(vehicles); })
+      .catch(err => {
+        console.error('Failed to load inventory:', err);
+        if (!cancelled) setDbVehicles([]);
+      })
+      .finally(() => { if (!cancelled) setIsLoading(false); });
+    return () => { cancelled = true; };
+  }, []);
 
   const filteredVehicles = useMemo(() => {
     if (!dbVehicles) return [];
-    
+
     return dbVehicles.filter(v => {
-      const matchesSearch = v.title.toLowerCase().includes(search.toLowerCase()) || 
+      const matchesSearch = v.title.toLowerCase().includes(search.toLowerCase()) ||
                            v.brand.toLowerCase().includes(search.toLowerCase());
       const matchesType = typeFilter === 'all' || v.type === typeFilter;
       const matchesBrand = brandFilter === 'all' || v.brand === brandFilter;
@@ -54,14 +61,14 @@ export default function InventoryPage() {
       <div className="bg-white p-4 rounded-[2rem] shadow-sm border grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-4">
         <div className="relative col-span-1 md:col-span-1 lg:col-span-2">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input 
-            placeholder="Search by brand or model..." 
+          <Input
+            placeholder="Search by brand or model..."
             className="pl-10 h-12 rounded-xl"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        
+
         <Select value={typeFilter} onValueChange={setTypeFilter}>
           <SelectTrigger className="h-12 rounded-xl">
             <SelectValue placeholder="Vehicle Type" />
@@ -118,7 +125,7 @@ export default function InventoryPage() {
               </div>
               <h3 className="font-headline font-bold text-2xl">No vehicles found</h3>
               <p className="text-muted-foreground max-w-xs mx-auto">Try adjusting your filters or search terms to find what you're looking for.</p>
-              <button 
+              <button
                 onClick={() => {setSearch(''); setTypeFilter('all'); setBrandFilter('all'); setSortOrder('latest');}}
                 className="text-primary font-bold hover:underline"
               >

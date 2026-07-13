@@ -35,6 +35,13 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        // Vehicle photos served by the Auto-Stock-Manager backend (inventory source of truth)
+        protocol: 'https',
+        hostname: 'auto-stock-manager.onrender.com',
+        port: '',
+        pathname: '/api/public/vehicles/**',
+      },
     ],
   },
 };

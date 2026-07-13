@@ -6,9 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Calendar, Gauge, Bike, ChevronLeft, Phone, MessageCircle, Share2, ShieldCheck, MapPin, Loader2 } from 'lucide-react';
 import { CONTACT_INFO } from '@/lib/constants';
-import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
-import { doc } from 'firebase/firestore';
 import { Vehicle } from '@/types/vehicle';
+import { fetchVehicleById } from '@/lib/inventory-api';
 import {
   Carousel,
   CarouselContent,
@@ -22,17 +21,26 @@ import { useEffect, useState } from 'react';
 export default function VehicleDetailPage() {
   const { id } = useParams();
   const router = useRouter();
-  const db = useFirestore();
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
   const [count, setCount] = useState(0);
-  
-  const vehicleRef = useMemoFirebase(() => {
-    if (!db || !id) return null;
-    return doc(db, 'vehicles', id as string);
-  }, [db, id]);
 
-  const { data: vehicle, isLoading } = useDoc<Vehicle>(vehicleRef);
+  const [vehicle, setVehicle] = useState<Vehicle | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (!id) return;
+    let cancelled = false;
+    setIsLoading(true);
+    fetchVehicleById(id as string)
+      .then(v => { if (!cancelled) setVehicle(v); })
+      .catch(err => {
+        console.error('Failed to load vehicle:', err);
+        if (!cancelled) setVehicle(null);
+      })
+      .finally(() => { if (!cancelled) setIsLoading(false); });
+    return () => { cancelled = true; };
+  }, [id]);
 
   useEffect(() => {
     if (!api) return;
@@ -83,9 +91,9 @@ export default function VehicleDetailPage() {
                 {images.map((url, index) => (
                   <CarouselItem key={index}>
                     <div className="relative flex items-center justify-center bg-gray-100 min-h-[400px] md:min-h-[600px] w-full">
-                      <Image 
-                        src={url} 
-                        alt={`${vehicle.title} - Image ${index + 1}`} 
+                      <Image
+                        src={url}
+                        alt={`${vehicle.title} - Image ${index + 1}`}
                         fill
                         priority={index === 0}
                         className="object-contain transition-transform duration-500"
@@ -94,17 +102,17 @@ export default function VehicleDetailPage() {
                   </CarouselItem>
                 ))}
               </CarouselContent>
-              
+
               {images.length > 1 && (
                 <>
                   <CarouselPrevious className="left-4 opacity-0 group-hover:opacity-100 transition-opacity bg-white/80 backdrop-blur-sm border-none shadow-lg h-12 w-12" />
                   <CarouselNext className="right-4 opacity-0 group-hover:opacity-100 transition-opacity bg-white/80 backdrop-blur-sm border-none shadow-lg h-12 w-12" />
-                  
+
                   {/* Indicators / Dots */}
                   <div className="absolute bottom-6 left-0 right-0 flex justify-center gap-2 z-20">
                     {images.map((_, i) => (
-                      <div 
-                        key={i} 
+                      <div
+                        key={i}
                         className={`h-2 rounded-full transition-all duration-300 ${
                           current === i + 1 ? 'w-8 bg-primary' : 'w-2 bg-white/60'
                         }`}
@@ -114,7 +122,7 @@ export default function VehicleDetailPage() {
                 </>
               )}
             </Carousel>
-            
+
             {vehicle.status === 'sold' && (
               <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-30">
                 <span className="text-white font-black text-4xl md:text-7xl tracking-widest -rotate-12 border-8 border-white p-6 rounded-xl">SOLD</span>
@@ -180,7 +188,7 @@ export default function VehicleDetailPage() {
             </div>
 
             <div className="space-y-4 pt-4">
-              <Button 
+              <Button
                 className="w-full h-16 bg-primary hover:bg-primary/90 text-xl font-bold gap-3 rounded-2xl shadow-xl shadow-primary/20"
                 asChild
               >
@@ -188,7 +196,7 @@ export default function VehicleDetailPage() {
                   <Phone className="w-6 h-6" /> Call Now
                 </a>
               </Button>
-              <Button 
+              <Button
                 className="w-full h-16 bg-[#25D366] hover:bg-[#25D366]/90 text-white text-xl font-bold gap-3 border-none rounded-2xl shadow-xl shadow-green-500/20"
                 asChild
               >
@@ -203,9 +211,9 @@ export default function VehicleDetailPage() {
                 <div className="bg-white p-2 rounded-xl shadow-sm"><MapPin className="w-6 h-6 text-primary" /></div>
                 <div className="text-sm">
                   <p className="font-bold text-foreground">Showroom Location</p>
-                  <a 
-                    href={CONTACT_INFO.mapsLink} 
-                    target="_blank" 
+                  <a
+                    href={CONTACT_INFO.mapsLink}
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="text-muted-foreground hover:text-primary transition-colors font-medium"
                   >
