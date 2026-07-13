@@ -3,18 +3,10 @@
 
 import Link from 'next/link';
 import { Phone, Mail, MapPin, Facebook, MessageCircle } from 'lucide-react';
-import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
-import { doc } from 'firebase/firestore';
 import { CONTACT_INFO } from '@/lib/constants';
+import type { SiteSettings } from '@/lib/inventory-api';
 
-export function Footer() {
-  const db = useFirestore();
-  const settingsRef = useMemoFirebase(() => {
-    if (!db) return null;
-    return doc(db, 'settings', 'general');
-  }, [db]);
-  const { data: settings } = useDoc(settingsRef);
-
+export function Footer({ settings }: { settings: SiteSettings }) {
   const logoImage = settings?.logo_url || CONTACT_INFO.logoUrl;
   const businessName = settings?.business_name || CONTACT_INFO.businessName;
   const contactPhone = settings?.contact_phone || CONTACT_INFO.phone;
@@ -68,7 +60,6 @@ export function Footer() {
             <li><Link href="/inventory" className="hover:text-white transition-colors">All Inventory</Link></li>
             <li><Link href="/sell" className="hover:text-white transition-colors">Sell Your Bike</Link></li>
             <li><Link href="/exchange" className="hover:text-white transition-colors">Exchange Offers</Link></li>
-            <li><Link href="/admin/login" className="hover:text-white transition-colors">Staff Login</Link></li>
           </ul>
         </div>
 

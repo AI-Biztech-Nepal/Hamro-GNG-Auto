@@ -11,8 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Bike, CheckCircle2, Camera, Upload, X, Image as ImageIcon, Loader2, Plus } from 'lucide-react';
-import { useFirestore, addDocumentNonBlocking } from '@/firebase';
-import { collection } from 'firebase/firestore';
+import { submitLead } from '@/lib/inventory-api';
 import { compressImage } from '@/lib/image-upload';
 
 const formSchema = z.object({
@@ -32,7 +31,6 @@ export default function SellPage() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isCompressing, setIsCompressing] = useState(false);
-  const db = useFirestore();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -77,29 +75,31 @@ export default function SellPage() {
     form.setValue('images', filtered, { shouldValidate: true });
   };
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    if (!db) return;
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
-
-    const inquiryData = {
-      type: 'sell',
-      name: values.name,
-      phone: values.phone,
-      message: `Sell Inquiry: ${values.brand} ${values.model} (${values.year}). KM: ${values.km_run}. Expected Price: NPR ${values.expected_price}. ${values.message || ''}`,
-      images: values.images,
-      created_at: new Date().toISOString(),
-      status: 'new'
-    };
-
-    const inquiriesRef = collection(db, 'inquiries');
-    addDocumentNonBlocking(inquiriesRef, inquiryData);
-    
-    setSubmitted(true);
-    setLoading(false);
-    toast({
-      title: "Inquiry Submitted",
-      description: "We've received your bike details and photos. Our team will contact you soon.",
-    });
+    try {
+      await submitLead({
+        type: 'sell',
+        name: values.name,
+        phone: values.phone,
+        message: `Sell Inquiry: ${values.brand} ${values.model} (${values.year}). KM: ${values.km_run}. Expected Price: NPR ${values.expected_price}. ${values.message || ''}`,
+        images: values.images,
+      });
+      setSubmitted(true);
+      toast({
+        title: "Inquiry Submitted",
+        description: "We've received your bike details and photos. Our team will contact you soon.",
+      });
+    } catch (err) {
+      console.error('Failed to submit sell inquiry:', err);
+      toast({
+        title: "Submission Failed",
+        description: "Something went wrong. Please try again or contact us directly.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   }
 
   if (submitted) {

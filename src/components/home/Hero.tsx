@@ -5,19 +5,12 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { ShieldCheck, BadgeCheck, Clock, ArrowRight, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
-import { doc } from 'firebase/firestore';
 import { CONTACT_INFO } from '@/lib/constants';
+import type { SiteSettings } from '@/lib/inventory-api';
 import { cn } from '@/lib/utils';
 
-export function Hero() {
+export function Hero({ settings }: { settings: SiteSettings }) {
   const [isSliding, setIsSliding] = useState(false);
-  const db = useFirestore();
-  const settingsRef = useMemoFirebase(() => {
-    if (!db) return null;
-    return doc(db, 'settings', 'general');
-  }, [db]);
-  const { data: settings } = useDoc(settingsRef);
 
   const heroImage = settings?.hero_image_url || CONTACT_INFO.heroUrl;
 

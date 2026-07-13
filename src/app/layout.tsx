@@ -5,7 +5,7 @@ import { Footer } from '@/components/layout/Footer';
 import { StickyBottomBar } from '@/components/layout/StickyBottomBar';
 import { Toaster } from '@/components/ui/toaster';
 import { TransitionProvider } from '@/components/layout/TransitionProvider';
-import { FirebaseClientProvider } from '@/firebase';
+import { fetchSettings } from '@/lib/inventory-api';
 import { CONTACT_INFO } from '@/lib/constants';
 
 export const metadata: Metadata = {
@@ -22,11 +22,16 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const settings = await fetchSettings().catch(err => {
+    console.error('Failed to load site settings:', err);
+    return {};
+  });
+
   return (
     <html lang="en">
       <head>
@@ -35,23 +40,21 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet" />
         <link rel="preconnect" href="https://images.unsplash.com" />
         <link rel="preconnect" href="https://picsum.photos" />
-        
+
         {/* Instant Asset Delivery: Preload branding visuals with high fetch priority */}
-        <link rel="preload" as="image" href={CONTACT_INFO.logoUrl} fetchPriority="high" />
-        <link rel="preload" as="image" href={CONTACT_INFO.heroUrl} fetchPriority="high" />
+        <link rel="preload" as="image" href={settings.logo_url || CONTACT_INFO.logoUrl} fetchPriority="high" />
+        <link rel="preload" as="image" href={settings.hero_image_url || CONTACT_INFO.heroUrl} fetchPriority="high" />
       </head>
       <body className="font-body antialiased min-h-screen">
-        <FirebaseClientProvider>
-          <Navbar />
-          <TransitionProvider>
-            <main className="flex-grow pb-16 md:pb-0">
-              {children}
-            </main>
-          </TransitionProvider>
-          <Footer />
-          <StickyBottomBar />
-          <Toaster />
-        </FirebaseClientProvider>
+        <Navbar settings={settings} />
+        <TransitionProvider>
+          <main className="flex-grow pb-16 md:pb-0">
+            {children}
+          </main>
+        </TransitionProvider>
+        <Footer settings={settings} />
+        <StickyBottomBar />
+        <Toaster />
       </body>
     </html>
   );

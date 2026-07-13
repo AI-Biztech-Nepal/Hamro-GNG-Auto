@@ -4,54 +4,24 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { Menu, X, Wrench, Bike, Settings, Users } from 'lucide-react';
+import { Menu, X, Wrench } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { useFirestore, useDoc, useMemoFirebase, useUser } from '@/firebase';
-import { doc } from 'firebase/firestore';
 import { CONTACT_INFO } from '@/lib/constants';
+import type { SiteSettings } from '@/lib/inventory-api';
 
-export function Navbar() {
+export function Navbar({ settings }: { settings: SiteSettings }) {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
-  const isAdminPage = pathname?.startsWith('/admin');
-  const { user } = useUser();
-  const db = useFirestore();
-
-  const roleRef = useMemoFirebase(() => {
-    if (!db || !user?.uid) return null;
-    return doc(db, 'roles_admin', user.uid);
-  }, [db, user?.uid]);
-
-  const { data: roleData } = useDoc(roleRef);
-  const isSuperAdmin = roleData?.role === 'super_admin';
-
-  const settingsRef = useMemoFirebase(() => {
-    if (!db) return null;
-    return doc(db, 'settings', 'general');
-  }, [db]);
-  const { data: settings } = useDoc(settingsRef);
 
   const logoImage = settings?.logo_url || CONTACT_INFO.logoUrl;
 
-  const navLinks = [
+  const links = [
     { name: 'Home', href: '/' },
     { name: 'Inventory', href: '/inventory' },
     { name: 'Services', href: '/services' },
     { name: 'Sell Bike', href: '/sell' },
     { name: 'Exchange', href: '/exchange' },
   ];
-
-  const adminLinks = [
-    { name: 'Inventory', href: '/admin/dashboard' },
-    { name: 'Leads', href: '/admin/inquiries' },
-    ...(isSuperAdmin ? [
-      { name: 'Roles', href: '/admin/roles', icon: <Users className="w-4 h-4" /> },
-      { name: 'Settings', href: '/admin/settings', icon: <Settings className="w-4 h-4" /> }
-    ] : [])
-  ];
-
-  const links = isAdminPage ? adminLinks : navLinks;
 
   return (
     <nav className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
@@ -90,29 +60,17 @@ export function Navbar() {
                   pathname === link.href ? 'text-primary' : 'text-foreground/70 hover:text-primary'
                 }`}
               >
-                {link.icon}
                 {link.name}
               </Link>
             ))}
-            
+
             <div className="flex items-center gap-3">
-              {isAdminPage ? (
-                <div className="flex items-center gap-3">
-                  {isSuperAdmin && <Badge className="bg-primary/10 text-primary border-primary/20 font-black">SUPER ADMIN</Badge>}
-                  <Button variant="outline" size="sm" className="font-bold gap-2 rounded-full" asChild>
-                    <Link href="/"><Bike className="w-4 h-4" /> View Site</Link>
-                  </Button>
-                </div>
-              ) : (
-                <>
-                  <Button variant="ghost" size="sm" className="font-bold text-primary gap-2" asChild>
-                    <Link href="/book-service"><Wrench className="w-4 h-4" /> Service</Link>
-                  </Button>
-                  <Button size="sm" className="font-bold rounded-full px-4 shadow-lg shadow-primary/20" asChild>
-                    <Link href="/inventory">Browse</Link>
-                  </Button>
-                </>
-              )}
+              <Button variant="ghost" size="sm" className="font-bold text-primary gap-2" asChild>
+                <Link href="/book-service"><Wrench className="w-4 h-4" /> Service</Link>
+              </Button>
+              <Button size="sm" className="font-bold rounded-full px-4 shadow-lg shadow-primary/20" asChild>
+                <Link href="/inventory">Browse</Link>
+              </Button>
             </div>
           </div>
 

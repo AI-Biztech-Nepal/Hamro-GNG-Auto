@@ -1,8 +1,7 @@
 /**
- * Fetches live inventory from the Auto-Stock-Manager backend (MongoDB-backed)
- * instead of Firestore. That backend is now the single source of truth for
- * vehicle stock — its own /admin/vehicles/new Firestore panel is no longer
- * the path new inventory goes through.
+ * Fetches live inventory, site settings, and lead submissions from the
+ * Auto-Stock-Manager backend — the single source of truth for all of it,
+ * managed from that backend's own admin panel.
  */
 import type { Vehicle } from '@/types/vehicle';
 
@@ -76,4 +75,39 @@ export async function fetchVehicleById(id: string): Promise<Vehicle | null> {
   if (!res.ok) throw new Error(`Failed to load vehicle (${res.status})`);
   const v = (await res.json()) as PublicVehicle;
   return mapVehicle(v);
+}
+
+export interface SiteSettings {
+  logo_url?: string;
+  business_name?: string;
+  contact_phone?: string;
+  contact_email?: string;
+  address?: string;
+  hero_image_url?: string;
+  service_image_url?: string;
+}
+
+/** Site branding/contact info, managed from the Auto-Stock-Manager admin panel. */
+export async function fetchSettings(): Promise<SiteSettings> {
+  const res = await fetch(`${API_BASE}/api/public/settings`, { next: { revalidate: 60 } });
+  if (!res.ok) throw new Error(`Failed to load settings (${res.status})`);
+  return res.json();
+}
+
+export interface LeadInput {
+  type: 'sell' | 'exchange' | 'service';
+  name: string;
+  phone: string;
+  message?: string;
+  images?: string[];
+}
+
+/** Submits a Sell / Exchange / Book Service form to the Auto-Stock-Manager admin's Leads screen. */
+export async function submitLead(lead: LeadInput): Promise<void> {
+  const res = await fetch(`${API_BASE}/api/public/leads`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(lead),
+  });
+  if (!res.ok) throw new Error(`Failed to submit lead (${res.status})`);
 }

@@ -7,27 +7,17 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Shield, Clock, CheckCircle, ArrowRight, Calendar } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { useFirestore, useMemoFirebase, useDoc } from '@/firebase';
-import { doc } from 'firebase/firestore';
 import { Vehicle } from '@/types/vehicle';
+import type { SiteSettings } from '@/lib/inventory-api';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
-export function HomeClient({ featuredVehicles }: { featuredVehicles: Vehicle[] }) {
-  const db = useFirestore();
-
-  const settingsRef = useMemoFirebase(() => {
-    if (!db) return null;
-    return doc(db, 'settings', 'general');
-  }, [db]);
-
-  const { data: settings } = useDoc(settingsRef);
-
+export function HomeClient({ featuredVehicles, settings }: { featuredVehicles: Vehicle[]; settings: SiteSettings }) {
   const maintenancePlaceholder = PlaceHolderImages.find(img => img.id === 'maintenance')?.imageUrl;
   const serviceImage = settings?.service_image_url || maintenancePlaceholder || "https://picsum.photos/seed/service/800/600";
 
   return (
     <div className="space-y-24 pb-20">
-      <Hero />
+      <Hero settings={settings} />
 
       {/* Featured Vehicles */}
       <section className="max-w-7xl mx-auto px-4">

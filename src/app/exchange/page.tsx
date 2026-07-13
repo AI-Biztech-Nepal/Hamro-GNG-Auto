@@ -10,8 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDes
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { RefreshCw, Camera, CheckCircle2, Loader2, Image as ImageIcon, Plus, X } from 'lucide-react';
-import { useFirestore, addDocumentNonBlocking } from '@/firebase';
-import { collection } from 'firebase/firestore';
+import { submitLead } from '@/lib/inventory-api';
 import { compressImage } from '@/lib/image-upload';
 
 const formSchema = z.object({
@@ -28,7 +27,6 @@ export default function ExchangePage() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isCompressing, setIsCompressing] = useState(false);
-  const db = useFirestore();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -70,34 +68,31 @@ export default function ExchangePage() {
     form.setValue('images', filtered, { shouldValidate: true });
   };
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    if (!db) return;
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
-
-    const inquiryData = {
-      type: 'exchange',
-      name: values.name,
-      phone: values.phone,
-      message: `Exchange Inquiry: ${values.old_bike} (${values.old_year}) for ${values.interested_in}. Photos provided: ${values.images.length}`,
-      images: values.images,
-      created_at: new Date().toISOString(),
-      status: 'new',
-      sellExchangeVehicleBrand: values.old_bike.split(' ')[0] || values.old_bike,
-      sellExchangeVehicleModel: values.old_bike,
-      sellExchangeVehicleYear: parseInt(values.old_year) || 0,
-    };
-
-    const inquiriesRef = collection(db, 'inquiries');
-    addDocumentNonBlocking(inquiriesRef, inquiryData);
-
-    setTimeout(() => {
-      setSubmitted(true);
-      setLoading(false);
-      toast({ 
-        title: "Exchange Request Sent", 
-        description: "We'll review your bike details and photos and call you with an offer." 
+    try {
+      await submitLead({
+        type: 'exchange',
+        name: values.name,
+        phone: values.phone,
+        message: `Exchange Inquiry: ${values.old_bike} (${values.old_year}) for ${values.interested_in}. Photos provided: ${values.images.length}`,
+        images: values.images,
       });
-    }, 800);
+      setSubmitted(true);
+      toast({
+        title: "Exchange Request Sent",
+        description: "We'll review your bike details and photos and call you with an offer.",
+      });
+    } catch (err) {
+      console.error('Failed to submit exchange inquiry:', err);
+      toast({
+        title: "Submission Failed",
+        description: "Something went wrong. Please try again or contact us directly.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   }
 
   if (submitted) {

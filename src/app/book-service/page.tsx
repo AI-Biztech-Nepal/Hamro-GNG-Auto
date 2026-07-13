@@ -15,8 +15,7 @@ import { format } from 'date-fns';
 import { CalendarIcon, Wrench, CheckCircle2, Clock, ShieldCheck, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
-import { useFirestore, addDocumentNonBlocking } from '@/firebase';
-import { collection } from 'firebase/firestore';
+import { submitLead } from '@/lib/inventory-api';
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -32,7 +31,6 @@ export default function BookServicePage() {
   const { toast } = useToast();
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
-  const db = useFirestore();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -44,28 +42,30 @@ export default function BookServicePage() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    if (!db) return;
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
-
-    const inquiryData = {
-      type: 'test-ride', // Mapping 'Service Booking' to 'test-ride' or similar type in our schema
-      name: values.name,
-      phone: values.phone,
-      message: `Service Booking: ${values.vehicle_model}. Type: ${values.service_type}. Preferred Date: ${format(values.preferred_date, "PPP")}`,
-      created_at: new Date().toISOString(),
-      status: 'new'
-    };
-
-    const inquiriesRef = collection(db, 'inquiries');
-    addDocumentNonBlocking(inquiriesRef, inquiryData);
-
-    setSubmitted(true);
-    setLoading(false);
-    toast({
-      title: "Appointment Requested",
-      description: "Our service team will call you to confirm your slot.",
-    });
+    try {
+      await submitLead({
+        type: 'service',
+        name: values.name,
+        phone: values.phone,
+        message: `Service Booking: ${values.vehicle_model}. Type: ${values.service_type}. Preferred Date: ${format(values.preferred_date, "PPP")}`,
+      });
+      setSubmitted(true);
+      toast({
+        title: "Appointment Requested",
+        description: "Our service team will call you to confirm your slot.",
+      });
+    } catch (err) {
+      console.error('Failed to submit service booking:', err);
+      toast({
+        title: "Submission Failed",
+        description: "Something went wrong. Please try again or contact us directly.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   }
 
   if (submitted) {
