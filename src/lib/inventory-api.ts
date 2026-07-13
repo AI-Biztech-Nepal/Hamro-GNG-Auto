@@ -63,7 +63,7 @@ function mapVehicle(v: PublicVehicle): Vehicle {
 
 /** All available vehicles, newest first (matches the backend's default sort). */
 export async function fetchInventory(): Promise<Vehicle[]> {
-  const res = await fetch(`${API_BASE}/api/public/vehicles`, { cache: 'no-store' });
+  const res = await fetch(`${API_BASE}/api/public/vehicles`, { next: { revalidate: 60 } });
   if (!res.ok) throw new Error(`Failed to load inventory (${res.status})`);
   const data = await res.json();
   return (data.vehicles as PublicVehicle[]).map(mapVehicle);
@@ -71,7 +71,7 @@ export async function fetchInventory(): Promise<Vehicle[]> {
 
 /** Single vehicle with its full photo gallery. Returns null if not found or not available (e.g. sold). */
 export async function fetchVehicleById(id: string): Promise<Vehicle | null> {
-  const res = await fetch(`${API_BASE}/api/public/vehicles/${id}`, { cache: 'no-store' });
+  const res = await fetch(`${API_BASE}/api/public/vehicles/${id}`, { next: { revalidate: 60 } });
   if (res.status === 404) return null;
   if (!res.ok) throw new Error(`Failed to load vehicle (${res.status})`);
   const v = (await res.json()) as PublicVehicle;
