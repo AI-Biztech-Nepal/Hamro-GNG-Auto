@@ -9,11 +9,9 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { format } from 'date-fns';
-import { CalendarIcon, Wrench, CheckCircle2, Clock, ShieldCheck, Loader2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import BSDatePicker from '@/components/BSDatePicker';
+import { formatBSDate } from '@/lib/nepali-date';
+import { Wrench, CheckCircle2, Clock, ShieldCheck, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { submitLead } from '@/lib/inventory-api';
 
@@ -22,9 +20,7 @@ const formSchema = z.object({
   phone: z.string().min(10, "Please enter a valid phone number"),
   vehicle_model: z.string().min(2, "Please specify your bike/scooter model"),
   service_type: z.string().min(1, "Please select a service type"),
-  preferred_date: z.date({
-    required_error: "A preferred date is required.",
-  }),
+  preferred_date: z.string().min(1, "A preferred date is required."),
 });
 
 export default function BookServicePage() {
@@ -39,6 +35,7 @@ export default function BookServicePage() {
       phone: "",
       vehicle_model: "",
       service_type: "",
+      preferred_date: "",
     },
   });
 
@@ -49,7 +46,7 @@ export default function BookServicePage() {
         type: 'service',
         name: values.name,
         phone: values.phone,
-        message: `Service Booking: ${values.vehicle_model}. Type: ${values.service_type}. Preferred Date: ${format(values.preferred_date, "PPP")}`,
+        message: `Service Booking: ${values.vehicle_model}. Type: ${values.service_type}. Preferred Date: ${formatBSDate(values.preferred_date)} BS (${values.preferred_date} AD)`,
       });
       setSubmitted(true);
       toast({
@@ -194,37 +191,14 @@ export default function BookServicePage() {
                     render={({ field }) => (
                       <FormItem className="flex flex-col">
                         <FormLabel className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Preferred Date</FormLabel>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <FormControl>
-                              <Button
-                                variant={"outline"}
-                                className={cn(
-                                  "h-12 rounded-xl text-left font-normal pl-3",
-                                  !field.value && "text-muted-foreground"
-                                )}
-                              >
-                                {field.value ? (
-                                  format(field.value, "PPP")
-                                ) : (
-                                  <span>Pick a date</span>
-                                )}
-                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                              </Button>
-                            </FormControl>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar
-                              mode="single"
-                              selected={field.value}
-                              onSelect={field.onChange}
-                              disabled={(date) =>
-                                date < new Date() || date < new Date("1900-01-01")
-                              }
-                              initialFocus
-                            />
-                          </PopoverContent>
-                        </Popover>
+                        <FormControl>
+                          <BSDatePicker
+                            value={field.value}
+                            onChange={field.onChange}
+                            disablePast
+                            required
+                          />
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
