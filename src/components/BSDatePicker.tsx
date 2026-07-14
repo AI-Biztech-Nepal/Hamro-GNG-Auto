@@ -36,6 +36,7 @@ interface BSDatePickerProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonEl
   onChange: (adDateString: string) => void;
   /** Disallow picking a day before today (used for future-facing bookings). */
   disablePast?: boolean;
+  required?: boolean;
 }
 
 const BSDatePicker = forwardRef<HTMLButtonElement, BSDatePickerProps>(function BSDatePicker(
@@ -84,7 +85,7 @@ const BSDatePicker = forwardRef<HTMLButtonElement, BSDatePickerProps>(function B
           ref={ref}
           type="button"
           variant="outline"
-          required={required}
+          aria-required={required}
           className={cn(
             "h-12 w-full rounded-xl text-left font-normal justify-start px-3",
             !selectedBS && "text-muted-foreground",
