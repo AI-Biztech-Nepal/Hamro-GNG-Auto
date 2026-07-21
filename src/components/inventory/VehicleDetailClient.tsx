@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Calendar, Gauge, Bike, ChevronLeft, Phone, MessageCircle, Share2, ShieldCheck, MapPin } from 'lucide-react';
+import { Calendar, Bike, ChevronLeft, Phone, MessageCircle, Share2, ShieldCheck, MapPin } from 'lucide-react';
 import { CONTACT_INFO } from '@/lib/constants';
 import { Vehicle } from '@/types/vehicle';
 import {
@@ -95,19 +95,12 @@ export function VehicleDetailClient({ vehicle }: { vehicle: Vehicle }) {
           </div>
 
           {/* Specs Grid */}
-          <div className="bg-white p-8 rounded-3xl shadow-xl border grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="bg-white p-8 rounded-3xl shadow-xl border grid grid-cols-3 gap-8">
             <div className="space-y-2">
               <p className="text-[10px] text-muted-foreground uppercase font-black tracking-[0.2em]">Year</p>
               <div className="flex items-center gap-3 font-bold text-xl">
                 <div className="bg-primary/10 p-2 rounded-lg"><Calendar className="w-5 h-5 text-primary" /></div>
                 <span>{vehicle.year}</span>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <p className="text-[10px] text-muted-foreground uppercase font-black tracking-[0.2em]">KM Run</p>
-              <div className="flex items-center gap-3 font-bold text-xl">
-                <div className="bg-primary/10 p-2 rounded-lg"><Gauge className="w-5 h-5 text-primary" /></div>
-                <span>{vehicle.km_run.toLocaleString()} KM</span>
               </div>
             </div>
             <div className="space-y-2">
