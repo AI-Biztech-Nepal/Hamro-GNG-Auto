@@ -47,6 +47,9 @@ export default function BookServicePage() {
         name: values.name,
         phone: values.phone,
         message: `Service Booking: ${values.vehicle_model}. Type: ${values.service_type}. Preferred Date: ${formatBSDate(values.preferred_date)} BS (${values.preferred_date} AD)`,
+        requested_service: values.service_type,
+        vehicle_type: values.vehicle_model,
+        preferred_date: values.preferred_date,
       });
       setSubmitted(true);
       toast({
@@ -174,11 +177,11 @@ export default function BookServicePage() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="full-service">Full Service</SelectItem>
-                            <SelectItem value="oil-change">Oil Change Only</SelectItem>
-                            <SelectItem value="brake-repair">Brake Repair</SelectItem>
-                            <SelectItem value="engine-work">Engine Work</SelectItem>
-                            <SelectItem value="electrical">Electrical Repair</SelectItem>
+                            <SelectItem value="Full Service">Full Service</SelectItem>
+                            <SelectItem value="Oil Change">Oil Change Only</SelectItem>
+                            <SelectItem value="Brake Repair">Brake Repair</SelectItem>
+                            <SelectItem value="Engine Work">Engine Work</SelectItem>
+                            <SelectItem value="Electrical Repair">Electrical Repair</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />

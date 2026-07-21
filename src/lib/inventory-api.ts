@@ -100,6 +100,12 @@ export interface LeadInput {
   phone: string;
   message?: string;
   images?: string[];
+  /** Selected service, e.g. "Oil Change" — used for Book Service submissions. */
+  requested_service?: string;
+  /** Customer's vehicle/model, e.g. "Pulsar 150" — used for Book Service submissions. */
+  vehicle_type?: string;
+  /** Customer's chosen service date, ISO format (YYYY-MM-DD) — used for Book Service submissions. */
+  preferred_date?: string;
 }
 
 /** Submits a Sell / Exchange / Book Service form to the Auto-Stock-Manager admin's Leads screen. */
