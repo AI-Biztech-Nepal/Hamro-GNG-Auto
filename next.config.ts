@@ -38,7 +38,7 @@ const nextConfig: NextConfig = {
       {
         // Vehicle photos served by the Auto-Stock-Manager backend (inventory source of truth)
         protocol: 'https',
-        hostname: 'auto-stock-manager.onrender.com',
+        hostname: 'api.hamroauto.com.np',
         port: '',
         pathname: '/api/public/vehicles/**',
       },
