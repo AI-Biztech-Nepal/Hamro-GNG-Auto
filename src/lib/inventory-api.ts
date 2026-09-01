@@ -6,7 +6,7 @@
 import type { Vehicle } from '@/types/vehicle';
 
 const API_BASE =
-  process.env.NEXT_PUBLIC_INVENTORY_API_URL || 'https://auto-stock-manager.onrender.com';
+  process.env.NEXT_PUBLIC_INVENTORY_API_URL || 'https://api.hamroauto.com.np';
 
 /**
  * Hard ceiling on any single backend request. Without this a slow or
