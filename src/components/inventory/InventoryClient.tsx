@@ -23,6 +23,8 @@ export function InventoryClient({ vehicles }: { vehicles: Vehicle[] }) {
       const matchesBrand = brandFilter === 'all' || v.brand === brandFilter;
       return matchesSearch && matchesType && matchesBrand;
     }).sort((a, b) => {
+      // Snoozed (photoless) entries always sink to the bottom, whatever the sort.
+      if (a.has_photos !== b.has_photos) return a.has_photos ? -1 : 1;
       if (sortOrder === 'price-low') return a.price - b.price;
       if (sortOrder === 'price-high') return b.price - a.price;
       if (sortOrder === 'name-asc') return a.title.localeCompare(b.title);

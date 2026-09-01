@@ -15,5 +15,8 @@ export default async function Home() {
     }),
   ]);
 
-  return <HomeClient featuredVehicles={vehicles.slice(0, 8)} settings={settings} />;
+  // Snoozed (photoless) entries never make the homepage highlights.
+  const featuredVehicles = vehicles.filter(v => v.has_photos).slice(0, 8);
+
+  return <HomeClient featuredVehicles={featuredVehicles} settings={settings} />;
 }

@@ -15,6 +15,7 @@ export const MOCK_VEHICLES: Vehicle[] = [
     image_urls: ['https://picsum.photos/seed/mt15/600/400'],
     condition: 'Excellent',
     status: 'available',
+    has_photos: true,
     created_at: new Date().toISOString(),
     featured: true
   },
@@ -31,6 +32,7 @@ export const MOCK_VEHICLES: Vehicle[] = [
     image_urls: ['https://picsum.photos/seed/dio/600/400'],
     condition: 'Good',
     status: 'available',
+    has_photos: true,
     created_at: new Date().toISOString(),
     featured: true
   },
@@ -47,6 +49,7 @@ export const MOCK_VEHICLES: Vehicle[] = [
     image_urls: ['https://picsum.photos/seed/classic350/600/400'],
     condition: 'Excellent',
     status: 'available',
+    has_photos: true,
     created_at: new Date().toISOString(),
     featured: false
   },
@@ -63,6 +66,7 @@ export const MOCK_VEHICLES: Vehicle[] = [
     image_urls: ['https://picsum.photos/seed/burgman/600/400'],
     condition: 'Like New',
     status: 'available',
+    has_photos: true,
     created_at: new Date().toISOString(),
     featured: false
   },
@@ -79,6 +83,7 @@ export const MOCK_VEHICLES: Vehicle[] = [
     image_urls: ['https://picsum.photos/seed/ns200/600/400'],
     condition: 'Fair',
     status: 'sold',
+    has_photos: true,
     created_at: new Date().toISOString(),
     featured: false
   },
@@ -95,6 +100,7 @@ export const MOCK_VEHICLES: Vehicle[] = [
     image_urls: ['https://picsum.photos/seed/ntorq/600/400'],
     condition: 'Excellent',
     status: 'available',
+    has_photos: true,
     created_at: new Date().toISOString(),
     featured: false
   }

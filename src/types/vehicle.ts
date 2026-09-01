@@ -13,6 +13,12 @@ export interface Vehicle {
   price: number;
   description: string;
   image_urls: string[];
+  /**
+   * Whether the backend supplied at least one real photo for this vehicle.
+   * Photoless entries are "snoozed": kept off the homepage and pushed to the
+   * bottom of the inventory list until a staff member attaches a photo.
+   */
+  has_photos: boolean;
   condition: string;
   status: VehicleStatus;
   created_at: string;

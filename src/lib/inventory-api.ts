@@ -42,6 +42,8 @@ function toDescription(v: PublicVehicle): string {
 }
 
 function mapVehicle(v: PublicVehicle): Vehicle {
+  const photos = (Array.isArray(v.image_urls) ? v.image_urls : []).filter(Boolean);
+  const hasPhotos = photos.length > 0;
   return {
     id: v.id,
     title: v.title,
@@ -52,7 +54,8 @@ function mapVehicle(v: PublicVehicle): Vehicle {
     km_run: v.kilometer_run ?? 0,
     price: v.price ?? 0,
     description: toDescription(v),
-    image_urls: v.image_urls && v.image_urls.length > 0 ? v.image_urls : ['https://placehold.co/800x600'],
+    image_urls: hasPhotos ? photos : ['https://placehold.co/800x600'],
+    has_photos: hasPhotos,
     condition: v.condition,
     status: 'available',
     created_at: v.created_at ?? new Date().toISOString(),
@@ -60,12 +63,20 @@ function mapVehicle(v: PublicVehicle): Vehicle {
   };
 }
 
-/** All available vehicles, newest first (matches the backend's default sort). */
+/**
+ * All available vehicles, newest first (matches the backend's default sort),
+ * with photoless ("snoozed") entries moved to the bottom of the list.
+ */
 export async function fetchInventory(): Promise<Vehicle[]> {
   const res = await fetch(`${API_BASE}/api/public/vehicles`, { next: { revalidate: 60, tags: ['storefront-data'] } });
   if (!res.ok) throw new Error(`Failed to load inventory (${res.status})`);
   const data = await res.json();
-  return (data.vehicles as PublicVehicle[]).map(mapVehicle);
+  const vehicles = (data.vehicles as PublicVehicle[]).map(mapVehicle);
+  // Keep the backend order, then sink every photoless entry to the end.
+  return [
+    ...vehicles.filter(v => v.has_photos),
+    ...vehicles.filter(v => !v.has_photos),
+  ];
 }
 
 /** Single vehicle with its full photo gallery. Returns null if not found or not available (e.g. sold). */
