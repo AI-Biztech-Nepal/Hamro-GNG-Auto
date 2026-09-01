@@ -1,7 +1,7 @@
 import { InventoryClient } from '@/components/inventory/InventoryClient';
 import { fetchInventory } from '@/lib/inventory-api';
 
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export default async function InventoryPage() {
   const vehicles = await fetchInventory().catch(err => {

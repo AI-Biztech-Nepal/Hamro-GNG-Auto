@@ -1,7 +1,7 @@
 import { HomeClient } from '@/components/home/HomeClient';
 import { fetchInventory, fetchSettings } from '@/lib/inventory-api';
 
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export default async function Home() {
   const [vehicles, settings] = await Promise.all([

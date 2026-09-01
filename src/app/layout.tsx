@@ -5,8 +5,13 @@ import { Footer } from '@/components/layout/Footer';
 import { StickyBottomBar } from '@/components/layout/StickyBottomBar';
 import { Toaster } from '@/components/ui/toaster';
 import { TransitionProvider } from '@/components/layout/TransitionProvider';
-import { fetchSettings } from '@/lib/inventory-api';
+import { fetchSettings, type SiteSettings } from '@/lib/inventory-api';
 import { CONTACT_INFO } from '@/lib/constants';
+
+// Render at request time so a slow/unreachable backend never blocks the build.
+// Per-fetch `next: { revalidate, tags }` in inventory-api still caches responses
+// and keeps on-demand revalidation (revalidateTag) working.
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'G&G AUTO Enterprises - Best Second Hand Bikes in Kathmandu',
@@ -27,7 +32,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const settings = await fetchSettings().catch(err => {
+  const settings = await fetchSettings().catch((err): SiteSettings => {
     console.error('Failed to load site settings:', err);
     return {};
   });

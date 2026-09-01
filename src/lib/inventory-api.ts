@@ -8,6 +8,14 @@ import type { Vehicle } from '@/types/vehicle';
 const API_BASE =
   process.env.NEXT_PUBLIC_INVENTORY_API_URL || 'https://auto-stock-manager.onrender.com';
 
+/**
+ * Hard ceiling on any single backend request. Without this a slow or
+ * unreachable backend hangs page rendering until the host's build/runtime
+ * timeout, which is what broke the Hostinger deploy. On abort the callers'
+ * existing `.catch()` fallbacks take over.
+ */
+const REQUEST_TIMEOUT_MS = 8000;
+
 interface PublicVehicle {
   id: string;
   title: string;
@@ -68,7 +76,10 @@ function mapVehicle(v: PublicVehicle): Vehicle {
  * with photoless ("snoozed") entries moved to the bottom of the list.
  */
 export async function fetchInventory(): Promise<Vehicle[]> {
-  const res = await fetch(`${API_BASE}/api/public/vehicles`, { next: { revalidate: 60, tags: ['storefront-data'] } });
+  const res = await fetch(`${API_BASE}/api/public/vehicles`, {
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+    next: { revalidate: 60, tags: ['storefront-data'] },
+  });
   if (!res.ok) throw new Error(`Failed to load inventory (${res.status})`);
   const data = await res.json();
   const vehicles = (data.vehicles as PublicVehicle[]).map(mapVehicle);
@@ -81,7 +92,10 @@ export async function fetchInventory(): Promise<Vehicle[]> {
 
 /** Single vehicle with its full photo gallery. Returns null if not found or not available (e.g. sold). */
 export async function fetchVehicleById(id: string): Promise<Vehicle | null> {
-  const res = await fetch(`${API_BASE}/api/public/vehicles/${id}`, { next: { revalidate: 60, tags: ['storefront-data'] } });
+  const res = await fetch(`${API_BASE}/api/public/vehicles/${id}`, {
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+    next: { revalidate: 60, tags: ['storefront-data'] },
+  });
   if (res.status === 404) return null;
   if (!res.ok) throw new Error(`Failed to load vehicle (${res.status})`);
   const v = (await res.json()) as PublicVehicle;
@@ -100,7 +114,10 @@ export interface SiteSettings {
 
 /** Site branding/contact info, managed from the Auto-Stock-Manager admin panel. */
 export async function fetchSettings(): Promise<SiteSettings> {
-  const res = await fetch(`${API_BASE}/api/public/settings`, { next: { revalidate: 60, tags: ['storefront-data'] } });
+  const res = await fetch(`${API_BASE}/api/public/settings`, {
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+    next: { revalidate: 60, tags: ['storefront-data'] },
+  });
   if (!res.ok) throw new Error(`Failed to load settings (${res.status})`);
   return res.json();
 }
