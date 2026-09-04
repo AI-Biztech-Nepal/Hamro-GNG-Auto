@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Calendar, Bike, ChevronLeft, Phone, MessageCircle, Share2, ShieldCheck, MapPin } from 'lucide-react';
 import { CONTACT_INFO } from '@/lib/constants';
 import { Vehicle } from '@/types/vehicle';
+import { useToast } from '@/hooks/use-toast';
 import {
   Carousel,
   CarouselContent,
@@ -20,6 +21,7 @@ import { useEffect, useState } from 'react';
 
 export function VehicleDetailClient({ vehicle }: { vehicle: Vehicle }) {
   const router = useRouter();
+  const { toast } = useToast();
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
   const [count, setCount] = useState(0);
@@ -36,6 +38,27 @@ export function VehicleDetailClient({ vehicle }: { vehicle: Vehicle }) {
   const whatsappMessage = `Hello Hamro G&G Auto, I am interested in the ${vehicle.title} (${vehicle.year} model) priced at NPR ${vehicle.price.toLocaleString()}. Is it still available?`;
   const whatsappUrl = `https://wa.me/${CONTACT_INFO.whatsapp}?text=${encodeURIComponent(whatsappMessage)}`;
   const images = vehicle.image_urls || ['https://picsum.photos/seed/vehicle/800/600'];
+
+  const handleShare = async () => {
+    const url = typeof window !== 'undefined' ? window.location.href : '';
+    const shareData = {
+      title: vehicle.title,
+      text: `${vehicle.title} — NPR ${vehicle.price.toLocaleString()} at Hamro G&G Auto`,
+      url,
+    };
+    try {
+      if (typeof navigator !== 'undefined' && navigator.share) {
+        await navigator.share(shareData);
+        return;
+      }
+      await navigator.clipboard.writeText(url);
+      toast({ title: 'Link copied', description: 'Vehicle link copied to your clipboard.' });
+    } catch (err) {
+      // User dismissed the share sheet — not an error worth surfacing.
+      if (err instanceof DOMException && err.name === 'AbortError') return;
+      toast({ variant: 'destructive', title: "Couldn't share", description: 'Please copy the link from your address bar.' });
+    }
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 space-y-8 animate-in fade-in duration-500">
@@ -133,7 +156,7 @@ export function VehicleDetailClient({ vehicle }: { vehicle: Vehicle }) {
             <div className="space-y-4">
               <div className="flex justify-between items-start gap-4">
                 <h1 className="font-headline font-bold text-3xl md:text-4xl tracking-tight">{vehicle.title}</h1>
-                <Button variant="outline" size="icon" className="rounded-full h-12 w-12 shrink-0"><Share2 className="w-5 h-5" /></Button>
+                <Button variant="outline" size="icon" onClick={handleShare} aria-label="Share this vehicle" className="rounded-full h-12 w-12 shrink-0"><Share2 className="w-5 h-5" /></Button>
               </div>
               <div className="flex items-baseline gap-2 text-primary font-black text-5xl">
                 <span className="text-xl">NPR</span>
