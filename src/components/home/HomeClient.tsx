@@ -2,7 +2,7 @@
 "use client"
 
 import { Hero } from '@/components/home/Hero';
-import { VehicleCard } from '@/components/inventory/VehicleCard';
+import { VehicleBrowser } from '@/components/inventory/VehicleBrowser';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Shield, Clock, CheckCircle, ArrowRight, Calendar } from 'lucide-react';
@@ -25,27 +25,16 @@ export function HomeClient({ vehicles, settings }: { vehicles: Vehicle[]; settin
           <div className="space-y-4">
             <Badge className="bg-primary/10 text-primary border-none font-bold px-4 py-1">ALL VEHICLES</Badge>
             <h2 className="font-headline font-bold text-4xl md:text-5xl leading-tight">Our Full <br className="hidden md:block" /> Inventory</h2>
-            {vehicles.length > 0 && (
-              <p className="text-muted-foreground text-lg">
-                {vehicles.length} {vehicles.length === 1 ? 'vehicle' : 'vehicles'} available right now.
-              </p>
-            )}
+            <p className="text-muted-foreground text-lg max-w-xl">
+              Search, filter and sort our entire stock right here.
+            </p>
           </div>
           <Link href="/inventory" className="group flex items-center gap-2 text-primary font-bold text-lg hover:underline transition-all">
-            Search &amp; Filter <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            Open Inventory Page <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-8 min-h-[400px]">
-          {vehicles.map((vehicle, index) => (
-            <VehicleCard key={vehicle.id} vehicle={vehicle} isPriority={index < 4} />
-          ))}
-          {vehicles.length === 0 && (
-            <div className="col-span-full py-10 text-center text-muted-foreground bg-gray-50 rounded-[3rem]">
-              Check back soon for new inventory!
-            </div>
-          )}
-        </div>
+        <VehicleBrowser vehicles={vehicles} priorityCount={4} />
       </section>
 
       {/* Trust Badges - Below Inventory */}

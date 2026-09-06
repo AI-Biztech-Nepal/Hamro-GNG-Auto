@@ -15,12 +15,7 @@ export default async function Home() {
     }),
   ]);
 
-  // The homepage lists the whole storefront. Snoozed (photoless) entries still
-  // sink to the bottom, same as on /inventory, instead of being dropped.
-  const homeVehicles = [...vehicles].sort((a, b) => {
-    if (a.has_photos !== b.has_photos) return a.has_photos ? -1 : 1;
-    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-  });
-
-  return <HomeClient vehicles={homeVehicles} settings={settings} />;
+  // The homepage lists the whole storefront; VehicleBrowser applies the same
+  // filtering and sorting (photoless entries last) that /inventory uses.
+  return <HomeClient vehicles={vehicles} settings={settings} />;
 }
