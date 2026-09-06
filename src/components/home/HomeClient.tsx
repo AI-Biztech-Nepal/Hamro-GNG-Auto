@@ -11,7 +11,7 @@ import { Vehicle } from '@/types/vehicle';
 import type { SiteSettings } from '@/lib/inventory-api';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
-export function HomeClient({ featuredVehicles, settings }: { featuredVehicles: Vehicle[]; settings: SiteSettings }) {
+export function HomeClient({ vehicles, settings }: { vehicles: Vehicle[]; settings: SiteSettings }) {
   const maintenancePlaceholder = PlaceHolderImages.find(img => img.id === 'maintenance')?.imageUrl;
   const serviceImage = settings?.service_image_url || maintenancePlaceholder || "https://picsum.photos/seed/service/800/600";
 
@@ -19,23 +19,28 @@ export function HomeClient({ featuredVehicles, settings }: { featuredVehicles: V
     <div className="space-y-24 pb-20">
       <Hero settings={settings} />
 
-      {/* Featured Vehicles */}
-      <section className="max-w-7xl mx-auto px-4">
+      {/* Full Inventory */}
+      <section id="inventory" className="max-w-7xl mx-auto px-4 scroll-mt-24">
         <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-12 text-center md:text-left gap-6">
           <div className="space-y-4">
-            <Badge className="bg-primary/10 text-primary border-none font-bold px-4 py-1">HOT ARRIVALS</Badge>
-            <h2 className="font-headline font-bold text-4xl md:text-5xl leading-tight">Featured <br className="hidden md:block" /> Inventory</h2>
+            <Badge className="bg-primary/10 text-primary border-none font-bold px-4 py-1">ALL VEHICLES</Badge>
+            <h2 className="font-headline font-bold text-4xl md:text-5xl leading-tight">Our Full <br className="hidden md:block" /> Inventory</h2>
+            {vehicles.length > 0 && (
+              <p className="text-muted-foreground text-lg">
+                {vehicles.length} {vehicles.length === 1 ? 'vehicle' : 'vehicles'} available right now.
+              </p>
+            )}
           </div>
           <Link href="/inventory" className="group flex items-center gap-2 text-primary font-bold text-lg hover:underline transition-all">
-            View Full Inventory <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            Search &amp; Filter <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 min-h-[400px]">
-          {featuredVehicles.map((vehicle, index) => (
+        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-8 min-h-[400px]">
+          {vehicles.map((vehicle, index) => (
             <VehicleCard key={vehicle.id} vehicle={vehicle} isPriority={index < 4} />
           ))}
-          {featuredVehicles.length === 0 && (
+          {vehicles.length === 0 && (
             <div className="col-span-full py-10 text-center text-muted-foreground bg-gray-50 rounded-[3rem]">
               Check back soon for new inventory!
             </div>
