@@ -14,7 +14,8 @@ export function VehicleCard({ vehicle, isPriority = false }: VehicleCardProps) {
   const isSold = vehicle.status === 'sold';
   const meta = [
     String(vehicle.year),
-    vehicle.km_run > 0 ? `${vehicle.km_run.toLocaleString()} km` : null,
+    vehicle.engine_cc ? `${vehicle.engine_cc}cc` : null,
+    vehicle.km_run != null ? `${vehicle.km_run.toLocaleString()} km` : null,
     vehicle.condition,
   ].filter(Boolean).join('  ·  ');
 
