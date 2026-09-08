@@ -44,14 +44,21 @@ export function VehicleDetailClient({ vehicle }: { vehicle: Vehicle }) {
   const images = vehicle.image_urls?.length ? vehicle.image_urls : ['https://picsum.photos/seed/vehicle/800/600'];
   const isSold = vehicle.status === 'sold';
 
-  const specs: { label: string; value: string }[] = [
-    { label: 'Brand', value: vehicle.brand },
-    { label: 'Model', value: vehicle.model || vehicle.title },
-    { label: 'Year', value: String(vehicle.year) },
-    { label: 'Kilometres run', value: `${vehicle.km_run.toLocaleString()} km` },
-    { label: 'Type', value: vehicle.type === 'scooter' ? 'Scooter' : 'Bike' },
-    { label: 'Condition', value: vehicle.condition },
-  ];
+  const specs = (
+    [
+      { label: 'Brand', value: vehicle.brand },
+      { label: 'Model', value: [vehicle.model || vehicle.title, vehicle.variant].filter(Boolean).join(' ') },
+      { label: 'Year', value: String(vehicle.year) },
+      { label: 'Type', value: vehicle.type === 'scooter' ? 'Scooter' : 'Bike' },
+      vehicle.engine_cc ? { label: 'Engine', value: `${vehicle.engine_cc} cc` } : null,
+      vehicle.fuel_type ? { label: 'Fuel', value: vehicle.fuel_type } : null,
+      { label: 'Kilometres run', value: vehicle.km_run != null ? `${vehicle.km_run.toLocaleString()} km` : 'Ask at the showroom' },
+      vehicle.owners ? { label: 'Owners', value: vehicle.owners === 1 ? 'First owner' : `${vehicle.owners} previous owners` } : null,
+      vehicle.color ? { label: 'Colour', value: vehicle.color } : null,
+      vehicle.registration_number ? { label: 'Registration', value: vehicle.registration_number } : null,
+      { label: 'Condition', value: vehicle.condition },
+    ] as ({ label: string; value: string } | null)[]
+  ).filter((s): s is { label: string; value: string } => s !== null && s.value !== '');
 
   const handleShare = async () => {
     const url = typeof window !== 'undefined' ? window.location.href : '';

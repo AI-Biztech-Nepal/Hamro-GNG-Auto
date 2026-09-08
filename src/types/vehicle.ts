@@ -7,9 +7,17 @@ export interface Vehicle {
   title: string;
   brand: string;
   model: string;
+  variant: string | null;
   type: VehicleType;
   year: number;
-  km_run: number;
+  /** Odometer reading. `null` when the showroom hasn't recorded it (currently the norm). */
+  km_run: number | null;
+  engine_cc: number | null;
+  fuel_type: string | null;
+  color: string | null;
+  registration_number: string | null;
+  /** Number of previous owners, only when it's a sane recorded value (1–6). */
+  owners: number | null;
   price: number;
   description: string;
   image_urls: string[];

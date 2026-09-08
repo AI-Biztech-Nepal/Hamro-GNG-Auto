@@ -26,6 +26,7 @@ interface PublicVehicle {
   year: number;
   engine_cc: number | null;
   fuel_type: string | null;
+  ownership_number: number | null;
   kilometer_run: number | null;
   condition: string;
   color: string | null;
@@ -36,6 +37,10 @@ interface PublicVehicle {
   cover_photo?: string | null;
   image_urls: string[];
 }
+
+/** Backend odometer/owner fields carry 0s and out-of-range junk for "not recorded". */
+const cleanNumber = (n: number | null | undefined, min: number, max: number): number | null =>
+  typeof n === 'number' && n >= min && n <= max ? n : null;
 
 function toDescription(v: PublicVehicle): string {
   return [
@@ -57,9 +62,15 @@ function mapVehicle(v: PublicVehicle): Vehicle {
     title: v.title,
     brand: v.brand,
     model: v.model,
+    variant: v.variant || null,
     type: v.type,
     year: v.year,
-    km_run: v.kilometer_run ?? 0,
+    km_run: cleanNumber(v.kilometer_run, 1, 500000),
+    engine_cc: cleanNumber(v.engine_cc, 1, 2000),
+    fuel_type: v.fuel_type || null,
+    color: v.color || null,
+    registration_number: v.registration_number || null,
+    owners: cleanNumber(v.ownership_number, 1, 6),
     price: v.price ?? 0,
     description: toDescription(v),
     image_urls: hasPhotos ? photos : ['https://placehold.co/800x600'],
