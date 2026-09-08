@@ -4,30 +4,60 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;    /* White */
-    --foreground: 0 0% 10%;     /* Dark Charcoal */
+    --background: 0 0% 100%;        /* Paper white */
+    --foreground: 0 0% 9%;          /* Ink */
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 10%;
+    --card-foreground: 0 0% 9%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 10%;
-    --primary: 0 84% 44%;       /* Strong Red #CC1111 */
+    --popover-foreground: 0 0% 9%;
+    --primary: 0 0% 9%;            /* Ink black — CTAs, key emphasis */
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 0%;       /* Black */
+    --secondary: 0 0% 9%;         /* Dark bands */
     --secondary-foreground: 0 0% 100%;
     --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 45%;
-    --accent: 0 84% 44%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 84% 60%;
+    --muted-foreground: 0 0% 40%;  /* 4.6:1 on white */
+    --accent: 0 0% 95%;           /* Quiet hover surface */
+    --accent-foreground: 0 0% 9%;
+    --destructive: 0 72% 44%;     /* Sold / errors */
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89%;
-    --input: 0 0% 89%;
-    --ring: 0 84% 44%;
-    --radius: 1rem;
+    --border: 0 0% 90%;
+    --input: 0 0% 88%;
+    --ring: 0 0% 9%;
+    --radius: 0.625rem;
+
+    --surface: 0 0% 97%;          /* Alternating section ground */
+    --brand: 0 72% 44%;           /* Red accent — the 10%: titles, links, active state */
+    --brand-foreground: 0 0% 100%;
   }
 
   html {
     scroll-behavior: smooth;
+  }
+
+  body {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Browser surfaces themed from the palette */
+  ::selection {
+    background: hsl(0 0% 9%);
+    color: hsl(0 0% 100%);
+  }
+  html {
+    scrollbar-color: hsl(0 0% 72%) transparent;
+  }
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(0 0% 78%);
+    border: 2px solid hsl(0 0% 100%);
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(0 0% 62%);
   }
 }
 
@@ -38,42 +68,67 @@
   body {
     @apply bg-background text-foreground;
   }
+  h1, h2, h3, h4 {
+    letter-spacing: -0.02em;
+  }
+}
+
+/* Retired gradient text — kept as a solid-ink alias for existing markup */
+.text-gradient {
+  @apply text-foreground;
 }
 
 .sticky-bottom-bar {
-  @apply fixed bottom-0 left-0 right-0 z-50 bg-white border-t p-2 flex justify-around md:hidden;
-  box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
+  @apply fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-border p-2 flex justify-around md:hidden;
+  box-shadow: 0 -6px 20px -8px rgba(0, 0, 0, 0.12);
 }
 
-.glass-card {
-  @apply bg-white/80 backdrop-blur-md border border-white/20 shadow-xl;
-}
-
-.text-gradient {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-red-600;
-}
-
-/* Snappy, Professional Page Transition */
-@keyframes premium-page-enter {
-  0% {
+/* Page transition — one authored entrance, used once at the route level */
+@keyframes page-enter {
+  from {
     opacity: 0;
-    transform: translateY(4px);
+    transform: translateY(6px);
   }
-  100% {
+  to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
 .page-transition-premium {
-  /* Reduced from 0.7s to 0.3s for experienced developer feel */
-  animation: premium-page-enter 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: page-enter 0.34s cubic-bezier(0.16, 1, 0.3, 1) both;
   will-change: transform, opacity;
 }
 
-/* Global fast transitions for interactions */
+@media (prefers-reduced-motion: reduce) {
+  .page-transition-premium {
+    animation: none;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}
+
 button, a {
-  @apply transition-all duration-200 ease-out;
+  @apply transition-colors duration-200 ease-out;
+}
+
+/* Brand ticker — the hero's one authored motion */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marquee 38s linear infinite;
+}
+.marquee-mask {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 6rem, #000 calc(100% - 6rem), transparent);
+  mask-image: linear-gradient(to right, transparent, #000 6rem, #000 calc(100% - 6rem), transparent);
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee {
+    animation: none;
+  }
 }
 
 .no-scrollbar::-webkit-scrollbar {

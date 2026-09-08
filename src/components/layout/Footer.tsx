@@ -7,7 +7,7 @@ import { CONTACT_INFO } from '@/lib/constants';
 import type { SiteSettings } from '@/lib/inventory-api';
 
 export function Footer({ settings }: { settings: SiteSettings }) {
-  const logoImage = settings?.logo_url || CONTACT_INFO.logoUrl;
+  const logoImage = CONTACT_INFO.logoUrl;
   const businessName = settings?.business_name || CONTACT_INFO.businessName;
   const contactPhone = settings?.contact_phone || CONTACT_INFO.phone;
   const contactEmail = settings?.contact_email || CONTACT_INFO.email;
@@ -16,33 +16,19 @@ export function Footer({ settings }: { settings: SiteSettings }) {
   const whatsappUrl = `https://wa.me/${CONTACT_INFO.whatsapp}`;
 
   return (
-    <footer className="bg-primary text-white pt-12 pb-8">
-      <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8">
+    <footer className="bg-secondary text-white pt-16 pb-10">
+      <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10">
         <div className="space-y-6">
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-12 h-12 bg-white rounded-full overflow-hidden flex items-center justify-center relative border shadow-sm shrink-0">
-              <img 
-                src={logoImage} 
-                alt="Logo" 
-                className="w-full h-full object-cover"
-                loading="lazy"
-              />
-            </div>
-            <div className="flex flex-col space-y-[1px]">
-              <span className="text-[9px] font-bold tracking-tight text-white/80 leading-none uppercase">
-                Hamro
-              </span>
-              <span className="font-headline font-black text-lg md:text-xl tracking-normal leading-none text-white uppercase whitespace-nowrap">
-                G&G AUTO
-              </span>
-              <span className="text-[9px] font-bold tracking-tight text-white/50 leading-none uppercase">
-                Enterprises
-              </span>
-            </div>
+          <Link href="/" className="inline-flex bg-white rounded-md p-3 w-fit" aria-label="Hamro G&G Auto Enterprises — home">
+            <img
+              src={logoImage}
+              alt="Hamro G&G Auto Enterprises"
+              className="h-14 w-auto object-contain"
+              loading="lazy"
+            />
           </Link>
-          <p className="text-sm text-white/70 leading-relaxed font-medium">
-            Reliable second-hand bikes and scooters showroom in {address.split(',')[0]}. 
-            Sales, exchange, and servicing.
+          <p className="text-sm text-white/70 leading-relaxed">
+            Second-hand bikes and scooters in {address.split(',')[0]} &mdash; sales, exchange and servicing under one roof.
           </p>
           <div className="flex gap-4">
             <a href={CONTACT_INFO.facebook} target="_blank" rel="noopener noreferrer" className="bg-white/10 p-2 rounded-full hover:bg-white/20 transition-colors">
@@ -55,8 +41,8 @@ export function Footer({ settings }: { settings: SiteSettings }) {
         </div>
 
         <div>
-          <h4 className="font-bold text-lg mb-4 uppercase tracking-wider">Quick Links</h4>
-          <ul className="space-y-2 text-sm text-white/70 font-medium">
+          <h4 className="text-xs font-semibold mb-4 uppercase tracking-[0.14em] text-white/50">Quick Links</h4>
+          <ul className="space-y-2.5 text-sm text-white/75 font-medium">
             <li><Link href="/inventory" className="hover:text-white transition-colors">All Inventory</Link></li>
             <li><Link href="/sell" className="hover:text-white transition-colors">Sell Your Bike</Link></li>
             <li><Link href="/exchange" className="hover:text-white transition-colors">Exchange Offers</Link></li>
@@ -64,8 +50,8 @@ export function Footer({ settings }: { settings: SiteSettings }) {
         </div>
 
         <div>
-          <h4 className="font-bold text-lg mb-4 uppercase tracking-wider">Services</h4>
-          <ul className="space-y-2 text-sm text-white/70 font-medium">
+          <h4 className="text-xs font-semibold mb-4 uppercase tracking-[0.14em] text-white/50">Services</h4>
+          <ul className="space-y-2.5 text-sm text-white/75 font-medium">
             <li className="hover:text-white transition-colors">Used Bike Sales</li>
             <li className="hover:text-white transition-colors">Easy Exchange</li>
             <li className="hover:text-white transition-colors">Insurance Renewal</li>
@@ -74,8 +60,8 @@ export function Footer({ settings }: { settings: SiteSettings }) {
         </div>
 
         <div>
-          <h4 className="font-bold text-lg mb-4 uppercase tracking-wider">Contact Us</h4>
-          <ul className="space-y-3 text-sm text-white/70 font-medium">
+          <h4 className="text-xs font-semibold mb-4 uppercase tracking-[0.14em] text-white/50">Contact Us</h4>
+          <ul className="space-y-3 text-sm text-white/75 font-medium">
             <li className="flex items-start gap-3">
               <MapPin className="w-4 h-4 mt-1 shrink-0" />
               <span>{address}</span>
@@ -91,8 +77,8 @@ export function Footer({ settings }: { settings: SiteSettings }) {
           </ul>
         </div>
       </div>
-      <div className="max-w-7xl mx-auto px-4 mt-12 pt-8 border-t border-white/10 text-center text-[10px] text-white/30 tracking-widest uppercase font-bold">
-        <p>&copy; {new Date().getFullYear()} {businessName}.</p>
+      <div className="max-w-7xl mx-auto px-4 mt-14 pt-8 border-t border-white/10 text-[11px] text-white/45 tracking-wide uppercase font-semibold">
+        <p>&copy; {new Date().getFullYear()} {businessName}</p>
       </div>
     </footer>
   );

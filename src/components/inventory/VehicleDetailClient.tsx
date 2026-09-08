@@ -3,9 +3,8 @@
 
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Calendar, Bike, ChevronLeft, Phone, MessageCircle, Share2, ShieldCheck, MapPin } from 'lucide-react';
+import { ChevronLeft, Phone, MessageCircle, Share2, ShieldCheck, FileCheck, MapPin } from 'lucide-react';
 import { CONTACT_INFO } from '@/lib/constants';
 import { Vehicle } from '@/types/vehicle';
 import { useToast } from '@/hooks/use-toast';
@@ -19,25 +18,40 @@ import {
 } from "@/components/ui/carousel";
 import { useEffect, useState } from 'react';
 
+/*
+  VEHICLE DETAIL — "One sheet"
+  THESIS: a single spec sheet that scrolls as one object. No sticky sidebar, no
+    floating panels drifting past each other — gallery, summary and details sit
+    on one hairline-ruled page.
+  OWN-WORLD: Ink & Paper. Contained column, ink price, plain spec table with
+    row rules, no nested cards.
+*/
+
 export function VehicleDetailClient({ vehicle }: { vehicle: Vehicle }) {
   const router = useRouter();
   const { toast } = useToast();
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
-  const [count, setCount] = useState(0);
 
   useEffect(() => {
     if (!api) return;
-    setCount(api.scrollSnapList().length);
-    setCurrent(api.selectedScrollSnap() + 1);
-    api.on("select", () => {
-      setCurrent(api.selectedScrollSnap() + 1);
-    });
+    setCurrent(api.selectedScrollSnap());
+    api.on("select", () => setCurrent(api.selectedScrollSnap()));
   }, [api]);
 
   const whatsappMessage = `Hello Hamro G&G Auto, I am interested in the ${vehicle.title} (${vehicle.year} model) priced at NPR ${vehicle.price.toLocaleString()}. Is it still available?`;
   const whatsappUrl = `https://wa.me/${CONTACT_INFO.whatsapp}?text=${encodeURIComponent(whatsappMessage)}`;
-  const images = vehicle.image_urls || ['https://picsum.photos/seed/vehicle/800/600'];
+  const images = vehicle.image_urls?.length ? vehicle.image_urls : ['https://picsum.photos/seed/vehicle/800/600'];
+  const isSold = vehicle.status === 'sold';
+
+  const specs: { label: string; value: string }[] = [
+    { label: 'Brand', value: vehicle.brand },
+    { label: 'Model', value: vehicle.model || vehicle.title },
+    { label: 'Year', value: String(vehicle.year) },
+    { label: 'Kilometres run', value: `${vehicle.km_run.toLocaleString()} km` },
+    { label: 'Type', value: vehicle.type === 'scooter' ? 'Scooter' : 'Bike' },
+    { label: 'Condition', value: vehicle.condition },
+  ];
 
   const handleShare = async () => {
     const url = typeof window !== 'undefined' ? window.location.href : '';
@@ -54,158 +68,158 @@ export function VehicleDetailClient({ vehicle }: { vehicle: Vehicle }) {
       await navigator.clipboard.writeText(url);
       toast({ title: 'Link copied', description: 'Vehicle link copied to your clipboard.' });
     } catch (err) {
-      // User dismissed the share sheet — not an error worth surfacing.
       if (err instanceof DOMException && err.name === 'AbortError') return;
       toast({ variant: 'destructive', title: "Couldn't share", description: 'Please copy the link from your address bar.' });
     }
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 space-y-8 animate-in fade-in duration-500">
-      <div className="flex items-center gap-2">
-        <Button variant="ghost" size="sm" onClick={() => router.back()} className="rounded-full">
-          <ChevronLeft className="w-4 h-4 mr-1" /> Back
-        </Button>
-        <span className="text-sm text-muted-foreground">Inventory / {vehicle.title}</span>
-      </div>
+    <div className="max-w-5xl mx-auto px-4 py-6 sm:py-10">
+      <button
+        onClick={() => router.back()}
+        className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground"
+      >
+        <ChevronLeft className="w-4 h-4" /> Back to inventory
+      </button>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Left Column: Media */}
-        <div className="lg:col-span-8 space-y-6">
-          <div className="bg-gray-100 rounded-3xl overflow-hidden shadow-sm relative group">
+      <div className="mt-6 lg:grid lg:grid-cols-[1.35fr_1fr] lg:gap-x-12 lg:gap-y-10">
+        {/* Gallery */}
+        <div className="lg:col-start-1 lg:row-start-1">
+          <div className="relative overflow-hidden rounded-lg border border-border bg-neutral-100 group">
             <Carousel setApi={setApi} className="w-full">
               <CarouselContent>
                 {images.map((url, index) => (
                   <CarouselItem key={index}>
-                    <div className="relative flex items-center justify-center bg-gray-100 min-h-[400px] md:min-h-[600px] w-full">
+                    <div className="relative aspect-[4/3] w-full">
                       <Image
                         src={url}
-                        alt={`${vehicle.title} - Image ${index + 1}`}
+                        alt={`${vehicle.title} — photo ${index + 1}`}
                         fill
                         priority={index === 0}
-                        className="object-contain transition-transform duration-500"
+                        sizes="(max-width: 1024px) 100vw, 55vw"
+                        className="object-cover object-center"
                       />
                     </div>
                   </CarouselItem>
                 ))}
               </CarouselContent>
-
               {images.length > 1 && (
                 <>
-                  <CarouselPrevious className="left-4 opacity-0 group-hover:opacity-100 transition-opacity bg-white/80 backdrop-blur-sm border-none shadow-lg h-12 w-12" />
-                  <CarouselNext className="right-4 opacity-0 group-hover:opacity-100 transition-opacity bg-white/80 backdrop-blur-sm border-none shadow-lg h-12 w-12" />
-
-                  {/* Indicators / Dots */}
-                  <div className="absolute bottom-6 left-0 right-0 flex justify-center gap-2 z-20">
-                    {images.map((_, i) => (
-                      <div
-                        key={i}
-                        className={`h-2 rounded-full transition-all duration-300 ${
-                          current === i + 1 ? 'w-8 bg-primary' : 'w-2 bg-white/60'
-                        }`}
-                      />
-                    ))}
-                  </div>
+                  <CarouselPrevious className="left-3 opacity-0 group-hover:opacity-100 transition-opacity bg-white border border-border shadow-sm h-10 w-10" />
+                  <CarouselNext className="right-3 opacity-0 group-hover:opacity-100 transition-opacity bg-white border border-border shadow-sm h-10 w-10" />
                 </>
               )}
             </Carousel>
 
-            {vehicle.status === 'sold' && (
-              <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-30">
-                <span className="text-white font-black text-4xl md:text-7xl tracking-widest -rotate-12 border-8 border-white p-6 rounded-xl">SOLD</span>
+            {isSold && (
+              <div className="absolute inset-0 bg-black/55 flex items-center justify-center">
+                <span className="text-white font-bold text-3xl md:text-5xl tracking-[0.2em] border-2 border-white px-6 py-3">SOLD</span>
               </div>
             )}
           </div>
 
-          {/* Specs Grid */}
-          <div className="bg-white p-8 rounded-3xl shadow-xl border grid grid-cols-3 gap-8">
-            <div className="space-y-2">
-              <p className="text-[10px] text-muted-foreground uppercase font-black tracking-[0.2em]">Year</p>
-              <div className="flex items-center gap-3 font-bold text-xl">
-                <div className="bg-primary/10 p-2 rounded-lg"><Calendar className="w-5 h-5 text-primary" /></div>
-                <span>{vehicle.year}</span>
-              </div>
+          {images.length > 1 && (
+            <div className="mt-3 flex gap-2 overflow-x-auto no-scrollbar">
+              {images.map((url, i) => (
+                <button
+                  key={i}
+                  onClick={() => api?.scrollTo(i)}
+                  aria-label={`View photo ${i + 1}`}
+                  className={`relative h-14 w-[74px] shrink-0 overflow-hidden rounded border bg-neutral-100 transition-colors ${
+                    current === i ? 'border-brand ring-1 ring-brand' : 'border-border hover:border-foreground/40'
+                  }`}
+                >
+                  <Image src={url} alt="" fill sizes="80px" className="object-cover object-center" />
+                </button>
+              ))}
             </div>
-            <div className="space-y-2">
-              <p className="text-[10px] text-muted-foreground uppercase font-black tracking-[0.2em]">Brand</p>
-              <div className="flex items-center gap-3 font-bold text-xl">
-                <div className="bg-primary/10 p-2 rounded-lg"><Bike className="w-5 h-5 text-primary" /></div>
-                <span>{vehicle.brand}</span>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <p className="text-[10px] text-muted-foreground uppercase font-black tracking-[0.2em]">Condition</p>
-              <div className="flex items-center gap-3 font-bold text-xl">
-                <div className="bg-primary/10 p-2 rounded-lg"><ShieldCheck className="w-5 h-5 text-primary" /></div>
-                <span>{vehicle.condition}</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-xl border space-y-6">
-            <h2 className="font-headline font-bold text-3xl">Owner's Description</h2>
-            <div className="prose prose-lg max-w-none text-muted-foreground leading-relaxed whitespace-pre-wrap font-medium">
-              {vehicle.description}
-            </div>
-          </div>
+          )}
         </div>
 
-        {/* Right Column: Pricing and CTA */}
-        <div className="lg:col-span-4 space-y-6">
-          <div className="bg-white p-8 md:p-10 rounded-[3rem] shadow-2xl border-4 border-gray-50 space-y-8 sticky top-24">
-            <div className="space-y-4">
-              <div className="flex justify-between items-start gap-4">
-                <h1 className="font-headline font-bold text-3xl md:text-4xl tracking-tight">{vehicle.title}</h1>
-                <Button variant="outline" size="icon" onClick={handleShare} aria-label="Share this vehicle" className="rounded-full h-12 w-12 shrink-0"><Share2 className="w-5 h-5" /></Button>
-              </div>
-              <div className="flex items-baseline gap-2 text-primary font-black text-5xl">
-                <span className="text-xl">NPR</span>
-                <span>{vehicle.price.toLocaleString()}</span>
-              </div>
-              <Badge className="bg-green-100 text-green-700 hover:bg-green-200 border-none px-4 py-1.5 rounded-full font-bold text-xs">
-                {vehicle.status.toUpperCase()}
-              </Badge>
-            </div>
+        {/* Summary — title, price, actions, specs */}
+        <div className="mt-8 lg:mt-0 lg:col-start-2 lg:row-start-1 lg:row-span-2">
+          <div className="flex items-start justify-between gap-4">
+            <h1 className="font-headline font-bold text-2xl sm:text-3xl md:text-4xl tracking-tight leading-tight">
+              {vehicle.title}
+            </h1>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handleShare}
+              aria-label="Share this vehicle"
+              className="rounded-md h-10 w-10 shrink-0"
+            >
+              <Share2 className="w-4 h-4" />
+            </Button>
+          </div>
 
-            <div className="space-y-4 pt-4">
-              <Button
-                className="w-full h-16 bg-primary hover:bg-primary/90 text-xl font-bold gap-3 rounded-2xl shadow-xl shadow-primary/20"
-                asChild
-              >
+          <div className="mt-4 flex items-baseline gap-2">
+            <span className="text-sm font-semibold text-muted-foreground">NPR</span>
+            <span className="font-headline text-3xl sm:text-4xl font-bold tracking-tight tabular-nums">
+              {vehicle.price.toLocaleString()}
+            </span>
+          </div>
+          <p className="mt-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-brand">
+            {isSold ? 'Sold' : 'Available now'}
+            <span className="ml-2 font-normal normal-case tracking-normal text-muted-foreground">
+              {isSold ? '' : 'Fixed price · genuine paperwork'}
+            </span>
+          </p>
+
+          {!isSold && (
+            <div className="mt-6 grid grid-cols-2 gap-3">
+              <Button className="h-12 text-base font-semibold gap-2" asChild>
                 <a href={`tel:${CONTACT_INFO.phone}`}>
-                  <Phone className="w-6 h-6" /> Call Now
+                  <Phone className="w-4 h-4" /> Call
                 </a>
               </Button>
               <Button
-                className="w-full h-16 bg-[#25D366] hover:bg-[#25D366]/90 text-white text-xl font-bold gap-3 border-none rounded-2xl shadow-xl shadow-green-500/20"
+                className="h-12 text-base font-semibold gap-2 bg-[#25D366] hover:bg-[#25D366]/90 text-white border-none"
                 asChild
               >
                 <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
-                  <MessageCircle className="w-6 h-6" /> WhatsApp
+                  <MessageCircle className="w-4 h-4" /> WhatsApp
                 </a>
               </Button>
             </div>
+          )}
 
-            <div className="pt-8 border-t space-y-6">
-              <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-2xl">
-                <div className="bg-white p-2 rounded-xl shadow-sm"><MapPin className="w-6 h-6 text-primary" /></div>
-                <div className="text-sm">
-                  <p className="font-bold text-foreground">Showroom Location</p>
-                  <a
-                    href={CONTACT_INFO.mapsLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-muted-foreground hover:text-primary transition-colors font-medium"
-                  >
-                    {CONTACT_INFO.address}
-                  </a>
-                </div>
+          <dl className="mt-8 border-t border-border">
+            {specs.map(({ label, value }) => (
+              <div key={label} className="flex items-center justify-between gap-4 border-b border-border py-3">
+                <dt className="text-sm text-muted-foreground">{label}</dt>
+                <dd className="text-sm font-semibold text-right">{value}</dd>
               </div>
-              <div className="flex items-center gap-3 p-4 bg-primary/5 rounded-2xl text-primary text-sm font-bold border border-primary/10">
-                <ShieldCheck className="w-6 h-6" />
-                <span>Genuine Paperwork Guaranteed</span>
-              </div>
-            </div>
+            ))}
+          </dl>
+        </div>
+
+        {/* Description + reassurance */}
+        <div className="mt-10 lg:mt-0 lg:col-start-1 lg:row-start-2">
+          {vehicle.description?.trim() && (
+            <section>
+              <h2 className="font-headline font-bold text-xl">Description</h2>
+              <p className="mt-3 text-[15px] leading-relaxed text-muted-foreground whitespace-pre-wrap">
+                {vehicle.description}
+              </p>
+            </section>
+          )}
+
+          <div className="mt-8 border-t border-border pt-6 flex flex-wrap gap-x-8 gap-y-3 text-sm text-muted-foreground">
+            <span className="flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 shrink-0 text-brand" /> Passed our 40-point inspection
+            </span>
+            <span className="flex items-center gap-2">
+              <FileCheck className="w-4 h-4 shrink-0 text-brand" /> Genuine paperwork, transfer handled
+            </span>
+            <a
+              href={CONTACT_INFO.mapsLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 hover:text-foreground"
+            >
+              <MapPin className="w-4 h-4 shrink-0 text-brand" /> {CONTACT_INFO.address}
+            </a>
           </div>
         </div>
       </div>
