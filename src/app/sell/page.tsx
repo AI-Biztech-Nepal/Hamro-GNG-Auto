@@ -123,38 +123,31 @@ export default function SellPage() {
         {/* Left Content */}
         <div className="lg:col-span-5 space-y-8">
           <div className="space-y-6">
-            <div className="bg-primary/10 p-4 rounded-3xl w-fit">
-              <Camera className="w-10 h-10 text-primary" />
-            </div>
-            <h1 className="font-headline font-bold text-5xl leading-tight">Sell Your Bike <br /><span className="text-primary">Online</span></h1>
+            <span aria-hidden className="block w-8 h-1 bg-brand" />
+            <h1 className="font-headline font-bold text-4xl md:text-5xl leading-tight tracking-tight">Sell your bike, <br />skip the showroom trips.</h1>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              Skip the showroom visits. Upload photos of your bike and send us the details. We'll give you a professional price evaluation within 30 minutes.
+              Upload a few photos and the details. We&rsquo;ll come back with a straight
+              price once we&rsquo;ve seen them &mdash; usually the same day.
             </p>
           </div>
-          
-          <div className="space-y-4">
-            <div className="flex items-center gap-4 p-4 bg-white rounded-2xl border shadow-sm">
-              <div className="bg-green-100 p-2 rounded-full"><CheckCircle2 className="w-5 h-5 text-green-600" /></div>
-              <p className="font-bold">Instant Online Valuation</p>
-            </div>
-            <div className="flex items-center gap-4 p-4 bg-white rounded-2xl border shadow-sm">
-              <div className="bg-green-100 p-2 rounded-full"><CheckCircle2 className="w-5 h-5 text-green-600" /></div>
-              <p className="font-bold">Free Doorstep Inspection</p>
-            </div>
-            <div className="flex items-center gap-4 p-4 bg-white rounded-2xl border shadow-sm">
-              <div className="bg-green-100 p-2 rounded-full"><CheckCircle2 className="w-5 h-5 text-green-600" /></div>
-              <p className="font-bold">Immediate Payment</p>
-            </div>
+
+          <div className="border-t border-border">
+            {['Fair valuation from photos', 'Free inspection at your door', 'Immediate payment on the deal'].map(item => (
+              <div key={item} className="flex items-center gap-3 border-b border-border py-3.5">
+                <CheckCircle2 className="w-5 h-5 shrink-0 text-brand" strokeWidth={2} />
+                <p className="font-medium">{item}</p>
+              </div>
+            ))}
           </div>
         </div>
 
         {/* Right Form */}
         <div className="lg:col-span-7">
-          <div className="bg-white p-8 md:p-12 rounded-[3rem] shadow-2xl border border-gray-100">
+          <div className="bg-white p-8 md:p-12 rounded-xl border border-border">
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                 <div className="space-y-6">
-                  <h3 className="text-2xl font-bold font-headline border-l-4 border-primary pl-4">Vehicle Details</h3>
+                  <h3 className="text-2xl font-bold font-headline border-l-2 border-brand pl-3">Vehicle Details</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <FormField
                       control={form.control}
@@ -162,7 +155,7 @@ export default function SellPage() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Full Name</FormLabel>
-                          <FormControl><Input placeholder="Your Name" className="h-12 rounded-xl" {...field} /></FormControl>
+                          <FormControl><Input placeholder="Your Name" className="h-11 rounded-md" {...field} /></FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -173,7 +166,7 @@ export default function SellPage() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Phone Number</FormLabel>
-                          <FormControl><Input placeholder="98XXXXXXXX" className="h-12 rounded-xl" {...field} /></FormControl>
+                          <FormControl><Input placeholder="98XXXXXXXX" className="h-11 rounded-md" {...field} /></FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -184,7 +177,7 @@ export default function SellPage() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Brand</FormLabel>
-                          <FormControl><Input placeholder="e.g. Honda" className="h-12 rounded-xl" {...field} /></FormControl>
+                          <FormControl><Input placeholder="e.g. Honda" className="h-11 rounded-md" {...field} /></FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -195,7 +188,7 @@ export default function SellPage() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Model</FormLabel>
-                          <FormControl><Input placeholder="e.g. Dio BS6" className="h-12 rounded-xl" {...field} /></FormControl>
+                          <FormControl><Input placeholder="e.g. Dio BS6" className="h-11 rounded-md" {...field} /></FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -206,7 +199,7 @@ export default function SellPage() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Model Year</FormLabel>
-                          <FormControl><Input placeholder="2022" className="h-12 rounded-xl" {...field} /></FormControl>
+                          <FormControl><Input placeholder="2022" className="h-11 rounded-md" {...field} /></FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -217,7 +210,7 @@ export default function SellPage() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Total KM Run</FormLabel>
-                          <FormControl><Input placeholder="12000" className="h-12 rounded-xl" {...field} /></FormControl>
+                          <FormControl><Input placeholder="12000" className="h-11 rounded-md" {...field} /></FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -228,7 +221,7 @@ export default function SellPage() {
                       render={({ field }) => (
                         <FormItem className="col-span-full">
                           <FormLabel className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Expected Price (NPR)</FormLabel>
-                          <FormControl><Input placeholder="e.g. 185000" className="h-12 rounded-xl" {...field} /></FormControl>
+                          <FormControl><Input placeholder="e.g. 185000" className="h-11 rounded-md" {...field} /></FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -238,10 +231,10 @@ export default function SellPage() {
                     <div className="col-span-full space-y-4 pt-4 border-t">
                       <div className="flex items-center justify-between">
                         <FormLabel className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                          <ImageIcon className="w-4 h-4 text-primary" /> Vehicle Photos (Max 6)
+                          <ImageIcon className="w-4 h-4 text-brand" /> Vehicle Photos (Max 6)
                         </FormLabel>
                         <div className="flex items-center gap-4">
-                          {isCompressing && <div className="flex items-center gap-2 text-primary font-bold animate-pulse text-[10px]"><Loader2 className="w-3 h-3 animate-spin" /> Optimizing...</div>}
+                          {isCompressing && <div className="flex items-center gap-2 text-brand font-bold animate-pulse text-[10px]"><Loader2 className="w-3 h-3 animate-spin" /> Optimizing...</div>}
                           <span className="text-[10px] text-muted-foreground font-bold">{form.watch('images').length} / 6</span>
                         </div>
                       </div>
@@ -260,7 +253,7 @@ export default function SellPage() {
                           </div>
                         ))}
                         {form.watch('images').length < 6 && (
-                          <label className="aspect-square rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center cursor-pointer hover:border-primary/40 hover:bg-primary/5 transition-all text-muted-foreground hover:text-primary group">
+                          <label className="aspect-square rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center cursor-pointer hover:border-foreground/40 hover:bg-brand/10 transition-all text-muted-foreground hover:text-brand group">
                             <Plus className="w-6 h-6 mb-1 group-hover:scale-110 transition-transform" />
                             <span className="text-[10px] font-bold uppercase">Add Photo</span>
                             <input 
@@ -292,11 +285,11 @@ export default function SellPage() {
                 </div>
 
                 <div className="pt-4">
-                  <Button type="submit" disabled={loading || isCompressing} className="w-full h-14 bg-primary text-xl font-bold rounded-2xl shadow-xl shadow-primary/20 hover:scale-[1.02] transition-transform">
-                    {loading ? <Loader2 className="animate-spin" /> : "Request Online Price Evaluation"}
+                  <Button type="submit" disabled={loading || isCompressing} className="w-full h-12 text-base font-semibold rounded-md">
+                    {loading ? <Loader2 className="animate-spin" /> : "Request a price"}
                   </Button>
-                  <p className="text-center text-[10px] text-muted-foreground mt-4 uppercase tracking-widest font-bold">
-                    Safe • Secure • No Obligation
+                  <p className="text-center text-[11px] text-muted-foreground mt-4 uppercase tracking-widest font-semibold">
+                    No obligation &middot; we&rsquo;ll call you back
                   </p>
                 </div>
               </form>

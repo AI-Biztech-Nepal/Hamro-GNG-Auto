@@ -6,24 +6,104 @@ import { StickyBottomBar } from '@/components/layout/StickyBottomBar';
 import { Toaster } from '@/components/ui/toaster';
 import { TransitionProvider } from '@/components/layout/TransitionProvider';
 import { fetchSettings, type SiteSettings } from '@/lib/inventory-api';
-import { CONTACT_INFO } from '@/lib/constants';
+import { CONTACT_INFO, SITE_URL } from '@/lib/constants';
 
 // Render at request time so a slow/unreachable backend never blocks the build.
 // Per-fetch `next: { revalidate, tags }` in inventory-api still caches responses
 // and keeps on-demand revalidation (revalidateTag) working.
 export const dynamic = 'force-dynamic';
 
+const DESCRIPTION =
+  'G&G Auto Enterprises is a used two-wheeler showroom in Nayabasti, Boudha, Kathmandu. ' +
+  'Every second-hand bike and scooter is inspected on 40 points, comes with genuine paperwork, ' +
+  'and is sold at a fixed fair price. Buy, sell, exchange and service two-wheelers in one place.';
+
 export const metadata: Metadata = {
-  title: 'G&G AUTO Enterprises - Best Second Hand Bikes in Kathmandu',
-  description: 'G&G AUTO provides reliable, inspected, and fairly priced second-hand two-wheelers in Kathmandu, Nepal.',
-  icons: {
-    icon: [
-      { url: CONTACT_INFO.logoUrl },
-      { url: CONTACT_INFO.logoUrl, rel: 'shortcut icon' },
-    ],
-    apple: [
-      { url: CONTACT_INFO.logoUrl },
-    ],
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: 'G&G Auto Enterprises — Second-hand Bikes & Scooters in Kathmandu',
+    template: '%s | G&G Auto Enterprises',
+  },
+  description: DESCRIPTION,
+  applicationName: 'G&G Auto Enterprises',
+  keywords: [
+    'second hand bikes Kathmandu',
+    'used scooters Nepal',
+    'used motorcycle Kathmandu',
+    'bike exchange Nepal',
+    'sell my bike Kathmandu',
+    'bike servicing Boudha',
+    'Honda Dio used',
+    'G&G Auto Enterprises',
+    'Hamro G&G Auto',
+  ],
+  authors: [{ name: 'G&G Auto Enterprises' }],
+  creator: 'G&G Auto Enterprises',
+  publisher: 'G&G Auto Enterprises',
+  alternates: { canonical: '/' },
+  category: 'automotive',
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1 },
+  },
+  openGraph: {
+    type: 'website',
+    siteName: 'G&G Auto Enterprises',
+    title: 'G&G Auto Enterprises — Second-hand Bikes & Scooters in Kathmandu',
+    description: DESCRIPTION,
+    url: SITE_URL,
+    locale: 'en_NP',
+    images: [{ url: '/og.jpg', width: 1200, height: 630, alt: 'G&G Auto Enterprises' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'G&G Auto Enterprises — Second-hand Bikes & Scooters in Kathmandu',
+    description: DESCRIPTION,
+    images: ['/og.jpg'],
+  },
+};
+
+const orgJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'AutomotiveBusiness',
+  '@id': `${SITE_URL}/#business`,
+  name: CONTACT_INFO.businessName,
+  alternateName: 'Hamro G&G Auto',
+  description: DESCRIPTION,
+  url: SITE_URL,
+  logo: `${SITE_URL}/logo.png`,
+  image: `${SITE_URL}/og.jpg`,
+  telephone: `+977${CONTACT_INFO.phone}`,
+  email: CONTACT_INFO.email,
+  priceRange: 'NPR',
+  currenciesAccepted: 'NPR',
+  paymentAccepted: 'Cash, Bank transfer',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: CONTACT_INFO.address,
+    addressLocality: CONTACT_INFO.addressLocality,
+    addressRegion: CONTACT_INFO.region,
+    addressCountry: CONTACT_INFO.country,
+  },
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: CONTACT_INFO.geo.lat,
+    longitude: CONTACT_INFO.geo.lng,
+  },
+  hasMap: CONTACT_INFO.mapsLink,
+  openingHoursSpecification: [
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+      opens: '09:00',
+      closes: '19:00',
+    },
+  ],
+  sameAs: [CONTACT_INFO.facebook],
+  makesOffer: {
+    '@type': 'Offer',
+    itemOffered: { '@type': 'Service', name: 'Used two-wheeler sales, exchange and servicing' },
   },
 };
 
@@ -46,9 +126,12 @@ export default async function RootLayout({
         <link rel="preconnect" href="https://images.unsplash.com" />
         <link rel="preconnect" href="https://picsum.photos" />
 
-        {/* Instant Asset Delivery: Preload branding visuals with high fetch priority */}
-        <link rel="preload" as="image" href={settings.logo_url || CONTACT_INFO.logoUrl} fetchPriority="high" />
-        <link rel="preload" as="image" href={settings.hero_image_url || CONTACT_INFO.heroUrl} fetchPriority="high" />
+        {/* Preload the brand mark shown in the header */}
+        <link rel="preload" as="image" href="/logo.png" fetchPriority="high" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
+        />
       </head>
       <body className="font-body antialiased min-h-screen">
         <Navbar settings={settings} />

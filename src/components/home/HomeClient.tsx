@@ -1,97 +1,52 @@
 
 "use client"
 
-import { Hero } from '@/components/home/Hero';
 import { VehicleBrowser } from '@/components/inventory/VehicleBrowser';
-import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { Shield, Clock, CheckCircle, ArrowRight, Calendar } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { ArrowUpRight } from 'lucide-react';
 import { Vehicle } from '@/types/vehicle';
 import type { SiteSettings } from '@/lib/inventory-api';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
+
+const elsewhere = [
+  { title: 'Service your bike', body: 'Same-day general servicing and repairs for every major brand.', href: '/book-service' },
+  { title: 'Sell or exchange', body: 'Send photos and details, get a fair valuation the same day.', href: '/sell' },
+];
 
 export function HomeClient({ vehicles, settings }: { vehicles: Vehicle[]; settings: SiteSettings }) {
-  const maintenancePlaceholder = PlaceHolderImages.find(img => img.id === 'maintenance')?.imageUrl;
-  const serviceImage = settings?.service_image_url || maintenancePlaceholder || "https://picsum.photos/seed/service/800/600";
-
   return (
-    <div className="space-y-24 pb-20">
-      <Hero settings={settings} />
+    <div className="max-w-7xl mx-auto px-4 py-8 sm:py-12 pb-24">
+      {/* Brief introduction */}
+      <header className="max-w-2xl">
+        <span aria-hidden className="block w-8 h-1 bg-brand mb-4" />
+        <h1 className="font-headline font-bold text-3xl md:text-[2.75rem] leading-[1.1] tracking-tight">
+          Second-hand bikes &amp; scooters, ready to ride.
+        </h1>
+        <p className="mt-4 text-[15px] md:text-base text-muted-foreground leading-relaxed">
+          G&amp;G Auto is a used two-wheeler showroom in Nayabasti, Boudha. Every bike on the
+          floor has passed our 40-point inspection, carries genuine paperwork, and is priced
+          fixed &mdash; no haggling. Browse the full stock below.
+        </p>
+      </header>
 
-      {/* Full Inventory */}
-      <section id="inventory" className="max-w-7xl mx-auto px-4 scroll-mt-24">
-        <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-12 text-center md:text-left gap-6">
-          <div className="space-y-4">
-            <Badge className="bg-primary/10 text-primary border-none font-bold px-4 py-1">ALL VEHICLES</Badge>
-            <h2 className="font-headline font-bold text-4xl md:text-5xl leading-tight">Our Full <br className="hidden md:block" /> Inventory</h2>
-            <p className="text-muted-foreground text-lg max-w-xl">
-              Search, filter and sort our entire stock right here.
-            </p>
-          </div>
-          <Link href="/inventory" className="group flex items-center gap-2 text-primary font-bold text-lg hover:underline transition-all">
-            Open Inventory Page <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+      <div className="mt-10">
+        <VehicleBrowser vehicles={vehicles} layout="sidebar" priorityCount={6} />
+      </div>
+
+      {/* Everything else — one quiet row */}
+      <section className="mt-20 border-t border-border pt-10 grid gap-px bg-border sm:grid-cols-2 overflow-hidden rounded-lg">
+        {elsewhere.map(({ title, body, href }) => (
+          <Link
+            key={href}
+            href={href}
+            className="group bg-background p-6 sm:p-8 hover:bg-muted transition-colors"
+          >
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="font-headline font-bold text-lg">{title}</h2>
+              <ArrowUpRight className="w-4 h-4 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-brand" />
+            </div>
+            <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{body}</p>
           </Link>
-        </div>
-
-        <VehicleBrowser vehicles={vehicles} priorityCount={4} />
-      </section>
-
-      {/* Trust Badges - Below Inventory */}
-      <section className="max-w-7xl mx-auto px-4 relative z-20">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="bg-white p-10 rounded-[2.5rem] shadow-xl border border-gray-50 flex flex-col items-center text-center space-y-6 group hover:-translate-y-2 transition-transform duration-300">
-            <div className="bg-primary/10 p-5 rounded-3xl group-hover:bg-primary group-hover:text-white transition-colors duration-300 text-primary">
-              <Shield className="w-10 h-10" />
-            </div>
-            <div className="space-y-2">
-              <h3 className="font-headline font-bold text-2xl">Verified Quality</h3>
-              <p className="text-muted-foreground leading-relaxed">Every vehicle undergoes a rigorous 40-point expert inspection process.</p>
-            </div>
-          </div>
-          <div className="bg-white p-10 rounded-[2.5rem] shadow-xl border border-gray-50 flex flex-col items-center text-center space-y-6 group hover:-translate-y-2 transition-transform duration-300">
-            <div className="bg-primary/10 p-5 rounded-3xl group-hover:bg-primary group-hover:text-white transition-colors duration-300 text-primary">
-              <Clock className="w-10 h-10" />
-            </div>
-            <div className="space-y-2">
-              <h3 className="font-headline font-bold text-2xl">Quick Exchange</h3>
-              <p className="text-muted-foreground leading-relaxed">Upgrade your ride in minutes with the best market valuation for your old bike.</p>
-            </div>
-          </div>
-          <div className="bg-white p-10 rounded-[2.5rem] shadow-xl border border-gray-50 flex flex-col items-center text-center space-y-6 group hover:-translate-y-2 transition-transform duration-300">
-            <div className="bg-primary/10 p-5 rounded-3xl group-hover:bg-primary group-hover:text-white transition-colors duration-300 text-primary">
-              <CheckCircle className="w-10 h-10" />
-            </div>
-            <div className="space-y-2">
-              <h3 className="font-headline font-bold text-2xl">Smooth Transfer</h3>
-              <p className="text-muted-foreground leading-relaxed">Hassle-free ownership and document transfer handled entirely by our experts.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Service Section */}
-      <section className="max-w-7xl mx-auto px-4">
-        <div className="bg-gray-50 rounded-[3rem] p-8 md:p-16 flex flex-col lg:flex-row gap-12 items-center border">
-          <div className="flex-1 space-y-6">
-            <Badge className="bg-secondary text-white border-none font-bold px-4 py-1">MAINTENANCE</Badge>
-            <h2 className="font-headline font-bold text-4xl md:text-5xl leading-tight">Professional <br /> Bike Servicing</h2>
-            <p className="text-muted-foreground text-lg leading-relaxed max-w-xl">
-              Don't wait for a breakdown. Get regular servicing from our expert mechanics. We use premium oil and genuine parts for all major brands.
-            </p>
-            <Button size="lg" className="h-16 px-10 bg-primary hover:bg-primary/90 text-lg font-bold rounded-2xl shadow-xl shadow-primary/20 gap-3" asChild>
-              <Link href="/book-service"><Calendar className="w-5 h-5" /> Book Appointment Now</Link>
-            </Button>
-          </div>
-          <div className="flex-1 relative group w-full lg:w-auto">
-            <img
-              src={serviceImage}
-              alt="Bike Service"
-              className="relative w-full rounded-[2.5rem] shadow-2xl object-cover aspect-[4/3]"
-              data-ai-hint="motorcycle maintenance"
-            />
-          </div>
-        </div>
+        ))}
       </section>
     </div>
   );

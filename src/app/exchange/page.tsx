@@ -107,7 +107,7 @@ export default function ExchangePage() {
             Thank you. Our valuation expert will review your bike details and contact you shortly to discuss the best exchange price.
           </p>
         </div>
-        <Button size="lg" className="h-14 px-10 text-lg font-bold rounded-2xl" asChild>
+        <Button size="lg" className="h-14 px-10 text-lg font-bold rounded-lg" asChild>
           <a href="/">Back to Home</a>
         </Button>
       </div>
@@ -115,71 +115,66 @@ export default function ExchangePage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-12 space-y-16">
-      <div className="text-center space-y-4">
-        <div className="bg-secondary/10 p-4 rounded-full w-fit mx-auto mb-4">
-          <RefreshCw className="w-10 h-10 text-secondary" />
-        </div>
-        <h1 className="text-5xl md:text-6xl font-bold font-headline tracking-tight text-gradient">Instant Exchange Facility</h1>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-          Upgrade your ride in minutes. Upload your current bike photos for a transparent, professional valuation.
+    <div className="max-w-4xl mx-auto px-4 py-10 sm:py-14 space-y-12">
+      <header className="max-w-2xl">
+        <span aria-hidden className="block w-8 h-1 bg-brand mb-4" />
+        <h1 className="text-3xl md:text-4xl font-bold font-headline tracking-tight">Exchange your two-wheeler</h1>
+        <p className="mt-3 text-muted-foreground leading-relaxed">
+          Trade what you ride now towards something better. Send your current bike&rsquo;s
+          photos and details for a straight valuation.
         </p>
-      </div>
+      </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <ol className="grid sm:grid-cols-3 border-t border-border">
         {[
-          { step: "1", title: "Share Details", desc: "Fill the form with your current bike info and photos." },
-          { step: "2", title: "Get Price", desc: "Our team provides an estimated exchange value online." },
-          { step: "3", title: "Drive Away", desc: "Visit us, finalize the deal, and drive away with a new ride." }
-        ].map((item, i) => (
-          <div key={i} className="bg-white p-8 rounded-[2rem] border shadow-sm text-center space-y-4 hover:border-primary/20 transition-all group">
-            <div className="bg-primary text-white w-12 h-12 rounded-2xl flex items-center justify-center mx-auto text-2xl font-black group-hover:rotate-6 transition-transform">
-              {item.step}
-            </div>
-            <h3 className="font-bold text-xl">{item.title}</h3>
-            <p className="text-muted-foreground">{item.desc}</p>
-          </div>
+          { step: '1', title: 'Share details', desc: 'Your current bike, its year, and a few photos.' },
+          { step: '2', title: 'Get a price', desc: 'We come back with an estimated exchange value.' },
+          { step: '3', title: 'Ride away', desc: 'Finalise at the showroom and swap the keys.' },
+        ].map((item) => (
+          <li key={item.step} className="border-b border-border sm:border-b-0 sm:border-r last:border-r-0 py-6 sm:px-6 sm:first:pl-0">
+            <span className="font-headline font-bold text-brand text-sm">{item.step}</span>
+            <h3 className="mt-1 font-semibold text-lg">{item.title}</h3>
+            <p className="mt-1 text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
+          </li>
         ))}
-      </div>
+      </ol>
 
-      <div className="bg-white p-8 md:p-12 rounded-[3.5rem] shadow-2xl max-w-4xl mx-auto border-4 border-gray-50 overflow-hidden relative">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-3xl" />
-        
+      <div className="bg-white p-6 md:p-10 rounded-xl border border-border">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-10 relative z-10">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-10">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="space-y-6">
-                <h3 className="text-2xl font-bold font-headline border-l-4 border-primary pl-4">Personal Info</h3>
+                <h3 className="text-2xl font-bold font-headline border-l-2 border-brand pl-3">Personal Info</h3>
                 <FormField control={form.control} name="name" render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Full Name</FormLabel>
-                    <FormControl><Input placeholder="John Doe" className="h-12 rounded-xl" {...field} /></FormControl>
+                    <FormControl><Input placeholder="John Doe" className="h-11 rounded-md" {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
                 <FormField control={form.control} name="phone" render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Phone Number</FormLabel>
-                    <FormControl><Input placeholder="98XXXXXXXX" className="h-12 rounded-xl" {...field} /></FormControl>
+                    <FormControl><Input placeholder="98XXXXXXXX" className="h-11 rounded-md" {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
               </div>
 
               <div className="space-y-6">
-                <h3 className="text-2xl font-bold font-headline border-l-4 border-primary pl-4">Vehicle Details</h3>
+                <h3 className="text-2xl font-bold font-headline border-l-2 border-brand pl-3">Vehicle Details</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <FormField control={form.control} name="old_bike" render={({ field }) => (
                     <FormItem className="col-span-2 sm:col-span-1">
                       <FormLabel className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Current Bike</FormLabel>
-                      <FormControl><Input placeholder="e.g. Pulsar 150" className="h-12 rounded-xl" {...field} /></FormControl>
+                      <FormControl><Input placeholder="e.g. Pulsar 150" className="h-11 rounded-md" {...field} /></FormControl>
                       <FormMessage />
                     </FormItem>
                   )} />
                   <FormField control={form.control} name="old_year" render={({ field }) => (
                     <FormItem className="col-span-2 sm:col-span-1">
                       <FormLabel className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Year</FormLabel>
-                      <FormControl><Input placeholder="2018" className="h-12 rounded-xl" {...field} /></FormControl>
+                      <FormControl><Input placeholder="2018" className="h-11 rounded-md" {...field} /></FormControl>
                       <FormMessage />
                     </FormItem>
                   )} />
@@ -187,7 +182,7 @@ export default function ExchangePage() {
                 <FormField control={form.control} name="interested_in" render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Interested In</FormLabel>
-                    <FormControl><Input placeholder="e.g. Yamaha MT-15 or Scooter" className="h-12 rounded-xl" {...field} /></FormControl>
+                    <FormControl><Input placeholder="e.g. Yamaha MT-15 or Scooter" className="h-11 rounded-md" {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
@@ -197,10 +192,10 @@ export default function ExchangePage() {
               <div className="col-span-full space-y-6 pt-6 border-t">
                 <div className="flex items-center justify-between">
                   <h3 className="text-2xl font-bold font-headline flex items-center gap-3">
-                    <Camera className="w-6 h-6 text-primary" /> Vehicle Photos (Max 6)
+                    <Camera className="w-6 h-6 text-brand" /> Vehicle Photos (Max 6)
                   </h3>
                   <div className="flex items-center gap-4">
-                    {isCompressing && <div className="flex items-center gap-2 text-primary font-bold animate-pulse text-[10px]"><Loader2 className="w-3 h-3 animate-spin" /> Optimizing...</div>}
+                    {isCompressing && <div className="flex items-center gap-2 text-brand font-bold animate-pulse text-[10px]"><Loader2 className="w-3 h-3 animate-spin" /> Optimizing...</div>}
                     <span className="text-[10px] text-muted-foreground font-bold">{form.watch('images').length} / 6</span>
                   </div>
                 </div>
@@ -219,7 +214,7 @@ export default function ExchangePage() {
                     </div>
                   ))}
                   {form.watch('images').length < 6 && (
-                    <label className="aspect-square rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center cursor-pointer hover:border-primary/40 hover:bg-primary/5 transition-all text-muted-foreground hover:text-primary group">
+                    <label className="aspect-square rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center cursor-pointer hover:border-foreground/40 hover:bg-brand/10 transition-all text-muted-foreground hover:text-brand group">
                       <Plus className="w-6 h-6 mb-1 group-hover:scale-110 transition-transform" />
                       <span className="text-[10px] font-bold uppercase">Upload</span>
                       <input 
@@ -238,16 +233,16 @@ export default function ExchangePage() {
               </div>
             </div>
 
-            <Button 
-              type="submit" 
-              disabled={loading || isCompressing} 
-              className="w-full h-16 bg-primary text-xl font-bold rounded-2xl shadow-xl shadow-primary/20 hover:scale-[1.01] transition-transform"
+            <Button
+              type="submit"
+              disabled={loading || isCompressing}
+              className="w-full h-12 text-base font-semibold rounded-md"
             >
-              {loading ? <Loader2 className="animate-spin w-6 h-6" /> : "Request Exchange Valuation"}
+              {loading ? <Loader2 className="animate-spin w-5 h-5" /> : "Request an exchange valuation"}
             </Button>
-            
-            <p className="text-center text-[10px] text-muted-foreground mt-4 uppercase tracking-widest font-bold">
-              Trusted by 10,000+ Riders in Kathmandu
+
+            <p className="text-center text-[11px] text-muted-foreground mt-4 uppercase tracking-widest font-semibold">
+              No obligation &middot; we&rsquo;ll call you back with an offer
             </p>
           </form>
         </Form>
