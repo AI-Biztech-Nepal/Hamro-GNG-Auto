@@ -10,9 +10,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDes
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Bike, CheckCircle2, Camera, Upload, X, Image as ImageIcon, Loader2, Plus } from 'lucide-react';
+import { Bike, CheckCircle2, Loader2 } from 'lucide-react';
 import { submitLead } from '@/lib/inventory-api';
-import { compressImage } from '@/lib/image-upload';
+import { VehiclePhotoUploader } from '@/components/VehiclePhotoUploader';
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
@@ -30,7 +30,6 @@ export default function SellPage() {
   const { toast } = useToast();
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [isCompressing, setIsCompressing] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -46,34 +45,6 @@ export default function SellPage() {
       images: [],
     },
   });
-
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files) return;
-
-    setIsCompressing(true);
-    const currentImages = form.getValues('images');
-    const newImages = [...currentImages];
-
-    for (let i = 0; i < files.length; i++) {
-      if (newImages.length >= 6) break;
-      try {
-        const compressedBase64 = await compressImage(files[i]);
-        newImages.push(compressedBase64);
-      } catch (err) {
-        console.error("Error compressing file", err);
-      }
-    }
-
-    form.setValue('images', newImages, { shouldValidate: true });
-    setIsCompressing(false);
-  };
-
-  const removeImage = (index: number) => {
-    const currentImages = form.getValues('images');
-    const filtered = currentImages.filter((_, i) => i !== index);
-    form.setValue('images', filtered, { shouldValidate: true });
-  };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
@@ -228,46 +199,13 @@ export default function SellPage() {
                     />
 
                     {/* Image Upload Section */}
-                    <div className="col-span-full space-y-4 pt-4 border-t">
-                      <div className="flex items-center justify-between">
-                        <FormLabel className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                          <ImageIcon className="w-4 h-4 text-brand" /> Vehicle Photos (Max 6)
-                        </FormLabel>
-                        <div className="flex items-center gap-4">
-                          {isCompressing && <div className="flex items-center gap-2 text-brand font-bold animate-pulse text-[10px]"><Loader2 className="w-3 h-3 animate-spin" /> Optimizing...</div>}
-                          <span className="text-[10px] text-muted-foreground font-bold">{form.watch('images').length} / 6</span>
-                        </div>
-                      </div>
-                      
-                      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-3 gap-3">
-                        {form.watch('images').map((img, idx) => (
-                          <div key={idx} className="relative aspect-square rounded-xl overflow-hidden border group shadow-sm">
-                            <img src={img} className="w-full h-full object-cover" alt={`Bike preview ${idx}`} />
-                            <button 
-                              type="button"
-                              onClick={() => removeImage(idx)}
-                              className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                            >
-                              <X className="w-3 h-3" />
-                            </button>
-                          </div>
-                        ))}
-                        {form.watch('images').length < 6 && (
-                          <label className="aspect-square rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center cursor-pointer hover:border-foreground/40 hover:bg-brand/10 transition-all text-muted-foreground hover:text-brand group">
-                            <Plus className="w-6 h-6 mb-1 group-hover:scale-110 transition-transform" />
-                            <span className="text-[10px] font-bold uppercase">Add Photo</span>
-                            <input 
-                              type="file" 
-                              className="hidden" 
-                              accept="image/*" 
-                              multiple 
-                              onChange={handleImageUpload} 
-                              disabled={isCompressing}
-                            />
-                          </label>
-                        )}
-                      </div>
-                      <FormMessage>{form.formState.errors.images?.message}</FormMessage>
+                    <div className="col-span-full pt-4 border-t">
+                      <VehiclePhotoUploader
+                        images={form.watch('images')}
+                        onChange={(images) => form.setValue('images', images, { shouldValidate: true })}
+                        maxImages={6}
+                        error={form.formState.errors.images?.message}
+                      />
                     </div>
 
                     <FormField
@@ -285,7 +223,7 @@ export default function SellPage() {
                 </div>
 
                 <div className="pt-4">
-                  <Button type="submit" disabled={loading || isCompressing} className="w-full h-12 text-base font-semibold rounded-md">
+                  <Button type="submit" disabled={loading} className="w-full h-12 text-base font-semibold rounded-md">
                     {loading ? <Loader2 className="animate-spin" /> : "Request a price"}
                   </Button>
                   <p className="text-center text-[11px] text-muted-foreground mt-4 uppercase tracking-widest font-semibold">

@@ -1,5 +1,59 @@
 'use client';
 
+export interface PixelCrop {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+/**
+ * Draws the cropped region of an image onto a canvas and returns a compressed
+ * JPEG data URL, at the same size/quality budget as compressImage below.
+ */
+export async function cropAndCompressImage(
+  imageSrc: string,
+  crop: PixelCrop,
+  maxWidth = 1000,
+  quality = 0.5
+): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+
+    img.onload = () => {
+      let width = crop.width;
+      let height = crop.height;
+      if (width > maxWidth) {
+        height = (maxWidth / width) * height;
+        width = maxWidth;
+      }
+
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        reject(new Error('Canvas context not available'));
+        return;
+      }
+
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, width, height);
+      ctx.drawImage(img, crop.x, crop.y, crop.width, crop.height, 0, 0, width, height);
+
+      try {
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      } catch (err) {
+        reject(new Error('Failed to generate data URL from canvas'));
+      }
+    };
+
+    img.onerror = () => reject(new Error('Failed to load image for cropping'));
+    img.src = imageSrc;
+  });
+}
+
 /**
  * Utility for handling client-side image compression.
  * Resizes images and applies aggressive JPEG compression to stay under Firestore's 1MB document limit.
