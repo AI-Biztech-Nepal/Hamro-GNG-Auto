@@ -97,14 +97,22 @@ export function VehicleDetailClient({ vehicle }: { vehicle: Vehicle }) {
               <CarouselContent>
                 {images.map((url, index) => (
                   <CarouselItem key={index}>
-                    <div className="relative aspect-[4/3] w-full">
+                    <div className="relative aspect-[4/3] w-full overflow-hidden">
+                      <Image
+                        src={url}
+                        alt=""
+                        aria-hidden="true"
+                        fill
+                        sizes="(max-width: 1024px) 100vw, 55vw"
+                        className="object-cover object-center scale-110 blur-xl opacity-60"
+                      />
                       <Image
                         src={url}
                         alt={`${vehicle.title} — photo ${index + 1}`}
                         fill
                         priority={index === 0}
                         sizes="(max-width: 1024px) 100vw, 55vw"
-                        className="object-cover object-center"
+                        className="object-contain object-center"
                       />
                     </div>
                   </CarouselItem>

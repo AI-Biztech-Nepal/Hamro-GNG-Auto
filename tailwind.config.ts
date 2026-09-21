@@ -69,6 +69,12 @@ export default {
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
       },
+      transitionDuration: {
+        '1200': '1200ms',
+      },
+      transitionTimingFunction: {
+        cinematic: 'cubic-bezier(0.16, 1, 0.3, 1)',
+      },
     },
   },
   plugins: [require('tailwindcss-animate')],
