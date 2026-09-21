@@ -1,6 +1,7 @@
 
 "use client"
 
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Vehicle } from '@/types/vehicle';
@@ -10,8 +11,14 @@ interface VehicleCardProps {
   isPriority?: boolean;
 }
 
+const TARGET_RATIO = 4 / 3;
+// How far off 4:3 a photo's own ratio can be before we treat it as "doesn't fit"
+const RATIO_TOLERANCE = 0.08;
+
 export function VehicleCard({ vehicle, isPriority = false }: VehicleCardProps) {
   const isSold = vehicle.status === 'sold';
+  // Assume it fits until the photo loads and proves otherwise, so most (already-4:3) photos never flash
+  const [fitsFrame, setFitsFrame] = useState(true);
   const meta = [
     String(vehicle.year),
     vehicle.engine_cc ? `${vehicle.engine_cc}cc` : null,
@@ -23,17 +30,21 @@ export function VehicleCard({ vehicle, isPriority = false }: VehicleCardProps) {
     <Link href={`/inventory/${vehicle.id}`} className="group block">
       <div className="relative aspect-[4/3] transition-transform duration-1200 ease-cinematic group-hover:z-20 group-hover:scale-110">
         <div className="absolute inset-0 overflow-hidden rounded-md border border-border bg-neutral-100 transition-shadow duration-1200 ease-cinematic group-hover:shadow-2xl">
-          {/* Blurred backdrop — softly fills the gaps once the photo un-zooms to fit */}
-          <Image
-            src={vehicle.image_urls[0]}
-            alt=""
-            aria-hidden="true"
-            fill
-            loading={isPriority ? "eager" : "lazy"}
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            className="object-cover object-center scale-110 blur-xl opacity-0 transition-opacity duration-1200 ease-cinematic group-hover:opacity-60 [@media(hover:none)]:opacity-60"
-          />
-          {/* One photo, always sharp — sits zoomed in (reads as cropped) at rest, un-zooms slowly to reveal the full frame on hover; always full on touch, since there's no hover gesture there */}
+          {/* Only rendered for photos that don't already fit 4:3 — softly fills the gaps once the photo un-zooms */}
+          {!fitsFrame && (
+            <Image
+              src={vehicle.image_urls[0]}
+              alt=""
+              aria-hidden="true"
+              fill
+              loading={isPriority ? "eager" : "lazy"}
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+              className="object-cover object-center scale-110 blur-xl opacity-0 transition-opacity duration-1200 ease-cinematic group-hover:opacity-60 [@media(hover:none)]:opacity-60"
+            />
+          )}
+          {/* Photos already shot at ~4:3 stay simply cropped with a gentle hover zoom. Photos with a different ratio
+              sit zoomed in (reads as cropped) at rest and slowly un-zoom to reveal the full frame on hover; always
+              full on touch, since there's no hover gesture there. */}
           <Image
             src={vehicle.image_urls[0]}
             alt={vehicle.title}
@@ -41,7 +52,17 @@ export function VehicleCard({ vehicle, isPriority = false }: VehicleCardProps) {
             priority={isPriority}
             loading={isPriority ? "eager" : "lazy"}
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            className="object-contain object-center scale-[1.45] transition-transform duration-1200 ease-cinematic group-hover:scale-100 [@media(hover:none)]:scale-100"
+            onLoad={(e) => {
+              const img = e.currentTarget;
+              if (!img.naturalWidth || !img.naturalHeight) return;
+              const ratio = img.naturalWidth / img.naturalHeight;
+              setFitsFrame(Math.abs(ratio - TARGET_RATIO) / TARGET_RATIO < RATIO_TOLERANCE);
+            }}
+            className={
+              fitsFrame
+                ? "object-cover object-center scale-100 transition-transform duration-1200 ease-cinematic group-hover:scale-110"
+                : "object-contain object-center scale-[1.45] transition-transform duration-1200 ease-cinematic group-hover:scale-100 [@media(hover:none)]:scale-100"
+            }
           />
           {isSold && (
             <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
