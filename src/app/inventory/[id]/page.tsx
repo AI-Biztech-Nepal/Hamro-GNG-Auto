@@ -16,12 +16,13 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
   const name = vehicle.title.replace(/\s+/g, ' ').trim();
   const price = `NPR ${vehicle.price.toLocaleString()}`;
-  const title = `${name} — ${price}`;
+  const isHonda = vehicle.brand?.toLowerCase() === 'honda';
+  const title = `Secondhand ${name} for sale in Kathmandu — ${price}`;
   const description =
     `${vehicle.year} ${name}, ${vehicle.condition.toLowerCase()} condition` +
     (vehicle.engine_cc ? `, ${vehicle.engine_cc}cc` : '') +
     (vehicle.km_run != null ? `, ${vehicle.km_run.toLocaleString()} km` : '') +
-    `. Inspected and priced at ${price} at G&G Auto Enterprises, Nayabasti, Boudha, Kathmandu.`;
+    `. Secondhand, reconditioned and inspected${isHonda ? ' Honda' : ''} ${vehicle.type === 'scooter' ? 'scooter' : 'bike'}, priced at ${price} at G&G Auto Enterprises, Nayabasti, Boudha, Kathmandu.`;
   const image = vehicle.image_urls?.[0];
   const url = `${SITE_URL}/inventory/${vehicle.id}`;
 

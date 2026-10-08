@@ -13,27 +13,34 @@ import { CONTACT_INFO, SITE_URL } from '@/lib/constants';
 // and keeps on-demand revalidation (revalidateTag) working.
 export const dynamic = 'force-dynamic';
 
+const TITLE = 'Secondhand & Reconditioned Honda Bikes and Scooters in Boudha, Kathmandu | G&G Auto';
 const DESCRIPTION =
-  'G&G Auto Enterprises is a used two-wheeler showroom in Nayabasti, Boudha, Kathmandu. ' +
-  'Every second-hand bike and scooter is inspected on 40 points, comes with genuine paperwork, ' +
+  'Buy secondhand and reconditioned Honda Dio, Activa, Shine and more at G&G Auto Enterprises, Nayabasti, Boudha, Kathmandu. ' +
+  'Every used bike and scooter is inspected on 40 points, comes with genuine paperwork, ' +
   'and is sold at a fixed fair price. Buy, sell, exchange and service two-wheelers in one place.';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: 'G&G Auto Enterprises — Second-hand Bikes & Scooters in Kathmandu',
+    default: TITLE,
     template: '%s | G&G Auto Enterprises',
   },
   description: DESCRIPTION,
   applicationName: 'G&G Auto Enterprises',
   keywords: [
+    'secondhand Honda Kathmandu',
+    'second hand Honda bike Nepal',
+    'reconditioned Honda scooter Kathmandu',
+    'reconditioned bikes Nepal',
+    'used Honda Dio Nepal',
+    'second hand scooter Boudha',
     'second hand bikes Kathmandu',
     'used scooters Nepal',
     'used motorcycle Kathmandu',
+    'bike showroom Nayabasti Boudha',
     'bike exchange Nepal',
     'sell my bike Kathmandu',
     'bike servicing Boudha',
-    'Honda Dio used',
     'G&G Auto Enterprises',
     'Hamro G&G Auto',
   ],
@@ -50,7 +57,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     siteName: 'G&G Auto Enterprises',
-    title: 'G&G Auto Enterprises — Second-hand Bikes & Scooters in Kathmandu',
+    title: TITLE,
     description: DESCRIPTION,
     url: SITE_URL,
     locale: 'en_NP',
@@ -58,7 +65,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'G&G Auto Enterprises — Second-hand Bikes & Scooters in Kathmandu',
+    title: TITLE,
     description: DESCRIPTION,
     images: ['/og.jpg'],
   },

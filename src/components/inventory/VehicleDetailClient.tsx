@@ -4,7 +4,7 @@
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, Phone, MessageCircle, Share2, ShieldCheck, FileCheck, MapPin } from 'lucide-react';
+import { ChevronLeft, Pause, Play, Phone, MessageCircle, Share2, ShieldCheck, FileCheck, MapPin } from 'lucide-react';
 import { CONTACT_INFO } from '@/lib/constants';
 import { Vehicle } from '@/types/vehicle';
 import { useToast } from '@/hooks/use-toast';
@@ -16,7 +16,9 @@ import {
   CarouselPrevious,
   type CarouselApi,
 } from "@/components/ui/carousel";
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+
+const SLIDE_MS = 4500;
 
 /*
   VEHICLE DETAIL — "One sheet"
@@ -33,16 +35,50 @@ export function VehicleDetailClient({ vehicle }: { vehicle: Vehicle }) {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
 
+  const thumbsRef = useRef<HTMLDivElement>(null);
+  const galleryRef = useRef<HTMLDivElement>(null);
+  const [hovering, setHovering] = useState(false);
+  const [inView, setInView] = useState(true);
+  const [tabVisible, setTabVisible] = useState(true);
+  const [stopped, setStopped] = useState(false); // visitor took over or pressed pause
+  const [reducedMotion, setReducedMotion] = useState(true);
+
   useEffect(() => {
     if (!api) return;
     setCurrent(api.selectedScrollSnap());
     api.on("select", () => setCurrent(api.selectedScrollSnap()));
   }, [api]);
 
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setReducedMotion(mq.matches);
+    const onChange = () => setReducedMotion(mq.matches);
+    mq.addEventListener('change', onChange);
+    const onVisibility = () => setTabVisible(!document.hidden);
+    document.addEventListener('visibilitychange', onVisibility);
+    const io = new IntersectionObserver(([e]) => setInView(e.isIntersecting), { threshold: 0.4 });
+    if (galleryRef.current) io.observe(galleryRef.current);
+    return () => {
+      mq.removeEventListener('change', onChange);
+      document.removeEventListener('visibilitychange', onVisibility);
+      io.disconnect();
+    };
+  }, []);
+
+  // Keep the active thumbnail in view inside the strip without scrolling the page.
+  useEffect(() => {
+    const strip = thumbsRef.current;
+    const el = strip?.children[current] as HTMLElement | undefined;
+    if (!strip || !el) return;
+    strip.scrollTo({ left: el.offsetLeft - (strip.clientWidth - el.clientWidth) / 2, behavior: reducedMotion ? 'auto' : 'smooth' });
+  }, [current, reducedMotion]);
+
   const whatsappMessage = `Hello Hamro G&G Auto, I am interested in the ${vehicle.title} (${vehicle.year} model) priced at NPR ${vehicle.price.toLocaleString()}. Is it still available?`;
   const whatsappUrl = `https://wa.me/${CONTACT_INFO.whatsapp}?text=${encodeURIComponent(whatsappMessage)}`;
   const images = vehicle.image_urls?.length ? vehicle.image_urls : ['https://picsum.photos/seed/vehicle/800/600'];
   const isSold = vehicle.status === 'sold';
+  const autoplay = images.length > 1 && !reducedMotion && !stopped;
+  const running = autoplay && inView && tabVisible && !hovering;
 
   const specs = (
     [
@@ -91,9 +127,14 @@ export function VehicleDetailClient({ vehicle }: { vehicle: Vehicle }) {
 
       <div className="mt-6 lg:grid lg:grid-cols-[1.35fr_1fr] lg:gap-x-12 lg:gap-y-10">
         {/* Gallery */}
-        <div className="lg:col-start-1 lg:row-start-1">
-          <div className="relative overflow-hidden rounded-lg border border-border bg-neutral-100 group">
-            <Carousel setApi={setApi} className="w-full">
+        <div className="lg:col-start-1 lg:row-start-1" ref={galleryRef}>
+          <div
+            className="relative overflow-hidden rounded-lg border border-border bg-neutral-100 group"
+            onMouseEnter={() => setHovering(true)}
+            onMouseLeave={() => setHovering(false)}
+            onPointerDown={() => setStopped(true)}
+          >
+            <Carousel setApi={setApi} className="w-full" opts={{ loop: true }}>
               <CarouselContent>
                 {images.map((url, index) => (
                   <CarouselItem key={index}>
@@ -126,6 +167,17 @@ export function VehicleDetailClient({ vehicle }: { vehicle: Vehicle }) {
               )}
             </Carousel>
 
+            {images.length > 1 && !reducedMotion && (
+              <button
+                onPointerDown={e => e.stopPropagation()}
+                onClick={() => setStopped(v => !v)}
+                aria-label={autoplay ? 'Pause slideshow' : 'Play slideshow'}
+                className="absolute bottom-3 right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 border border-border shadow-sm text-foreground hover:bg-white"
+              >
+                {autoplay ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
+              </button>
+            )}
+
             {isSold && (
               <div className="absolute inset-0 bg-black/55 flex items-center justify-center">
                 <span className="text-white font-bold text-3xl md:text-5xl tracking-[0.2em] border-2 border-white px-6 py-3">SOLD</span>
@@ -134,17 +186,26 @@ export function VehicleDetailClient({ vehicle }: { vehicle: Vehicle }) {
           </div>
 
           {images.length > 1 && (
-            <div className="mt-3 flex gap-2 overflow-x-auto no-scrollbar">
+            <div ref={thumbsRef} className="mt-3 flex gap-2 overflow-x-auto no-scrollbar">
               {images.map((url, i) => (
                 <button
                   key={i}
-                  onClick={() => api?.scrollTo(i)}
+                  onClick={() => { setStopped(true); api?.scrollTo(i); }}
                   aria-label={`View photo ${i + 1}`}
                   className={`relative h-14 w-[74px] shrink-0 overflow-hidden rounded border bg-neutral-100 transition-colors ${
                     current === i ? 'border-brand ring-1 ring-brand' : 'border-border hover:border-foreground/40'
                   }`}
                 >
                   <Image src={url} alt="" fill sizes="80px" className="object-cover object-center" />
+                  {autoplay && current === i && (
+                    <span
+                      key={`${i}-${current}`}
+                      aria-hidden="true"
+                      onAnimationEnd={() => api?.scrollNext()}
+                      className="absolute inset-x-0 bottom-0 h-[3px] origin-left bg-brand"
+                      style={{ animation: `gallery-progress ${SLIDE_MS}ms linear forwards`, animationPlayState: running ? 'running' : 'paused' }}
+                    />
+                  )}
                 </button>
               ))}
             </div>

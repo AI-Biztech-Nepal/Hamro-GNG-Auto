@@ -138,3 +138,10 @@ button, a {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Vehicle gallery autoplay: the progress bar on the active thumbnail drives the
+   slide change (onAnimationEnd), so pausing the bar pauses the slideshow. */
+@keyframes gallery-progress {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
