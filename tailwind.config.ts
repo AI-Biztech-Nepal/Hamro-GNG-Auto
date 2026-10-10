@@ -10,6 +10,10 @@ export default {
   ],
   theme: {
     extend: {
+      screens: {
+        // A laptop/desktop with a mouse or trackpad, as opposed to a phone or tablet held in the hand.
+        mouse: { raw: '(hover: hover) and (pointer: fine)' },
+      },
       fontFamily: {
         body: ['Montserrat', 'sans-serif'],
         headline: ['Poppins', 'sans-serif'],

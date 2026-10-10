@@ -1,19 +1,21 @@
 import type { Metadata } from 'next';
-import { Star, User, Gift } from 'lucide-react';
+import { QrCode, Star, User, Gift } from 'lucide-react';
 import { DashainSpin } from '@/components/offers/DashainSpin';
 import { fetchDashainOffer } from '@/lib/inventory-api';
+import { SITE_URL } from '@/lib/constants';
 
 export const metadata: Metadata = {
   title: 'Dashain Offer — Spin & Win with Every Bike or Scooter',
   description:
-    'Bought a bike or scooter from G&G Auto Enterprises this Dashain? Enter your bike number, leave a Google review and spin the wheel for petrol, a helmet, riding gear and more.',
+    'Bought a bike or scooter from G&G Auto Enterprises this Dashain? Scan the QR code, leave a Google review, add your bike number and spin the wheel on your phone for petrol, a helmet, riding gear and more.',
   alternates: { canonical: '/offers' },
 };
 
 const steps = [
-  { icon: User, title: 'Enter your details', text: 'Your name, mobile number and the number plate of the bike or scooter you bought.' },
-  { icon: Star, title: 'Tell us how we did', text: 'Scan the QR code with your phone and leave a quick Google review of your experience.' },
-  { icon: Gift, title: 'Spin and collect', text: 'Show the winning screen to our staff and take your gift home.' },
+  { icon: QrCode, title: 'Scan the QR code', text: 'Point your phone camera at the code shown at our showroom.' },
+  { icon: Star, title: 'Tell us how we did', text: 'Leave a quick Google review of your experience.' },
+  { icon: User, title: 'Add your details', text: 'Your name, mobile number and the number plate of the bike or scooter you bought.' },
+  { icon: Gift, title: 'Spin and collect', text: 'Spin the wheel on your phone, then show the winning screen to our staff and take your gift home.' },
 ];
 
 export default async function OffersPage() {
@@ -25,7 +27,7 @@ export default async function OffersPage() {
   return (
     <div className="max-w-6xl mx-auto px-4 py-12 md:py-16">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
-        {/* On phones (QR scans) the wheel card comes first; the explainer follows. */}
+        {/* On phones (QR scans) the spin card comes first; the explainer follows. */}
         <div className="order-2 lg:order-1 lg:col-span-5 space-y-8">
           <div className="space-y-5">
             <span aria-hidden className="block w-8 h-1 bg-brand" />
@@ -53,7 +55,7 @@ export default async function OffersPage() {
 
         <div className="order-1 lg:order-2 lg:col-span-7">
           {offer && offer.prizes.length > 0 ? (
-            <DashainSpin prizes={offer.prizes} reviewUrl={offer.review_url} />
+            <DashainSpin prizes={offer.prizes} reviewUrl={offer.review_url} joinUrl={`${SITE_URL}/offers`} />
           ) : (
             <div className="bg-white p-10 rounded-xl border border-border text-center space-y-2">
               <h2 className="text-2xl font-bold font-headline">The gift wheel is taking a short break</h2>
