@@ -6,7 +6,8 @@ const API_BASE =
 const ACTIONS = ['check', 'spin'] as const;
 
 /**
- * Same-origin relay for the Offers page's gift-code check and wheel spin. The browser
+ * Same-origin relay for the Offers page's bike-number check and wheel spin (`code` is the
+ * bike's number plate -- one spin per bike). The browser
  * talks to this route instead of api.hamroauto.com.np directly, so the Offers tab doesn't
  * depend on the backend's CORS allow-list including this site.
  */

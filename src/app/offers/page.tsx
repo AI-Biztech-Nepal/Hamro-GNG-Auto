@@ -1,18 +1,18 @@
 import type { Metadata } from 'next';
-import { Star, Ticket, Gift } from 'lucide-react';
+import { Star, User, Gift } from 'lucide-react';
 import { DashainSpin } from '@/components/offers/DashainSpin';
 import { fetchDashainOffer } from '@/lib/inventory-api';
 
 export const metadata: Metadata = {
   title: 'Dashain Offer — Spin & Win with Every Bike or Scooter',
   description:
-    'Bought a bike or scooter from G&G Auto Enterprises this Dashain? Enter the gift code from your bill and spin the wheel for petrol, a helmet, riding gear and more.',
+    'Bought a bike or scooter from G&G Auto Enterprises this Dashain? Enter your bike number, leave a Google review and spin the wheel for petrol, a helmet, riding gear and more.',
   alternates: { canonical: '/offers' },
 };
 
 const steps = [
-  { icon: Star, title: 'Tell us how we did', text: 'Leave a quick Google review of your experience at the showroom.' },
-  { icon: Ticket, title: 'Enter your gift code', text: 'It is written on the bill of the bike or scooter you bought.' },
+  { icon: User, title: 'Enter your details', text: 'Your name, mobile number and the number plate of the bike or scooter you bought.' },
+  { icon: Star, title: 'Tell us how we did', text: 'Scan the QR code with your phone and leave a quick Google review of your experience.' },
   { icon: Gift, title: 'Spin and collect', text: 'Show the winning screen to our staff and take your gift home.' },
 ];
 
