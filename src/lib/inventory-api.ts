@@ -156,3 +156,19 @@ export async function submitLead(lead: LeadInput): Promise<void> {
   });
   if (!res.ok) throw new Error(`Failed to submit lead (${res.status})`);
 }
+
+export interface DashainOffer {
+  review_url: string;
+  /** Prize names in wheel order; the backend picks the winner by index into this list. */
+  prizes: string[];
+}
+
+/** The Offers tab's gift wheel, managed from the Auto-Stock-Manager admin's Offers screen. */
+export async function fetchDashainOffer(): Promise<DashainOffer> {
+  const res = await fetch(`${API_BASE}/api/public/offers/dashain`, {
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+    cache: 'no-store',
+  });
+  if (!res.ok) throw new Error(`Failed to load the Dashain offer (${res.status})`);
+  return res.json();
+}

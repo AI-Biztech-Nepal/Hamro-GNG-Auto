@@ -22,6 +22,7 @@ export function Navbar({ settings }: { settings: SiteSettings }) {
     { name: 'Services', href: '/services' },
     { name: 'Sell Bike', href: '/sell' },
     { name: 'Exchange', href: '/exchange' },
+    { name: 'Offers', href: '/offers' },
   ];
 
   return (
@@ -39,7 +40,7 @@ export function Navbar({ settings }: { settings: SiteSettings }) {
           </Link>
 
           {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-7">
+          <div className="hidden md:flex items-center gap-4 lg:gap-7">
             {links.map((link) => (
               <Link
                 key={link.name}
