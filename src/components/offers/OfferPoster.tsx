@@ -4,90 +4,81 @@ import Image from 'next/image';
 import { QRCodeSVG } from 'qrcode.react';
 
 /**
- * The laptop / showroom-screen view of the Offers page: the Dashain poster with a live QR code
- * set into its empty centre panel and the shop's phone number in its footer. Nothing is played
- * here -- the review, form and wheel all happen on the customer's phone after they scan.
+ * The laptop / showroom-screen view of the Offers page: the Dashain & Tihar poster, sized to fit
+ * the screen, with a live QR code set into its gold panel. Nothing is played here -- the form,
+ * wheel and review all happen on the customer's phone after they scan.
  *
- * Everything on top of the artwork is positioned in fractions of the artwork and sized in
- * container-width units (cqw), so it stays glued to the poster at any screen width. If the
- * artwork in /public/offers-poster.jpg is replaced, re-measure PANEL and PHONE below.
+ * The QR code sits in fractions of the artwork and is sized in container-width units (cqw), so it
+ * stays glued to the poster at any screen size. If /public/offers-poster-v2.jpg is replaced,
+ * re-measure QR_BOX below (the empty row of the gold panel, in artwork pixels).
  */
 const ART_W = 1024;
-const ART_H = 473;
+const ART_H = 765;
 const frac = (px: number, of: number) => `${((px / of) * 100).toFixed(3)}%`;
 
-/** The empty white panel inside the bulb frame, in artwork pixels. */
-const PANEL = { x: 410, y: 117, w: 213, h: 216 };
-/** The slot in the footer bar where the phone number goes, in artwork pixels. */
-const PHONE = { x: 338, y: 446, h: 24 };
+/** The white box holding the QR code, in artwork pixels. Centred in the panel, between its title and ribbon. */
+const QR_BOX = { x: 580.5, y: 380, w: 128, h: 128 };
 
-function formatPhone(raw?: string): string {
-  const digits = (raw || '').replace(/\D/g, '');
-  const local = digits.startsWith('977') && digits.length > 10 ? digits.slice(3) : digits;
-  return local ? `+977-${local}` : '';
-}
-
-export function OfferPoster({ joinUrl, phone }: { joinUrl: string; phone?: string }) {
-  const phoneText = formatPhone(phone);
-
+export function OfferPoster({ joinUrl }: { joinUrl: string }) {
   return (
-    <div
-      className="relative w-full overflow-hidden bg-[#f6efe3]"
-      style={{ aspectRatio: `${ART_W} / ${ART_H}`, containerType: 'inline-size' }}
-      data-testid="scan-to-spin"
-    >
-      <h1 className="sr-only">Dashain Spin &amp; Win</h1>
-      <p className="sr-only">
-        Every bike or scooter bought from our showroom this Dashain comes with one spin of the gift wheel. Scan the QR code
-        with your phone, add your details, spin the wheel on your phone and leave a Google review.
-      </p>
-
+    <div className="relative flex w-full justify-center overflow-hidden bg-[#2a0f2e]" data-testid="scan-to-spin">
+      {/* Soft blurred copy of the poster fills the screen either side of it (the poster is 4:3). */}
       <Image
-        src="/offers-poster.jpg"
-        alt="Dashain and Tihar greetings from Hamro G&G Auto Enterprises: Dashain Spin & Win, one spin of the gift wheel with every bike or scooter"
+        src="/offers-poster-v2.jpg"
+        alt=""
+        aria-hidden
         fill
-        sizes="100vw"
-        quality={90}
-        className="object-fill"
+        unoptimized
+        className="scale-110 object-cover opacity-60 blur-2xl"
       />
 
+      {/* As large as fits under the 5rem navbar without scrolling. */}
       <div
-        className="absolute flex flex-col items-center justify-between text-center"
+        className="relative"
         style={{
-          left: frac(PANEL.x, ART_W),
-          top: frac(PANEL.y, ART_H),
-          width: frac(PANEL.w, ART_W),
-          height: frac(PANEL.h, ART_H),
-          padding: '0.8cqw 1.1cqw',
+          width: 'min(100%, max(560px, calc((100dvh - 5rem) * 1024 / 765)))',
+          aspectRatio: `${ART_W} / ${ART_H}`,
+          containerType: 'inline-size',
         }}
       >
-        <h2 className="font-headline font-bold leading-tight" style={{ fontSize: '1.25cqw' }}>Scan to spin the wheel</h2>
-        <p className="text-muted-foreground" style={{ fontSize: '0.7cqw' }}>Add your details, spin, then review us</p>
-        <div className="border border-neutral-300 bg-white" style={{ width: '15.4cqw', padding: '0.55cqw', borderRadius: '0.5cqw' }} data-testid="join-qr">
+        <h1 className="sr-only">Dashain Spin &amp; Win</h1>
+        <p className="sr-only">
+          Every bike or scooter bought from our showroom this Dashain comes with one spin of the gift wheel. Scan the QR code
+          with your phone, add your details, spin the wheel on your phone and leave a Google review.
+        </p>
+
+        <Image
+          src="/offers-poster-v2.jpg"
+          alt="Dashain and Tihar Maha-Festive Offer from Hamro G&G Auto Enterprises: scan the QR code to spin the wheel. Every bike or scooter bought this Dashain comes with one spin of the gift wheel."
+          fill
+          unoptimized
+          className="object-fill"
+        />
+
+        <div
+          className="absolute bg-white shadow-md"
+          style={{
+            left: frac(QR_BOX.x, ART_W),
+            top: frac(QR_BOX.y, ART_H),
+            width: frac(QR_BOX.w, ART_W),
+            height: frac(QR_BOX.h, ART_H),
+            padding: '0.7cqw',
+            borderRadius: '0.7cqw',
+          }}
+          data-testid="join-qr"
+        >
           <QRCodeSVG
             value={joinUrl}
             size={256}
-            level="M"
+            level="L"
             marginSize={0}
             bgColor="#ffffff"
             fgColor="#000000"
             title="Scan to join the G&G Auto Enterprises Dashain Spin & Win"
-            className="block w-full h-auto"
+            className="block h-full w-full"
           />
         </div>
-        <p className="text-muted-foreground" style={{ fontSize: '0.66cqw' }}>
-          or open <span className="font-mono font-semibold text-foreground">{joinUrl.replace(/^https?:\/\//, '')}</span> on your phone
-        </p>
       </div>
-
-      {phoneText && (
-        <span
-          className="absolute flex items-center whitespace-nowrap font-headline font-medium text-white"
-          style={{ left: frac(PHONE.x, ART_W), top: frac(PHONE.y, ART_H), height: frac(PHONE.h, ART_H), fontSize: '1.42cqw' }}
-        >
-          {phoneText}
-        </span>
-      )}
     </div>
   );
 }

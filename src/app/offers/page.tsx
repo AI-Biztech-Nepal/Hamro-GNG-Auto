@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { QrCode, Star, User, Gift } from 'lucide-react';
 import { DashainSpin } from '@/components/offers/DashainSpin';
 import { OfferPoster } from '@/components/offers/OfferPoster';
-import { fetchDashainOffer, fetchSettings } from '@/lib/inventory-api';
+import { fetchDashainOffer } from '@/lib/inventory-api';
 import { SITE_URL } from '@/lib/constants';
 
 export const metadata: Metadata = {
@@ -20,19 +20,16 @@ const steps = [
 ];
 
 export default async function OffersPage() {
-  const [offer, settings] = await Promise.all([
-    fetchDashainOffer().catch((err) => {
-      console.error('Failed to load the Dashain offer:', err);
-      return null;
-    }),
-    fetchSettings().catch(() => null),
-  ]);
+  const offer = await fetchDashainOffer().catch((err) => {
+    console.error('Failed to load the Dashain offer:', err);
+    return null;
+  });
 
   return (
     <>
       {/* Laptops and showroom screens: just the poster with the QR code. Nothing plays here. */}
       <div className="hidden mouse:block">
-        <OfferPoster joinUrl={`${SITE_URL}/offers`} phone={settings?.contact_phone} />
+        <OfferPoster joinUrl={`${SITE_URL}/offers`} />
       </div>
 
       {/* Phones: the review -> details -> wheel flow, which runs on the customer's own phone. */}
