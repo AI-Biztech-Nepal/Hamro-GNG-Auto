@@ -39,7 +39,7 @@ export function OfferPoster({ joinUrl, phone }: { joinUrl: string; phone?: strin
       <h1 className="sr-only">Dashain Spin &amp; Win</h1>
       <p className="sr-only">
         Every bike or scooter bought from our showroom this Dashain comes with one spin of the gift wheel. Scan the QR code
-        with your phone, leave a Google review, add your details and spin the wheel on your phone.
+        with your phone, add your details, spin the wheel on your phone and leave a Google review.
       </p>
 
       <Image
@@ -58,22 +58,19 @@ export function OfferPoster({ joinUrl, phone }: { joinUrl: string; phone?: strin
           top: frac(PANEL.y, ART_H),
           width: frac(PANEL.w, ART_W),
           height: frac(PANEL.h, ART_H),
-          padding: '0.9cqw 1.1cqw',
+          padding: '0.8cqw 1.1cqw',
         }}
       >
-        <h2 className="font-headline font-bold leading-tight" style={{ fontSize: '1.2cqw' }}>Scan to spin the wheel</h2>
-        <p className="text-muted-foreground leading-snug" style={{ fontSize: '0.74cqw' }}>
-          Point your phone camera at this code. You&apos;ll leave a quick Google review, add your details and spin the wheel
-          right on your phone.
-        </p>
-        <div className="border border-border bg-white" style={{ width: '11.4cqw', padding: '0.6cqw', borderRadius: '0.6cqw' }} data-testid="join-qr">
+        <h2 className="font-headline font-bold leading-tight" style={{ fontSize: '1.25cqw' }}>Scan to spin the wheel</h2>
+        <p className="text-muted-foreground" style={{ fontSize: '0.7cqw' }}>Add your details, spin, then review us</p>
+        <div className="border border-neutral-300 bg-white" style={{ width: '15.4cqw', padding: '0.55cqw', borderRadius: '0.5cqw' }} data-testid="join-qr">
           <QRCodeSVG
             value={joinUrl}
-            size={176}
+            size={256}
             level="M"
             marginSize={0}
             bgColor="#ffffff"
-            fgColor="#171717"
+            fgColor="#000000"
             title="Scan to join the G&G Auto Enterprises Dashain Spin & Win"
             className="block w-full h-auto"
           />

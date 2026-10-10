@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Backpack, CookingPot, Fuel, Gift, Hand, HardHat, Loader2, Shirt, Smartphone, Star, type LucideIcon,
 } from 'lucide-react';
@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-type Step = 'review' | 'details' | 'wheel' | 'result';
+type Step = 'details' | 'wheel' | 'result';
 
 interface OfferReply {
   ok: boolean;
@@ -38,27 +38,36 @@ const SLICE_COLORS = [
 
 const R = 150;
 const SPIN_MS = 5500;
+/** Seconds the customer sees their prize before being taken to the Google review. */
+const REVIEW_REDIRECT_SECS = 5;
 
-// Remembers that this phone opened the Google review, so the form still opens by itself when the
-// browser reloads this page on return (phones with little memory drop the tab while the Google /
-// Maps app is in front). Cleared once the wheel has been spun.
-const REVIEW_FLAG = 'gng-dashain-review-opened';
-const REVIEW_FLAG_TTL_MS = 2 * 60 * 60 * 1000;
+// The result is remembered on this phone. Going off to the Google review can reload this page (or
+// the browser restores it), and the customer should land back on their gift -- not the start.
+const RESULT_KEY = 'gng-dashain-result';
+const RESULT_TTL_MS = 6 * 60 * 60 * 1000;
 
-function reviewWasOpened(): boolean {
+interface SavedResult {
+  prize: string;
+  bikeNo: string;
+  /** The customer has been sent to the Google review. */
+  reviewSent: boolean;
+  at: number;
+}
+
+function loadResult(): SavedResult | null {
   try {
-    const at = Number(localStorage.getItem(REVIEW_FLAG));
-    return at > 0 && Date.now() - at < REVIEW_FLAG_TTL_MS;
+    const saved = JSON.parse(localStorage.getItem(RESULT_KEY) || 'null') as SavedResult | null;
+    return saved && saved.prize && Date.now() - saved.at < RESULT_TTL_MS ? saved : null;
   } catch {
-    return false;
+    return null;
   }
 }
-function setReviewFlag(on: boolean) {
+function saveResult(r: Omit<SavedResult, 'at'> | null) {
   try {
-    if (on) localStorage.setItem(REVIEW_FLAG, String(Date.now()));
-    else localStorage.removeItem(REVIEW_FLAG);
+    if (r) localStorage.setItem(RESULT_KEY, JSON.stringify({ ...r, at: Date.now() }));
+    else localStorage.removeItem(RESULT_KEY);
   } catch {
-    /* private mode / storage blocked -- the in-memory handlers below still work */
+    /* private mode / storage blocked -- the in-memory state below still works */
   }
 }
 
@@ -121,8 +130,7 @@ function Wheel({ prizes, rotation }: { prizes: string[]; rotation: number }) {
 }
 
 export function DashainSpin({ prizes, reviewUrl }: { prizes: string[]; reviewUrl: string }) {
-  const [step, setStep] = useState<Step>('review');
-  const [reviewOpened, setReviewOpened] = useState(false);
+  const [step, setStep] = useState<Step>('details');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [bikeNo, setBikeNo] = useState('');
@@ -130,37 +138,77 @@ export function DashainSpin({ prizes, reviewUrl }: { prizes: string[]; reviewUrl
   const [busy, setBusy] = useState(false);
   const [rotation, setRotation] = useState(0);
   const [result, setResult] = useState<{ prize: string; already: boolean } | null>(null);
-  const stepRef = useRef(step);
-  stepRef.current = step;
-
-  // Page was reloaded after the customer went off to write the review: carry straight on.
-  useEffect(() => {
-    if (reviewWasOpened()) {
-      setReviewOpened(true);
-      setStep('details');
-    }
-  }, []);
-
-  // When the customer comes back from the Google review tab/app, open the form by itself.
-  // visibilitychange covers tab/app switches, focus covers some in-app browsers, and pageshow
-  // covers the browser restoring this page from its back/forward cache.
-  useEffect(() => {
-    if (!reviewOpened) return;
-    const onReturn = () => {
-      if (document.visibilityState === 'visible' && stepRef.current === 'review') setStep('details');
-    };
-    document.addEventListener('visibilitychange', onReturn);
-    window.addEventListener('focus', onReturn);
-    window.addEventListener('pageshow', onReturn);
-    return () => {
-      document.removeEventListener('visibilitychange', onReturn);
-      window.removeEventListener('focus', onReturn);
-      window.removeEventListener('pageshow', onReturn);
-    };
-  }, [reviewOpened]);
+  const [reviewState, setReviewState] = useState<'pending' | 'redirecting' | 'done'>('pending');
+  /** Seconds left before the customer is sent to the review; null = no automatic redirect running. */
+  const [countdown, setCountdown] = useState<number | null>(null);
 
   // The backend treats this as the one-spin-per-bike key (and reads it as `code` on the wire).
   const bikeNumber = bikeNo.trim().toUpperCase();
+
+  // Back on this page after the review (reload, or the browser restored it): show the gift again.
+  useEffect(() => {
+    const saved = loadResult();
+    if (!saved) return;
+    setBikeNo(saved.bikeNo);
+    setResult({ prize: saved.prize, already: true });
+    setReviewState(saved.reviewSent ? 'done' : 'pending');
+    setStep('result');
+  }, []);
+
+  // Count down on the prize screen, then take the customer to the Google review.
+  useEffect(() => {
+    if (countdown === null) return;
+    if (countdown <= 0) {
+      goToReview();
+      return;
+    }
+    const t = setTimeout(() => setCountdown((c) => (c === null ? null : c - 1)), 1000);
+    return () => clearTimeout(t);
+  }, [countdown]);
+
+  // If the review opened in another app (e.g. Google Maps) this page stays alive underneath:
+  // when the customer comes back to it, the review is finished.
+  useEffect(() => {
+    if (reviewState !== 'redirecting') return;
+    const onReturn = () => {
+      if (document.visibilityState === 'visible') setReviewState('done');
+    };
+    document.addEventListener('visibilitychange', onReturn);
+    window.addEventListener('pageshow', onReturn);
+    return () => {
+      document.removeEventListener('visibilitychange', onReturn);
+      window.removeEventListener('pageshow', onReturn);
+    };
+  }, [reviewState]);
+
+  function showResult(prize: string, already: boolean) {
+    setResult({ prize, already });
+    saveResult({ prize, bikeNo: bikeNumber, reviewSent: false });
+    setReviewState('pending');
+    setStep('result');
+    // Only a fresh win is sent to the review by itself; someone checking an old gift is left alone.
+    setCountdown(already ? null : REVIEW_REDIRECT_SECS);
+  }
+
+  function goToReview() {
+    setCountdown(null);
+    if (result) saveResult({ prize: result.prize, bikeNo: bikeNumber, reviewSent: true });
+    setReviewState('redirecting');
+    window.location.assign(reviewUrl);
+  }
+
+  function startAgain() {
+    saveResult(null);
+    setResult(null);
+    setReviewState('pending');
+    setCountdown(null);
+    setName('');
+    setPhone('');
+    setBikeNo('');
+    setRotation(0);
+    setError('');
+    setStep('details');
+  }
 
   async function submitDetails(e: React.FormEvent) {
     e.preventDefault();
@@ -176,11 +224,8 @@ export function DashainSpin({ prizes, reviewUrl }: { prizes: string[]; reviewUrl
       // Has this bike already had its spin? If so show that gift instead of the wheel.
       const r = await callOffer('check', { code: bikeNumber });
       if (!r.ok) setError(r.msg || 'Please check the bike number and try again.');
-      else if (r.used) {
-        setResult({ prize: r.prize || '', already: true });
-        setReviewFlag(false);
-        setStep('result');
-      } else setStep('wheel');
+      else if (r.used) showResult(r.prize || '', true);
+      else setStep('wheel');
     } catch {
       setError('Connection problem. Please try again.');
     }
@@ -202,9 +247,7 @@ export function DashainSpin({ prizes, reviewUrl }: { prizes: string[]; reviewUrl
       const landing = 360 - ((r.prize_index ?? 0) + 0.5) * seg + (Math.random() - 0.5) * seg * 0.6;
       setRotation((prev) => prev - (prev % 360) + 360 * 6 + landing);
       setTimeout(() => {
-        setResult({ prize: r.prize as string, already: Boolean(r.already) });
-        setReviewFlag(false);
-        setStep('result');
+        showResult(r.prize as string, Boolean(r.already));
         setBusy(false);
       }, SPIN_MS + 600);
     } catch {
@@ -217,47 +260,11 @@ export function DashainSpin({ prizes, reviewUrl }: { prizes: string[]; reviewUrl
 
   return (
     <div className="bg-white p-6 sm:p-10 rounded-xl border border-border" data-testid="dashain-spin">
-      {step === 'review' && (
-        <div className="space-y-6 text-center">
-          <h2 className="text-3xl font-bold font-headline">Congratulations on your new ride!</h2>
-          <div className="flex justify-center gap-1.5" aria-hidden>
-            {[0, 1, 2, 3, 4].map((i) => <Star key={i} className="w-8 h-8 fill-[#f2b824] text-[#f2b824]" />)}
-          </div>
-          <p className="text-muted-foreground leading-relaxed">
-            Tell us how we did with a quick Google review. When you come back to this page, you can add your details and spin the wheel.
-          </p>
-          <Button
-            size="lg"
-            className="w-full h-14 text-lg font-bold rounded-lg bg-brand text-brand-foreground hover:bg-brand/90"
-            onClick={() => {
-              setReviewFlag(true);
-              window.open(reviewUrl, '_blank', 'noopener');
-              setReviewOpened(true);
-            }}
-          >
-            <Star className="w-5 h-5" /> Write a Google review
-          </Button>
-          {reviewOpened && (
-            <>
-              <p className="text-sm text-muted-foreground">
-                Submit your review, then come back to this page &mdash; your form opens by itself.
-              </p>
-              <Button size="lg" variant="outline" className="w-full h-12 font-semibold rounded-lg" onClick={() => setStep('details')}>
-                I&apos;m done — add my details
-              </Button>
-            </>
-          )}
-          <button type="button" className="text-sm text-muted-foreground underline underline-offset-4" onClick={() => setStep('details')}>
-            Already reviewed us? Continue
-          </button>
-        </div>
-      )}
-
       {step === 'details' && (
         <form onSubmit={submitDetails} className="space-y-6" noValidate>
           <div className="space-y-2">
-            <h2 className="text-3xl font-bold font-headline">Thank you! One last step</h2>
-            <p className="text-muted-foreground">Tell us who you are and which bike you bought, then spin the gift wheel.</p>
+            <h2 className="text-3xl font-bold font-headline">Congratulations on your new ride!</h2>
+            <p className="text-muted-foreground">Tell us who you are and which bike you bought to claim your spin of the gift wheel.</p>
           </div>
           <div className="space-y-2">
             <Label htmlFor="offer-name" className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Full Name</Label>
@@ -273,18 +280,9 @@ export function DashainSpin({ prizes, reviewUrl }: { prizes: string[]; reviewUrl
             <p className="text-xs text-muted-foreground">The number plate of the bike or scooter you bought.</p>
           </div>
           {error && <p role="alert" className="text-sm font-medium text-destructive">{error}</p>}
-          <Button type="submit" size="lg" disabled={busy} className="w-full h-14 text-lg font-bold rounded-lg">
-            {busy ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Open the wheel'}
+          <Button type="submit" size="lg" disabled={busy} className="w-full h-14 text-lg font-bold rounded-lg" data-testid="go-for-spin">
+            {busy ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Go for spin'}
           </Button>
-          <p className="text-center">
-            <button
-              type="button"
-              className="text-sm text-muted-foreground underline underline-offset-4"
-              onClick={() => window.open(reviewUrl, '_blank', 'noopener')}
-            >
-              Haven&apos;t left your review yet? Write it now
-            </button>
-          </p>
         </form>
       )}
 
@@ -308,9 +306,39 @@ export function DashainSpin({ prizes, reviewUrl }: { prizes: string[]; reviewUrl
             <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground">{result.already ? 'Your gift' : 'You won'}</p>
             <h2 className="font-headline font-bold text-4xl md:text-5xl text-brand">{result.prize}</h2>
           </div>
-          <p className="text-muted-foreground">Show this screen to our staff to collect your gift.</p>
           <p className="mx-auto w-fit rounded-md border-2 border-dashed border-border px-6 py-2 font-mono text-lg font-semibold tracking-wider">{bikeNumber}</p>
-          <p className="text-muted-foreground">Happy Dashain and safe riding!</p>
+
+          {reviewState === 'done' ? (
+            <div className="space-y-3" data-testid="dashain-finished">
+              <p className="text-xl font-bold font-headline">Thank you for your review!</p>
+              <p className="text-muted-foreground">Show this screen to our staff to collect your gift.</p>
+              <p className="text-muted-foreground">Happy Dashain and safe riding!</p>
+              <button type="button" className="text-sm text-muted-foreground underline underline-offset-4" onClick={startAgain}>
+                Bought another bike? Start again
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-4 rounded-lg bg-[#fff4dc] p-5" data-testid="dashain-review-step">
+              <p className="text-lg font-bold font-headline">One last step: tell us how we did</p>
+              {countdown !== null && (
+                <p className="text-sm text-muted-foreground" aria-live="polite">Taking you to our Google review in {countdown}…</p>
+              )}
+              <Button
+                size="lg"
+                className="w-full h-14 text-lg font-bold rounded-lg bg-brand text-brand-foreground hover:bg-brand/90"
+                onClick={goToReview}
+                disabled={reviewState === 'redirecting'}
+              >
+                <Star className="w-5 h-5" /> Leave a Google review
+              </Button>
+              {countdown !== null && (
+                <button type="button" className="text-sm text-muted-foreground underline underline-offset-4" onClick={() => setCountdown(null)}>
+                  Stay on this page
+                </button>
+              )}
+              <p className="text-sm text-muted-foreground">Show this screen to our staff to collect your gift.</p>
+            </div>
+          )}
         </div>
       )}
     </div>

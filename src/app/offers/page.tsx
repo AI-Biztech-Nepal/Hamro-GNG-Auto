@@ -8,15 +8,15 @@ import { SITE_URL } from '@/lib/constants';
 export const metadata: Metadata = {
   title: 'Dashain Offer — Spin & Win with Every Bike or Scooter',
   description:
-    'Bought a bike or scooter from G&G Auto Enterprises this Dashain? Scan the QR code, leave a Google review, add your bike number and spin the wheel on your phone for petrol, a helmet, riding gear and more.',
+    'Bought a bike or scooter from G&G Auto Enterprises this Dashain? Scan the QR code, add your bike number, spin the wheel on your phone and leave a quick Google review. Win petrol, a helmet, riding gear and more.',
   alternates: { canonical: '/offers' },
 };
 
 const steps = [
   { icon: QrCode, title: 'Scan the QR code', text: 'Point your phone camera at the code shown at our showroom.' },
-  { icon: Star, title: 'Tell us how we did', text: 'Leave a quick Google review of your experience.' },
   { icon: User, title: 'Add your details', text: 'Your name, mobile number and the number plate of the bike or scooter you bought.' },
-  { icon: Gift, title: 'Spin and collect', text: 'Spin the wheel on your phone, then show the winning screen to our staff and take your gift home.' },
+  { icon: Gift, title: 'Spin the wheel', text: 'Spin the wheel on your phone and see what you have won.' },
+  { icon: Star, title: 'Leave a Google review', text: 'Tell us how we did, then show the winning screen to our staff and take your gift home.' },
 ];
 
 export default async function OffersPage() {
