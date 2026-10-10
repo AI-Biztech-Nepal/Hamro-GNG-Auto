@@ -1,8 +1,10 @@
 "use client"
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import Image from 'next/image';
+import { QRCodeSVG } from 'qrcode.react';
 import {
-  Backpack, CookingPot, Fuel, Gift, Hand, HardHat, Loader2, Shirt, Smartphone, Star, type LucideIcon,
+  Backpack, Banknote, CookingPot, Fuel, Gift, Hand, HardHat, Loader2, Shirt, Smartphone, Sparkles, Star, type LucideIcon,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,6 +25,7 @@ interface OfferReply {
 const PRIZE_ICONS: [string, LucideIcon][] = [
   ['petrol', Fuel], ['fuel', Fuel], ['helmet', HardHat], ['induction', CookingPot], ['glove', Hand],
   ['bag', Backpack], ['jacket', Shirt], ['recharge', Smartphone], ['card', Smartphone],
+  ['cash', Banknote], ['accessor', Sparkles],
 ];
 function iconFor(prize: string): LucideIcon {
   const name = prize.toLowerCase();
@@ -38,6 +41,59 @@ const SLICE_COLORS = [
 
 const R = 150;
 const SPIN_MS = 5500;
+
+/**
+ * The picture wheel (public/wheel.webp). Its prizes are part of the artwork, so a backend prize is
+ * matched to a slice by name (not by position) and the wheel lands on that slice. `centre` and
+ * `width` are in degrees clockwise from the top; "Rs. 2000 Cash" is printed on two slices.
+ * If the artwork is replaced, re-measure this table.
+ */
+const PICTURE_SRC = '/wheel.webp';
+const PICTURE_SLICES = [
+  { prize: 'petrol2', centre: 34.0, width: 48 },
+  { prize: 'induction', centre: 83.0, width: 50 },
+  { prize: 'cash2000', centre: 133.2, width: 50.5 },
+  { prize: 'petrol5', centre: 184.0, width: 51 },
+  { prize: 'cash2000', centre: 236.8, width: 54.5 },
+  { prize: 'accessories', centre: 290.2, width: 52.5 },
+  { prize: 'cash500', centre: 343.2, width: 53.5 },
+] as const;
+type PictureSlice = (typeof PICTURE_SLICES)[number];
+
+/** Which prize on the picture a backend prize name stands for, by keyword. */
+function pictureKey(name: string): string | null {
+  const n = name.toLowerCase().replace(/,/g, '');
+  if (n.includes('induction')) return 'induction';
+  if (n.includes('accessor')) return 'accessories';
+  if (/petrol|fuel/.test(n)) {
+    const litres = n.match(/(\d+)\s*(?:l|lt|ltr|ltrs|liters?|litres?)\b/);
+    return litres?.[1] === '2' ? 'petrol2' : litres?.[1] === '5' ? 'petrol5' : null;
+  }
+  if (n.includes('cash')) {
+    const amount = n.match(/\b(500|2000)\b/);
+    return amount ? `cash${amount[1]}` : null;
+  }
+  return null;
+}
+
+/**
+ * Backend prize name -> the slice(s) it sits on, or null when the prizes in the admin panel don't
+ * line up with the picture (a prize the picture doesn't show, or a printed prize that isn't on the
+ * wheel). Then the plain drawn wheel is used, so the wheel can never show a prize that isn't real.
+ */
+function planPictureWheel(prizes: string[]): Map<string, PictureSlice[]> | null {
+  const plan = new Map<string, PictureSlice[]>();
+  const used = new Set<string>();
+  for (const name of prizes) {
+    const key = pictureKey(name);
+    if (!key || used.has(key)) return null;
+    used.add(key);
+    const slices = PICTURE_SLICES.filter((s) => s.prize === key);
+    if (!slices.length) return null;
+    plan.set(name, slices);
+  }
+  return PICTURE_SLICES.every((s) => used.has(s.prize)) ? plan : null;
+}
 /** Seconds the customer sees their prize before being taken to the Google review. */
 const REVIEW_REDIRECT_SECS = 5;
 
@@ -129,8 +185,106 @@ function Wheel({ prizes, rotation }: { prizes: string[]; rotation: number }) {
   );
 }
 
-export function DashainSpin({ prizes, reviewUrl }: { prizes: string[]; reviewUrl: string }) {
+function PictureWheel({ rotation, spinning, onSpin }: { rotation: number; spinning: boolean; onSpin: () => void }) {
+  return (
+    <div className="relative mx-auto w-full max-w-[360px] pt-4" style={{ containerType: 'inline-size' }} data-testid="picture-wheel">
+      {/* warm glow behind the wheel */}
+      <div
+        aria-hidden
+        className="absolute inset-x-0 top-4 aspect-square scale-[1.18] rounded-full bg-[radial-gradient(circle,rgba(242,184,36,0.6)_0%,rgba(242,184,36,0)_66%)] motion-safe:animate-pulse"
+      />
+      <div className="relative aspect-square">
+        <div
+          className="h-full w-full drop-shadow-[0_10px_16px_rgba(0,0,0,0.32)]"
+          style={{ transform: `rotate(${rotation}deg)`, transition: `transform ${SPIN_MS}ms cubic-bezier(0.12, 0.8, 0.2, 1)` }}
+          data-testid="picture-wheel-disc"
+        >
+          <Image
+            src={PICTURE_SRC}
+            alt="Gift wheel: Rs. 500 Cash, Rs. 2000 Cash, 2 Liter Petrol, 5 Liter Petrol, Induction Stove and Accessories"
+            width={900}
+            height={900}
+            unoptimized
+            draggable={false}
+            className="h-full w-full select-none"
+          />
+        </div>
+
+        {/* The pointer and the hub stay still while the picture turns under them. */}
+        <div aria-hidden className="pointer-events-none absolute left-1/2 top-0 z-10 w-[14%] -translate-x-1/2 -translate-y-[28%]">
+          <svg viewBox="0 0 64 84" className={`block w-full drop-shadow-[0_3px_3px_rgba(0,0,0,0.4)] ${spinning ? 'gng-wheel-tick' : ''}`}>
+            <defs>
+              <linearGradient id="gng-pin" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stopColor="#fff2a8" />
+                <stop offset="0.5" stopColor="#f2b824" />
+                <stop offset="1" stopColor="#b97b06" />
+              </linearGradient>
+            </defs>
+            <path d="M32 82 C26 66 6 52 6 30 A26 26 0 1 1 58 30 C58 52 38 66 32 82 Z" fill="url(#gng-pin)" stroke="#7f1d1d" strokeWidth="3" strokeLinejoin="round" />
+            <circle cx="32" cy="30" r="11" fill="#c1121f" stroke="#7f1d1d" strokeWidth="2" />
+            <circle cx="28" cy="26" r="3.5" fill="#ffffff" opacity="0.75" />
+          </svg>
+        </div>
+
+        <button
+          type="button"
+          onClick={onSpin}
+          disabled={spinning}
+          aria-label="Spin the wheel"
+          className={`absolute left-1/2 top-1/2 z-10 grid aspect-square w-[29.5%] -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-[radial-gradient(circle_at_32%_26%,#fff6c2,#f7c948_52%,#c58a0b)] font-headline font-extrabold uppercase tracking-wide text-[#7a1010] shadow-[0_0_0_3px_#fff7d6,0_0_0_5px_#b97b06,0_6px_14px_rgba(0,0,0,0.4)] ${spinning ? 'opacity-90' : 'gng-hub-pulse'}`}
+          style={{ fontSize: '7.4cqw' }}
+        >
+          Spin
+        </button>
+      </div>
+    </div>
+  );
+}
+
+const CONFETTI_COLORS = ['#c1121f', '#f2b824', '#1d4ed8', '#16a34a', '#7e22ce', '#f97316'];
+
+/** A short burst of paper confetti over the prize screen. Decorative; off under reduced motion. */
+function Confetti() {
+  const pieces = useMemo(
+    () => Array.from({ length: 46 }, (_, i) => ({
+      left: Math.random() * 100,
+      delay: Math.random() * 0.7,
+      dur: 2.4 + Math.random() * 1.6,
+      drift: (Math.random() - 0.5) * 140,
+      spin: (Math.random() < 0.5 ? -1 : 1) * (360 + Math.random() * 540),
+      color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
+      w: 6 + Math.random() * 6,
+      h: 10 + Math.random() * 8,
+    })),
+    [],
+  );
+  return (
+    <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden" data-testid="confetti">
+      {pieces.map((c, i) => (
+        <span
+          key={i}
+          className="gng-confetti"
+          style={{
+            left: `${c.left}%`,
+            width: c.w,
+            height: c.h,
+            backgroundColor: c.color,
+            borderRadius: 2,
+            ['--gng-delay' as string]: `${c.delay}s`,
+            ['--gng-dur' as string]: `${c.dur}s`,
+            ['--gng-drift' as string]: `${c.drift}px`,
+            ['--gng-spin' as string]: `${c.spin}deg`,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+export function DashainSpin({ prizes, reviewUrl, joinUrl }: { prizes: string[]; reviewUrl: string; joinUrl: string }) {
   const [step, setStep] = useState<Step>('details');
+  const picture = useMemo(() => planPictureWheel(prizes), [prizes]);
+  const wheelPreloaded = useRef(false);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [bikeNo, setBikeNo] = useState('');
@@ -180,6 +334,14 @@ export function DashainSpin({ prizes, reviewUrl }: { prizes: string[]; reviewUrl
       window.removeEventListener('pageshow', onReturn);
     };
   }, [reviewState]);
+
+  // Start fetching the wheel picture as soon as the customer begins typing, so it is ready by the wheel step.
+  function preloadWheel() {
+    if (wheelPreloaded.current || !picture) return;
+    wheelPreloaded.current = true;
+    const img = new window.Image();
+    img.src = PICTURE_SRC;
+  }
 
   function showResult(prize: string, already: boolean) {
     setResult({ prize, already });
@@ -243,8 +405,16 @@ export function DashainSpin({ prizes, reviewUrl }: { prizes: string[]; reviewUrl
         return;
       }
       // The pointer sits at the top; turn the wheel so the middle of the winning slice lands under it.
-      const seg = 360 / prizes.length;
-      const landing = 360 - ((r.prize_index ?? 0) + 0.5) * seg + (Math.random() - 0.5) * seg * 0.6;
+      let landing: number;
+      if (picture) {
+        // Land on the slice that shows this prize (one of two for a prize printed twice), a little off-centre.
+        const options = picture.get(r.prize as string) ?? PICTURE_SLICES;
+        const slice = options[Math.floor(Math.random() * options.length)];
+        landing = 360 - slice.centre + (Math.random() - 0.5) * slice.width * 0.5;
+      } else {
+        const seg = 360 / prizes.length;
+        landing = 360 - ((r.prize_index ?? 0) + 0.5) * seg + (Math.random() - 0.5) * seg * 0.6;
+      }
       setRotation((prev) => prev - (prev % 360) + 360 * 6 + landing);
       setTimeout(() => {
         showResult(r.prize as string, Boolean(r.already));
@@ -259,88 +429,116 @@ export function DashainSpin({ prizes, reviewUrl }: { prizes: string[]; reviewUrl
   const ResultIcon = result ? iconFor(result.prize) : Gift;
 
   return (
-    <div className="bg-white p-6 sm:p-10 rounded-xl border border-border" data-testid="dashain-spin">
-      {step === 'details' && (
-        <form onSubmit={submitDetails} className="space-y-6" noValidate>
-          <div className="space-y-2">
-            <h2 className="text-3xl font-bold font-headline">Congratulations on your new ride!</h2>
-            <p className="text-muted-foreground">Tell us who you are and which bike you bought to claim your spin of the gift wheel.</p>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="offer-name" className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Full Name</Label>
-            <Input id="offer-name" autoComplete="name" maxLength={60} value={name} onChange={(e) => setName(e.target.value)} placeholder="Your Name" className="h-11 rounded-md" />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="offer-phone" className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Mobile Number</Label>
-            <Input id="offer-phone" type="tel" inputMode="numeric" autoComplete="tel" maxLength={10} value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="98XXXXXXXX" className="h-11 rounded-md" />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="offer-bike" className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Bike Lot No.</Label>
-            <Input id="offer-bike" autoCapitalize="characters" autoComplete="off" maxLength={24} value={bikeNo} onChange={(e) => setBikeNo(e.target.value)} placeholder="Ba 70 Pa 1234" className="h-11 rounded-md font-mono uppercase" />
-            <p className="text-xs text-muted-foreground">The number plate of the bike or scooter you bought.</p>
-          </div>
-          {error && <p role="alert" className="text-sm font-medium text-destructive">{error}</p>}
-          <Button type="submit" size="lg" disabled={busy} className="w-full h-14 text-lg font-bold rounded-lg" data-testid="go-for-spin">
-            {busy ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Go for spin'}
-          </Button>
-        </form>
-      )}
-
-      {step === 'wheel' && (
-        <div className="space-y-6 text-center">
-          <h2 className="text-3xl font-bold font-headline">Spin the wheel!</h2>
-          <Wheel prizes={prizes} rotation={rotation} />
-          {error && <p role="alert" className="text-sm font-medium text-destructive">{error}</p>}
-          <Button size="lg" disabled={busy} onClick={spin} className="w-full h-14 text-lg font-bold rounded-lg bg-brand text-brand-foreground hover:bg-brand/90">
-            {busy ? 'Spinning…' : 'SPIN'}
-          </Button>
+    <div className="relative overflow-hidden bg-white p-6 sm:p-10 rounded-xl border border-border" data-testid="dashain-spin">
+      {/* A laptop or showroom screen only shows a code to scan -- the form, the wheel and the
+          review all happen on the customer's own phone, so nothing spins on this screen. */}
+      <div className="hidden mouse:block space-y-6 text-center" data-testid="scan-to-spin">
+        <h2 className="text-3xl font-bold font-headline">Scan to spin the wheel</h2>
+        <p className="text-muted-foreground leading-relaxed">
+          Point your phone camera at this code. You&apos;ll add your details, spin the wheel and leave a quick Google review right on your phone.
+        </p>
+        <div className="mx-auto w-fit rounded-xl border border-border bg-white p-5" data-testid="join-qr">
+          <QRCodeSVG
+            value={joinUrl}
+            size={260}
+            level="M"
+            marginSize={0}
+            bgColor="#ffffff"
+            fgColor="#000000"
+            title="Scan to join the G&G Auto Enterprises Dashain Spin & Win"
+          />
         </div>
-      )}
+        <p className="text-sm text-muted-foreground">
+          or open <span className="font-mono font-semibold text-foreground">{joinUrl.replace(/^https?:\/\//, '')}</span> on your phone
+        </p>
+      </div>
 
-      {step === 'result' && result && (
-        <div className="space-y-6 text-center" data-testid="dashain-result">
-          <div className="mx-auto w-20 h-20 rounded-full bg-[#fff4dc] flex items-center justify-center">
-            <ResultIcon className="w-10 h-10 text-brand" strokeWidth={1.75} />
-          </div>
-          <div className="space-y-2">
-            <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground">{result.already ? 'Your gift' : 'You won'}</p>
-            <h2 className="font-headline font-bold text-4xl md:text-5xl text-brand">{result.prize}</h2>
-          </div>
-          <p className="mx-auto w-fit rounded-md border-2 border-dashed border-border px-6 py-2 font-mono text-lg font-semibold tracking-wider">{bikeNumber}</p>
-
-          {reviewState === 'done' ? (
-            <div className="space-y-3" data-testid="dashain-finished">
-              <p className="text-xl font-bold font-headline">Thank you for your review!</p>
-              <p className="text-muted-foreground">Show this screen to our staff to collect your gift.</p>
-              <p className="text-muted-foreground">Happy Dashain and safe riding!</p>
-              <button type="button" className="text-sm text-muted-foreground underline underline-offset-4" onClick={startAgain}>
-                Bought another bike? Start again
-              </button>
+      <div className="mouse:hidden">
+        {step === 'details' && (
+          <form onSubmit={submitDetails} onFocusCapture={preloadWheel} className="space-y-6" noValidate>
+            <div className="space-y-2">
+              <h2 className="text-3xl font-bold font-headline">Congratulations on your new ride!</h2>
+              <p className="text-muted-foreground">Tell us who you are and which bike you bought to claim your spin of the gift wheel.</p>
             </div>
-          ) : (
-            <div className="space-y-4 rounded-lg bg-[#fff4dc] p-5" data-testid="dashain-review-step">
-              <p className="text-lg font-bold font-headline">One last step: tell us how we did</p>
-              {countdown !== null && (
-                <p className="text-sm text-muted-foreground" aria-live="polite">Taking you to our Google review in {countdown}…</p>
-              )}
-              <Button
-                size="lg"
-                className="w-full h-14 text-lg font-bold rounded-lg bg-brand text-brand-foreground hover:bg-brand/90"
-                onClick={goToReview}
-                disabled={reviewState === 'redirecting'}
-              >
-                <Star className="w-5 h-5" /> Leave a Google review
-              </Button>
-              {countdown !== null && (
-                <button type="button" className="text-sm text-muted-foreground underline underline-offset-4" onClick={() => setCountdown(null)}>
-                  Stay on this page
+            <div className="space-y-2">
+              <Label htmlFor="offer-name" className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Full Name</Label>
+              <Input id="offer-name" autoComplete="name" maxLength={60} value={name} onChange={(e) => setName(e.target.value)} placeholder="Your Name" className="h-11 rounded-md" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="offer-phone" className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Mobile Number</Label>
+              <Input id="offer-phone" type="tel" inputMode="numeric" autoComplete="tel" maxLength={10} value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="98XXXXXXXX" className="h-11 rounded-md" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="offer-bike" className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Bike Lot No.</Label>
+              <Input id="offer-bike" autoCapitalize="characters" autoComplete="off" maxLength={24} value={bikeNo} onChange={(e) => setBikeNo(e.target.value)} placeholder="Ba 70 Pa 1234" className="h-11 rounded-md font-mono uppercase" />
+              <p className="text-xs text-muted-foreground">The number plate of the bike or scooter you bought.</p>
+            </div>
+            {error && <p role="alert" className="text-sm font-medium text-destructive">{error}</p>}
+            <Button type="submit" size="lg" disabled={busy} className="w-full h-14 text-lg font-bold rounded-lg" data-testid="go-for-spin">
+              {busy ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Go for spin'}
+            </Button>
+          </form>
+        )}
+
+        {step === 'wheel' && (
+          <div className="space-y-6 text-center">
+            <h2 className="text-3xl font-bold font-headline">Spin the wheel!</h2>
+            {picture
+              ? <PictureWheel rotation={rotation} spinning={busy} onSpin={spin} />
+              : <Wheel prizes={prizes} rotation={rotation} />}
+            {error && <p role="alert" className="text-sm font-medium text-destructive">{error}</p>}
+            <Button size="lg" disabled={busy} onClick={spin} className="w-full h-14 text-lg font-bold rounded-lg bg-brand text-brand-foreground hover:bg-brand/90">
+              {busy ? 'Spinning…' : 'SPIN'}
+            </Button>
+          </div>
+        )}
+
+        {step === 'result' && result && (
+          <div className="space-y-6 text-center" data-testid="dashain-result">
+          {!result.already && <Confetti />}
+            <div className="mx-auto w-20 h-20 rounded-full bg-[#fff4dc] flex items-center justify-center">
+              <ResultIcon className="w-10 h-10 text-brand" strokeWidth={1.75} />
+            </div>
+            <div className="space-y-2">
+              <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground">{result.already ? 'Your gift' : 'You won'}</p>
+              <h2 className="font-headline font-bold text-4xl md:text-5xl text-brand">{result.prize}</h2>
+            </div>
+            <p className="mx-auto w-fit rounded-md border-2 border-dashed border-border px-6 py-2 font-mono text-lg font-semibold tracking-wider">{bikeNumber}</p>
+
+            {reviewState === 'done' ? (
+              <div className="space-y-3" data-testid="dashain-finished">
+                <p className="text-xl font-bold font-headline">Thank you for your review!</p>
+                <p className="text-muted-foreground">Show this screen to our staff to collect your gift.</p>
+                <p className="text-muted-foreground">Happy Dashain and safe riding!</p>
+                <button type="button" className="text-sm text-muted-foreground underline underline-offset-4" onClick={startAgain}>
+                  Bought another bike? Start again
                 </button>
-              )}
-              <p className="text-sm text-muted-foreground">Show this screen to our staff to collect your gift.</p>
-            </div>
-          )}
-        </div>
-      )}
+              </div>
+            ) : (
+              <div className="space-y-4 rounded-lg bg-[#fff4dc] p-5" data-testid="dashain-review-step">
+                <p className="text-lg font-bold font-headline">One last step: tell us how we did</p>
+                {countdown !== null && (
+                  <p className="text-sm text-muted-foreground" aria-live="polite">Taking you to our Google review in {countdown}…</p>
+                )}
+                <Button
+                  size="lg"
+                  className="w-full h-14 text-lg font-bold rounded-lg bg-brand text-brand-foreground hover:bg-brand/90"
+                  onClick={goToReview}
+                  disabled={reviewState === 'redirecting'}
+                >
+                  <Star className="w-5 h-5" /> Leave a Google review
+                </Button>
+                {countdown !== null && (
+                  <button type="button" className="text-sm text-muted-foreground underline underline-offset-4" onClick={() => setCountdown(null)}>
+                    Stay on this page
+                  </button>
+                )}
+                <p className="text-sm text-muted-foreground">Show this screen to our staff to collect your gift.</p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

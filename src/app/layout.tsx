@@ -5,6 +5,7 @@ import { Footer } from '@/components/layout/Footer';
 import { StickyBottomBar } from '@/components/layout/StickyBottomBar';
 import { Toaster } from '@/components/ui/toaster';
 import { TransitionProvider } from '@/components/layout/TransitionProvider';
+import { OfferPopup } from '@/components/offers/OfferPopup';
 import { fetchSettings, type SiteSettings } from '@/lib/inventory-api';
 import { CONTACT_INFO, SITE_URL } from '@/lib/constants';
 
@@ -149,6 +150,7 @@ export default async function RootLayout({
         </TransitionProvider>
         <Footer settings={settings} />
         <StickyBottomBar />
+        <OfferPopup />
         <Toaster />
       </body>
     </html>

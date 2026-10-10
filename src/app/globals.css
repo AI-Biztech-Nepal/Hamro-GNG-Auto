@@ -145,3 +145,38 @@ button, a {
   from { transform: scaleX(0); }
   to { transform: scaleX(1); }
 }
+
+/* Dashain gift wheel (Offers page) */
+@keyframes gng-wheel-tick {
+  from { transform: rotate(-9deg); }
+  to { transform: rotate(5deg); }
+}
+.gng-wheel-tick {
+  transform-origin: 50% 36%;
+  animation: gng-wheel-tick 0.14s ease-in-out infinite alternate;
+}
+@keyframes gng-hub-pulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.06); }
+}
+.gng-hub-pulse {
+  animation: gng-hub-pulse 1.6s ease-in-out infinite;
+}
+@keyframes gng-confetti {
+  0% { transform: translate3d(0, -24px, 0) rotate(0deg); opacity: 1; }
+  100% { transform: translate3d(var(--gng-drift, 0px), 640px, 0) rotate(var(--gng-spin, 540deg)); opacity: 0.9; }
+}
+.gng-confetti {
+  position: absolute;
+  top: 0;
+  pointer-events: none;
+  animation: gng-confetti var(--gng-dur, 2.8s) cubic-bezier(0.25, 0.6, 0.4, 1) var(--gng-delay, 0s) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .gng-wheel-tick, .gng-hub-pulse, .gng-confetti {
+    animation: none;
+  }
+  .gng-confetti {
+    display: none;
+  }
+}
