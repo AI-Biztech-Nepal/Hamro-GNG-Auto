@@ -3,6 +3,10 @@ export const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL || 'https://hamroauto.com.np'
 ).replace(/\/$/, '');
 
+/** The showroom's Google review page (same link the Offers backend hands out as `review_url`). */
+export const GOOGLE_REVIEW_URL =
+  'https://search.google.com/local/writereview?placeid=ChIJcRmLdk4b6zkRI2pToermlUw';
+
 export const CONTACT_INFO = {
   phone: '9860087161',
   whatsapp: '9808027608',

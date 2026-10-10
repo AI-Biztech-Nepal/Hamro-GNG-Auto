@@ -5,17 +5,18 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { QRCodeSVG } from 'qrcode.react';
-import { Gift, X } from 'lucide-react';
+import { Gift, Star, X } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
-import { SITE_URL } from '@/lib/constants';
+import { GOOGLE_REVIEW_URL, SITE_URL } from '@/lib/constants';
 
 /**
- * The Dashain & Tihar offer poster, shown once per visit as a popup when the home page opens.
+ * The Dashain & Tihar offer poster, shown as a popup every time the home page is opened or
+ * reloaded (not again when the customer browses away and comes back without reloading).
  *
  * - Laptops / showroom screens (mouse or trackpad): a crisp live QR code is set over the poster's
  *   own QR, so a customer can scan it with their phone.
- * - Phones can't scan their own screen, so the poster itself links to the Offers page and a
- *   "Spin the wheel" button sits under it.
+ * - Phones can't scan their own screen, so the poster itself links to the Offers page and two
+ *   buttons sit under it: "Spin the wheel" (details -> spin) and "Proceed to Google review".
  *
  * The overlay is positioned in fractions of the artwork (and sized in cqw), so it stays glued to
  * the poster at any size. If /public/offers-popup.jpg is replaced, re-measure QR_BOX below.
@@ -23,28 +24,17 @@ import { SITE_URL } from '@/lib/constants';
 const ART_W = 1024;
 const ART_H = 765;
 const POSTER = '/offers-popup.jpg';
-/** Remembered per browser session, so closing the popup keeps it away until the next visit. */
-const SEEN_KEY = 'gng-offer-popup-seen-v1';
 const SHOW_DELAY_MS = 700;
+/**
+ * Set once the popup has opened in this page load. It lives in memory (not storage), so a reload
+ * starts fresh and shows the popup again, while moving around the site and back to the home page
+ * doesn't keep re-opening it.
+ */
+let shownThisLoad = false;
 
 const frac = (px: number, of: number) => `${((px / of) * 100).toFixed(3)}%`;
 /** A white box that covers the QR code printed on the poster, in artwork pixels. */
 const QR_BOX = { x: 582.5, y: 382, w: 124, h: 124 };
-
-function alreadySeen(): boolean {
-  try {
-    return sessionStorage.getItem(SEEN_KEY) === '1';
-  } catch {
-    return false;
-  }
-}
-function markSeen() {
-  try {
-    sessionStorage.setItem(SEEN_KEY, '1');
-  } catch {
-    /* storage blocked -- worst case it shows again on the next page load */
-  }
-}
 
 export function OfferPopup() {
   const pathname = usePathname();
@@ -52,7 +42,7 @@ export function OfferPopup() {
   const onHome = pathname === '/';
 
   useEffect(() => {
-    if (!onHome || alreadySeen()) return;
+    if (!onHome || shownThisLoad) return;
     let cancelled = false;
     let timer: ReturnType<typeof setTimeout> | undefined;
     // Fetch the poster first and open once it is ready, so the popup never appears half-drawn.
@@ -61,7 +51,7 @@ export function OfferPopup() {
       if (cancelled) return;
       timer = setTimeout(() => {
         if (cancelled) return;
-        markSeen();
+        shownThisLoad = true;
         setOpen(true);
       }, SHOW_DELAY_MS);
     };
@@ -88,8 +78,8 @@ export function OfferPopup() {
         </DialogDescription>
 
         <div
-          // Phones keep room under the poster for the "Spin the wheel" button.
-          className="relative overflow-hidden rounded-xl bg-[#1b1030] shadow-2xl [--ph:78dvh] mouse:[--ph:86dvh]"
+          // Phones keep room under the poster for the two buttons.
+          className="relative overflow-hidden rounded-xl bg-[#1b1030] shadow-2xl [--ph:calc(100dvh_-_11rem)] mouse:[--ph:86dvh]"
           style={{
             width: 'min(92vw, calc(var(--ph) * 1024 / 765))',
             aspectRatio: `${ART_W} / ${ART_H}`,
@@ -142,14 +132,24 @@ export function OfferPopup() {
           </button>
         </div>
 
-        <Link
-          href="/offers"
-          onClick={() => setOpen(false)}
-          className="mx-auto mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-brand font-bold text-brand-foreground hover:bg-brand/90 mouse:hidden"
-          style={{ maxWidth: 'min(92vw, 420px)' }}
-        >
-          <Gift className="h-5 w-5" /> Spin the wheel
-        </Link>
+        {/* Phones can't scan their own screen, so the way in is a button. */}
+        <div className="mx-auto mt-3 flex w-full flex-col gap-2 mouse:hidden" style={{ maxWidth: 'min(92vw, 420px)' }}>
+          <Link
+            href="/offers"
+            onClick={() => setOpen(false)}
+            className="flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-brand px-3 text-[15px] font-bold text-brand-foreground hover:bg-brand/90"
+          >
+            <Gift className="h-5 w-5" /> Spin the wheel
+          </Link>
+          <a
+            href={GOOGLE_REVIEW_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-white px-3 text-[15px] font-bold text-foreground hover:bg-white/90"
+          >
+            <Star className="h-5 w-5" /> Proceed to Google review
+          </a>
+        </div>
       </DialogContent>
     </Dialog>
   );
