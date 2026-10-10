@@ -32,35 +32,27 @@ function iconFor(prize: string): LucideIcon {
   return PRIZE_ICONS.find(([key]) => name.includes(key))?.[1] ?? Gift;
 }
 
-const SLICE_COLORS = [
-  { fill: 'hsl(0 72% 44%)', ink: '#ffffff' },
-  { fill: '#fff4dc', ink: '#171717' },
-  { fill: '#171717', ink: '#ffffff' },
-  { fill: '#f2b824', ink: '#171717' },
-];
-
-const R = 150;
 const SPIN_MS = 5500;
 
 /**
- * The picture wheel (public/wheel.webp). Its prizes are part of the artwork, so a backend prize is
- * matched to a slice by name (not by position) and the wheel lands on that slice. `centre` and
- * `width` are in degrees clockwise from the top; "Rs. 2000 Cash" is printed on two slices.
- * If the artwork is replaced, re-measure this table.
+ * The wheel is a picture (public/wheel-v2.webp) and its prizes are part of the artwork. The prize is
+ * always picked by the backend; the wheel turns to land on the slice that shows that prize.
+ * `centre` and `width` are in degrees clockwise from the top; "Rs. 2000 Cash" is printed on two
+ * slices. If the artwork is replaced, re-measure this table.
  */
-const PICTURE_SRC = '/wheel.webp';
+const PICTURE_SRC = '/wheel-v2.webp';
 const PICTURE_SLICES = [
-  { prize: 'petrol2', centre: 34.0, width: 48 },
-  { prize: 'induction', centre: 83.0, width: 50 },
-  { prize: 'cash2000', centre: 133.2, width: 50.5 },
-  { prize: 'petrol5', centre: 184.0, width: 51 },
-  { prize: 'cash2000', centre: 236.8, width: 54.5 },
-  { prize: 'accessories', centre: 290.2, width: 52.5 },
-  { prize: 'cash500', centre: 343.2, width: 53.5 },
+  { prize: 'petrol2', centre: 32.3, width: 49.9 },
+  { prize: 'induction', centre: 82.9, width: 51.3 },
+  { prize: 'cash2000', centre: 133.2, width: 49.4 },
+  { prize: 'petrol5', centre: 183.8, width: 51.7 },
+  { prize: 'cash2000', centre: 237.0, width: 54.9 },
+  { prize: 'accessories', centre: 290.6, width: 52.3 },
+  { prize: 'cash500', centre: 342.1, width: 50.6 },
 ] as const;
 type PictureSlice = (typeof PICTURE_SLICES)[number];
 
-/** Which prize on the picture a backend prize name stands for, by keyword. */
+/** Which prize on the picture a backend prize name stands for, by keyword; null if none does. */
 function pictureKey(name: string): string | null {
   const n = name.toLowerCase().replace(/,/g, '');
   if (n.includes('induction')) return 'induction';
@@ -77,22 +69,15 @@ function pictureKey(name: string): string | null {
 }
 
 /**
- * Backend prize name -> the slice(s) it sits on, or null when the prizes in the admin panel don't
- * line up with the picture (a prize the picture doesn't show, or a printed prize that isn't on the
- * wheel). Then the plain drawn wheel is used, so the wheel can never show a prize that isn't real.
+ * The slice(s) the wheel should land on for a prize. When the prize in the admin panel isn't one of
+ * the six printed on the picture, the nearest printed one is used (fuel -> petrol, money or a
+ * recharge -> cash, any gear -> accessories). The prize shown afterwards is always the real one.
  */
-function planPictureWheel(prizes: string[]): Map<string, PictureSlice[]> | null {
-  const plan = new Map<string, PictureSlice[]>();
-  const used = new Set<string>();
-  for (const name of prizes) {
-    const key = pictureKey(name);
-    if (!key || used.has(key)) return null;
-    used.add(key);
-    const slices = PICTURE_SLICES.filter((s) => s.prize === key);
-    if (!slices.length) return null;
-    plan.set(name, slices);
-  }
-  return PICTURE_SLICES.every((s) => used.has(s.prize)) ? plan : null;
+function slicesFor(prize: string): PictureSlice[] {
+  const n = prize.toLowerCase();
+  const nearest = /petrol|fuel/.test(n) ? 'petrol2' : /cash|recharge|card|rs\.?\s*\d/.test(n) ? 'cash500' : 'accessories';
+  const key = pictureKey(prize) ?? nearest;
+  return PICTURE_SLICES.filter((s) => s.prize === key);
 }
 /** Seconds the customer sees their prize before being taken to the Google review. */
 const REVIEW_REDIRECT_SECS = 5;
@@ -134,55 +119,6 @@ async function callOffer(action: 'check' | 'spin', payload: Record<string, strin
     body: JSON.stringify({ action, ...payload }),
   });
   return res.json();
-}
-
-function Wheel({ prizes, rotation }: { prizes: string[]; rotation: number }) {
-  const seg = 360 / prizes.length;
-  // Point on the rim at `deg` clockwise from the top.
-  const rim = (deg: number) => {
-    const rad = ((deg - 90) * Math.PI) / 180;
-    return `${(R * Math.cos(rad)).toFixed(2)} ${(R * Math.sin(rad)).toFixed(2)}`;
-  };
-
-  return (
-    <div className="relative mx-auto w-full max-w-[340px]">
-      <div
-        aria-hidden
-        className="absolute left-1/2 -top-1 z-10 -translate-x-1/2 w-0 h-0 border-x-[13px] border-x-transparent border-t-[26px] border-t-foreground drop-shadow"
-      />
-      <svg viewBox="-160 -160 320 320" className="w-full h-auto" role="img" aria-label={`Gift wheel: ${prizes.join(', ')}`}>
-        <g style={{ transform: `rotate(${rotation}deg)`, transition: `transform ${SPIN_MS}ms cubic-bezier(0.12, 0.8, 0.2, 1)` }}>
-          {prizes.map((prize, i) => {
-            const { fill, ink } = SLICE_COLORS[i % SLICE_COLORS.length];
-            const Icon = iconFor(prize);
-            return (
-              <g key={`${prize}-${i}`}>
-                <path d={`M0 0 L${rim(i * seg)} A${R} ${R} 0 0 1 ${rim((i + 1) * seg)} Z`} fill={fill} stroke="#ffffff" strokeWidth={2} />
-                <g transform={`rotate(${(i + 0.5) * seg})`}>
-                  <Icon x={-12} y={-R + 12} width={24} height={24} color={ink} strokeWidth={2} />
-                  <text
-                    transform="rotate(-90)"
-                    x={R - 44}
-                    y={4}
-                    textAnchor="end"
-                    fontSize={11.5}
-                    fontWeight={700}
-                    fill={ink}
-                    {...(prize.length > 12 ? { textLength: 76, lengthAdjust: 'spacingAndGlyphs' as const } : {})}
-                  >
-                    {prize}
-                  </text>
-                </g>
-              </g>
-            );
-          })}
-        </g>
-        <circle r={R + 4} fill="none" stroke="#171717" strokeWidth={8} />
-        <circle r={22} fill="#ffffff" stroke="#171717" strokeWidth={4} />
-        <circle r={6} fill="hsl(0 72% 44%)" />
-      </svg>
-    </div>
-  );
 }
 
 function PictureWheel({ rotation, spinning, onSpin }: { rotation: number; spinning: boolean; onSpin: () => void }) {
@@ -231,7 +167,7 @@ function PictureWheel({ rotation, spinning, onSpin }: { rotation: number; spinni
           onClick={onSpin}
           disabled={spinning}
           aria-label="Spin the wheel"
-          className={`absolute left-1/2 top-1/2 z-10 grid aspect-square w-[29.5%] -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-[radial-gradient(circle_at_32%_26%,#fff6c2,#f7c948_52%,#c58a0b)] font-headline font-extrabold uppercase tracking-wide text-[#7a1010] shadow-[0_0_0_3px_#fff7d6,0_0_0_5px_#b97b06,0_6px_14px_rgba(0,0,0,0.4)] ${spinning ? 'opacity-90' : 'gng-hub-pulse'}`}
+          className={`absolute left-1/2 top-1/2 z-10 grid aspect-square w-[25.5%] -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-[radial-gradient(circle_at_32%_26%,#fff6c2,#f7c948_52%,#c58a0b)] font-headline font-extrabold uppercase tracking-wide text-[#7a1010] shadow-[0_0_0_3px_#fff7d6,0_0_0_5px_#b97b06,0_6px_14px_rgba(0,0,0,0.4)] ${spinning ? 'opacity-90' : 'gng-hub-pulse'}`}
           style={{ fontSize: '7.4cqw' }}
         >
           Spin
@@ -283,7 +219,6 @@ function Confetti() {
 
 export function DashainSpin({ prizes, reviewUrl, joinUrl }: { prizes: string[]; reviewUrl: string; joinUrl: string }) {
   const [step, setStep] = useState<Step>('details');
-  const picture = useMemo(() => planPictureWheel(prizes), [prizes]);
   const wheelPreloaded = useRef(false);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -308,6 +243,15 @@ export function DashainSpin({ prizes, reviewUrl, joinUrl }: { prizes: string[]; 
     setReviewState(saved.reviewSent ? 'done' : 'pending');
     setStep('result');
   }, []);
+
+  // A heads-up for whoever is testing the page: the picture only shows six prizes, so any other
+  // prize set in the admin panel can't be seen on the wheel (the wheel lands on the nearest one).
+  useEffect(() => {
+    const missing = prizes.filter((p) => !pictureKey(p));
+    if (missing.length) {
+      console.warn(`Gift wheel: these prizes are not printed on the wheel picture: ${missing.join(', ')}. Update the prizes in the admin Offers screen to match the picture.`);
+    }
+  }, [prizes]);
 
   // Count down on the prize screen, then take the customer to the Google review.
   useEffect(() => {
@@ -337,7 +281,7 @@ export function DashainSpin({ prizes, reviewUrl, joinUrl }: { prizes: string[]; 
 
   // Start fetching the wheel picture as soon as the customer begins typing, so it is ready by the wheel step.
   function preloadWheel() {
-    if (wheelPreloaded.current || !picture) return;
+    if (wheelPreloaded.current) return;
     wheelPreloaded.current = true;
     const img = new window.Image();
     img.src = PICTURE_SRC;
@@ -405,16 +349,10 @@ export function DashainSpin({ prizes, reviewUrl, joinUrl }: { prizes: string[]; 
         return;
       }
       // The pointer sits at the top; turn the wheel so the middle of the winning slice lands under it.
-      let landing: number;
-      if (picture) {
-        // Land on the slice that shows this prize (one of two for a prize printed twice), a little off-centre.
-        const options = picture.get(r.prize as string) ?? PICTURE_SLICES;
-        const slice = options[Math.floor(Math.random() * options.length)];
-        landing = 360 - slice.centre + (Math.random() - 0.5) * slice.width * 0.5;
-      } else {
-        const seg = 360 / prizes.length;
-        landing = 360 - ((r.prize_index ?? 0) + 0.5) * seg + (Math.random() - 0.5) * seg * 0.6;
-      }
+      // A prize printed on two slices lands on either one, a little off-centre.
+      const options = slicesFor(r.prize as string);
+      const slice = options[Math.floor(Math.random() * options.length)];
+      const landing = 360 - slice.centre + (Math.random() - 0.5) * slice.width * 0.5;
       setRotation((prev) => prev - (prev % 360) + 360 * 6 + landing);
       setTimeout(() => {
         showResult(r.prize as string, Boolean(r.already));
@@ -483,9 +421,7 @@ export function DashainSpin({ prizes, reviewUrl, joinUrl }: { prizes: string[]; 
         {step === 'wheel' && (
           <div className="space-y-6 text-center">
             <h2 className="text-3xl font-bold font-headline">Spin the wheel!</h2>
-            {picture
-              ? <PictureWheel rotation={rotation} spinning={busy} onSpin={spin} />
-              : <Wheel prizes={prizes} rotation={rotation} />}
+            <PictureWheel rotation={rotation} spinning={busy} onSpin={spin} />
             {error && <p role="alert" className="text-sm font-medium text-destructive">{error}</p>}
             <Button size="lg" disabled={busy} onClick={spin} className="w-full h-14 text-lg font-bold rounded-lg bg-brand text-brand-foreground hover:bg-brand/90">
               {busy ? 'Spinning…' : 'SPIN'}
