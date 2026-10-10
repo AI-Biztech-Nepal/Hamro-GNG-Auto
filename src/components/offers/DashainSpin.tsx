@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useRef, useState } from 'react';
-import { QRCodeSVG } from 'qrcode.react';
 import {
   Backpack, CookingPot, Fuel, Gift, Hand, HardHat, Loader2, Shirt, Smartphone, Star, type LucideIcon,
 } from 'lucide-react';
@@ -39,6 +38,29 @@ const SLICE_COLORS = [
 
 const R = 150;
 const SPIN_MS = 5500;
+
+// Remembers that this phone opened the Google review, so the form still opens by itself when the
+// browser reloads this page on return (phones with little memory drop the tab while the Google /
+// Maps app is in front). Cleared once the wheel has been spun.
+const REVIEW_FLAG = 'gng-dashain-review-opened';
+const REVIEW_FLAG_TTL_MS = 2 * 60 * 60 * 1000;
+
+function reviewWasOpened(): boolean {
+  try {
+    const at = Number(localStorage.getItem(REVIEW_FLAG));
+    return at > 0 && Date.now() - at < REVIEW_FLAG_TTL_MS;
+  } catch {
+    return false;
+  }
+}
+function setReviewFlag(on: boolean) {
+  try {
+    if (on) localStorage.setItem(REVIEW_FLAG, String(Date.now()));
+    else localStorage.removeItem(REVIEW_FLAG);
+  } catch {
+    /* private mode / storage blocked -- the in-memory handlers below still work */
+  }
+}
 
 async function callOffer(action: 'check' | 'spin', payload: Record<string, string>): Promise<OfferReply> {
   const res = await fetch('/api/offers/dashain', {
@@ -98,7 +120,7 @@ function Wheel({ prizes, rotation }: { prizes: string[]; rotation: number }) {
   );
 }
 
-export function DashainSpin({ prizes, reviewUrl, joinUrl }: { prizes: string[]; reviewUrl: string; joinUrl: string }) {
+export function DashainSpin({ prizes, reviewUrl }: { prizes: string[]; reviewUrl: string }) {
   const [step, setStep] = useState<Step>('review');
   const [reviewOpened, setReviewOpened] = useState(false);
   const [name, setName] = useState('');
@@ -111,14 +133,30 @@ export function DashainSpin({ prizes, reviewUrl, joinUrl }: { prizes: string[]; 
   const stepRef = useRef(step);
   stepRef.current = step;
 
-  // When the customer comes back from the Google review tab/app, move on by itself.
+  // Page was reloaded after the customer went off to write the review: carry straight on.
+  useEffect(() => {
+    if (reviewWasOpened()) {
+      setReviewOpened(true);
+      setStep('details');
+    }
+  }, []);
+
+  // When the customer comes back from the Google review tab/app, open the form by itself.
+  // visibilitychange covers tab/app switches, focus covers some in-app browsers, and pageshow
+  // covers the browser restoring this page from its back/forward cache.
   useEffect(() => {
     if (!reviewOpened) return;
-    const onVisible = () => {
+    const onReturn = () => {
       if (document.visibilityState === 'visible' && stepRef.current === 'review') setStep('details');
     };
-    document.addEventListener('visibilitychange', onVisible);
-    return () => document.removeEventListener('visibilitychange', onVisible);
+    document.addEventListener('visibilitychange', onReturn);
+    window.addEventListener('focus', onReturn);
+    window.addEventListener('pageshow', onReturn);
+    return () => {
+      document.removeEventListener('visibilitychange', onReturn);
+      window.removeEventListener('focus', onReturn);
+      window.removeEventListener('pageshow', onReturn);
+    };
   }, [reviewOpened]);
 
   // The backend treats this as the one-spin-per-bike key (and reads it as `code` on the wire).
@@ -140,6 +178,7 @@ export function DashainSpin({ prizes, reviewUrl, joinUrl }: { prizes: string[]; 
       if (!r.ok) setError(r.msg || 'Please check the bike number and try again.');
       else if (r.used) {
         setResult({ prize: r.prize || '', already: true });
+        setReviewFlag(false);
         setStep('result');
       } else setStep('wheel');
     } catch {
@@ -164,6 +203,7 @@ export function DashainSpin({ prizes, reviewUrl, joinUrl }: { prizes: string[]; 
       setRotation((prev) => prev - (prev % 360) + 360 * 6 + landing);
       setTimeout(() => {
         setResult({ prize: r.prize as string, already: Boolean(r.already) });
+        setReviewFlag(false);
         setStep('result');
         setBusy(false);
       }, SPIN_MS + 600);
@@ -177,112 +217,102 @@ export function DashainSpin({ prizes, reviewUrl, joinUrl }: { prizes: string[]; 
 
   return (
     <div className="bg-white p-6 sm:p-10 rounded-xl border border-border" data-testid="dashain-spin">
-      {/* A laptop or showroom screen only shows a code to scan -- the review, the form and the
-          wheel all happen on the customer's own phone, so nothing spins on this screen. */}
-      <div className="hidden mouse:block space-y-6 text-center" data-testid="scan-to-spin">
-        <h2 className="text-3xl font-bold font-headline">Scan to spin the wheel</h2>
-        <p className="text-muted-foreground leading-relaxed">
-          Point your phone camera at this code. You&apos;ll leave a quick Google review, add your details and spin the wheel right on your phone.
-        </p>
-        <div className="mx-auto w-fit rounded-xl border border-border bg-white p-5" data-testid="join-qr">
-          <QRCodeSVG
-            value={joinUrl}
-            size={240}
-            level="M"
-            marginSize={0}
-            bgColor="#ffffff"
-            fgColor="#171717"
-            title="Scan to join the G&G Auto Enterprises Dashain Spin & Win"
-          />
-        </div>
-        <p className="text-sm text-muted-foreground">
-          or open <span className="font-mono font-semibold text-foreground">{joinUrl.replace(/^https?:\/\//, '')}</span> on your phone
-        </p>
-      </div>
-
-      <div className="mouse:hidden">
-        {step === 'review' && (
-          <div className="space-y-6 text-center">
-            <h2 className="text-3xl font-bold font-headline">Congratulations on your new ride!</h2>
-            <div className="flex justify-center gap-1.5" aria-hidden>
-              {[0, 1, 2, 3, 4].map((i) => <Star key={i} className="w-8 h-8 fill-[#f2b824] text-[#f2b824]" />)}
-            </div>
-            <p className="text-muted-foreground leading-relaxed">
-              Tell us how we did with a quick Google review. When you come back to this page, you can add your details and spin the wheel.
-            </p>
-            <Button
-              size="lg"
-              className="w-full h-14 text-lg font-bold rounded-lg bg-brand text-brand-foreground hover:bg-brand/90"
-              onClick={() => {
-                window.open(reviewUrl, '_blank', 'noopener');
-                setReviewOpened(true);
-              }}
-            >
-              <Star className="w-5 h-5" /> Write a Google review
-            </Button>
-            {reviewOpened && (
+      {step === 'review' && (
+        <div className="space-y-6 text-center">
+          <h2 className="text-3xl font-bold font-headline">Congratulations on your new ride!</h2>
+          <div className="flex justify-center gap-1.5" aria-hidden>
+            {[0, 1, 2, 3, 4].map((i) => <Star key={i} className="w-8 h-8 fill-[#f2b824] text-[#f2b824]" />)}
+          </div>
+          <p className="text-muted-foreground leading-relaxed">
+            Tell us how we did with a quick Google review. When you come back to this page, you can add your details and spin the wheel.
+          </p>
+          <Button
+            size="lg"
+            className="w-full h-14 text-lg font-bold rounded-lg bg-brand text-brand-foreground hover:bg-brand/90"
+            onClick={() => {
+              setReviewFlag(true);
+              window.open(reviewUrl, '_blank', 'noopener');
+              setReviewOpened(true);
+            }}
+          >
+            <Star className="w-5 h-5" /> Write a Google review
+          </Button>
+          {reviewOpened && (
+            <>
+              <p className="text-sm text-muted-foreground">
+                Submit your review, then come back to this page &mdash; your form opens by itself.
+              </p>
               <Button size="lg" variant="outline" className="w-full h-12 font-semibold rounded-lg" onClick={() => setStep('details')}>
                 I&apos;m done — add my details
               </Button>
-            )}
-            <button type="button" className="text-sm text-muted-foreground underline underline-offset-4" onClick={() => setStep('details')}>
-              Already reviewed us? Continue
+            </>
+          )}
+          <button type="button" className="text-sm text-muted-foreground underline underline-offset-4" onClick={() => setStep('details')}>
+            Already reviewed us? Continue
+          </button>
+        </div>
+      )}
+
+      {step === 'details' && (
+        <form onSubmit={submitDetails} className="space-y-6" noValidate>
+          <div className="space-y-2">
+            <h2 className="text-3xl font-bold font-headline">Thank you! One last step</h2>
+            <p className="text-muted-foreground">Tell us who you are and which bike you bought, then spin the gift wheel.</p>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="offer-name" className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Full Name</Label>
+            <Input id="offer-name" autoComplete="name" maxLength={60} value={name} onChange={(e) => setName(e.target.value)} placeholder="Your Name" className="h-11 rounded-md" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="offer-phone" className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Mobile Number</Label>
+            <Input id="offer-phone" type="tel" inputMode="numeric" autoComplete="tel" maxLength={10} value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="98XXXXXXXX" className="h-11 rounded-md" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="offer-bike" className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Bike Lot No.</Label>
+            <Input id="offer-bike" autoCapitalize="characters" autoComplete="off" maxLength={24} value={bikeNo} onChange={(e) => setBikeNo(e.target.value)} placeholder="Ba 70 Pa 1234" className="h-11 rounded-md font-mono uppercase" />
+            <p className="text-xs text-muted-foreground">The number plate of the bike or scooter you bought.</p>
+          </div>
+          {error && <p role="alert" className="text-sm font-medium text-destructive">{error}</p>}
+          <Button type="submit" size="lg" disabled={busy} className="w-full h-14 text-lg font-bold rounded-lg">
+            {busy ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Open the wheel'}
+          </Button>
+          <p className="text-center">
+            <button
+              type="button"
+              className="text-sm text-muted-foreground underline underline-offset-4"
+              onClick={() => window.open(reviewUrl, '_blank', 'noopener')}
+            >
+              Haven&apos;t left your review yet? Write it now
             </button>
-          </div>
-        )}
+          </p>
+        </form>
+      )}
 
-        {step === 'details' && (
-          <form onSubmit={submitDetails} className="space-y-6" noValidate>
-            <div className="space-y-2">
-              <h2 className="text-3xl font-bold font-headline">Thank you! One last step</h2>
-              <p className="text-muted-foreground">Tell us who you are and which bike you bought, then spin the gift wheel.</p>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="offer-name" className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Full Name</Label>
-              <Input id="offer-name" autoComplete="name" maxLength={60} value={name} onChange={(e) => setName(e.target.value)} placeholder="Your Name" className="h-11 rounded-md" />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="offer-phone" className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Mobile Number</Label>
-              <Input id="offer-phone" type="tel" inputMode="numeric" autoComplete="tel" maxLength={10} value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="98XXXXXXXX" className="h-11 rounded-md" />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="offer-bike" className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Bike Lot No.</Label>
-              <Input id="offer-bike" autoCapitalize="characters" autoComplete="off" maxLength={24} value={bikeNo} onChange={(e) => setBikeNo(e.target.value)} placeholder="Ba 70 Pa 1234" className="h-11 rounded-md font-mono uppercase" />
-              <p className="text-xs text-muted-foreground">The number plate of the bike or scooter you bought.</p>
-            </div>
-            {error && <p role="alert" className="text-sm font-medium text-destructive">{error}</p>}
-            <Button type="submit" size="lg" disabled={busy} className="w-full h-14 text-lg font-bold rounded-lg">
-              {busy ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Open the wheel'}
-            </Button>
-          </form>
-        )}
+      {step === 'wheel' && (
+        <div className="space-y-6 text-center">
+          <h2 className="text-3xl font-bold font-headline">Spin the wheel!</h2>
+          <Wheel prizes={prizes} rotation={rotation} />
+          {error && <p role="alert" className="text-sm font-medium text-destructive">{error}</p>}
+          <Button size="lg" disabled={busy} onClick={spin} className="w-full h-14 text-lg font-bold rounded-lg bg-brand text-brand-foreground hover:bg-brand/90">
+            {busy ? 'Spinning…' : 'SPIN'}
+          </Button>
+        </div>
+      )}
 
-        {step === 'wheel' && (
-          <div className="space-y-6 text-center">
-            <h2 className="text-3xl font-bold font-headline">Spin the wheel!</h2>
-            <Wheel prizes={prizes} rotation={rotation} />
-            {error && <p role="alert" className="text-sm font-medium text-destructive">{error}</p>}
-            <Button size="lg" disabled={busy} onClick={spin} className="w-full h-14 text-lg font-bold rounded-lg bg-brand text-brand-foreground hover:bg-brand/90">
-              {busy ? 'Spinning…' : 'SPIN'}
-            </Button>
+      {step === 'result' && result && (
+        <div className="space-y-6 text-center" data-testid="dashain-result">
+          <div className="mx-auto w-20 h-20 rounded-full bg-[#fff4dc] flex items-center justify-center">
+            <ResultIcon className="w-10 h-10 text-brand" strokeWidth={1.75} />
           </div>
-        )}
-
-        {step === 'result' && result && (
-          <div className="space-y-6 text-center" data-testid="dashain-result">
-            <div className="mx-auto w-20 h-20 rounded-full bg-[#fff4dc] flex items-center justify-center">
-              <ResultIcon className="w-10 h-10 text-brand" strokeWidth={1.75} />
-            </div>
-            <div className="space-y-2">
-              <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground">{result.already ? 'Your gift' : 'You won'}</p>
-              <h2 className="font-headline font-bold text-4xl md:text-5xl text-brand">{result.prize}</h2>
-            </div>
-            <p className="text-muted-foreground">Show this screen to our staff to collect your gift.</p>
-            <p className="mx-auto w-fit rounded-md border-2 border-dashed border-border px-6 py-2 font-mono text-lg font-semibold tracking-wider">{bikeNumber}</p>
-            <p className="text-muted-foreground">Happy Dashain and safe riding!</p>
+          <div className="space-y-2">
+            <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground">{result.already ? 'Your gift' : 'You won'}</p>
+            <h2 className="font-headline font-bold text-4xl md:text-5xl text-brand">{result.prize}</h2>
           </div>
-        )}
-      </div>
+          <p className="text-muted-foreground">Show this screen to our staff to collect your gift.</p>
+          <p className="mx-auto w-fit rounded-md border-2 border-dashed border-border px-6 py-2 font-mono text-lg font-semibold tracking-wider">{bikeNumber}</p>
+          <p className="text-muted-foreground">Happy Dashain and safe riding!</p>
+        </div>
+      )}
     </div>
   );
 }
