@@ -32,7 +32,14 @@ function iconFor(prize: string): LucideIcon {
   return PRIZE_ICONS.find(([key]) => name.includes(key))?.[1] ?? Gift;
 }
 
-const SPIN_MS = 5500;
+const SPIN_MS = 7500;
+const SPIN_TURNS = 7;
+/**
+ * Slows down at a steady rate, like a real wheel losing speed to friction: it starts fast and is
+ * still visibly turning in the last seconds, then rolls gently to a stop. (The old curve dropped
+ * its speed within the first third, so the last few seconds looked like it had already stopped.)
+ */
+const SPIN_EASE = 'cubic-bezier(0.5, 1, 0.89, 1)';
 
 /**
  * The wheel is a picture (public/wheel-v2.webp) and its prizes are part of the artwork. The prize is
@@ -132,7 +139,7 @@ function PictureWheel({ rotation, spinning, onSpin }: { rotation: number; spinni
       <div className="relative aspect-square">
         <div
           className="h-full w-full drop-shadow-[0_10px_16px_rgba(0,0,0,0.32)]"
-          style={{ transform: `rotate(${rotation}deg)`, transition: `transform ${SPIN_MS}ms cubic-bezier(0.12, 0.8, 0.2, 1)` }}
+          style={{ transform: `rotate(${rotation}deg)`, transition: `transform ${SPIN_MS}ms ${SPIN_EASE}` }}
           data-testid="picture-wheel-disc"
         >
           <Image
@@ -353,7 +360,7 @@ export function DashainSpin({ prizes, reviewUrl, joinUrl }: { prizes: string[]; 
       const options = slicesFor(r.prize as string);
       const slice = options[Math.floor(Math.random() * options.length)];
       const landing = 360 - slice.centre + (Math.random() - 0.5) * slice.width * 0.5;
-      setRotation((prev) => prev - (prev % 360) + 360 * 6 + landing);
+      setRotation((prev) => prev - (prev % 360) + 360 * SPIN_TURNS + landing);
       setTimeout(() => {
         showResult(r.prize as string, Boolean(r.already));
         setBusy(false);
