@@ -6,6 +6,8 @@ import { StickyBottomBar } from '@/components/layout/StickyBottomBar';
 import { Toaster } from '@/components/ui/toaster';
 import { TransitionProvider } from '@/components/layout/TransitionProvider';
 import { OfferPopup } from '@/components/offers/OfferPopup';
+import { VisitBeacon } from '@/components/analytics/VisitBeacon';
+import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics';
 import { fetchSettings, type SiteSettings } from '@/lib/inventory-api';
 import { CONTACT_INFO, SITE_URL } from '@/lib/constants';
 
@@ -50,6 +52,8 @@ export const metadata: Metadata = {
   publisher: 'G&G Auto Enterprises',
   alternates: { canonical: '/' },
   category: 'automotive',
+  // Set NEXT_PUBLIC_GSC_VERIFICATION to the token Google Search Console gives for the HTML-tag method.
+  verification: process.env.NEXT_PUBLIC_GSC_VERIFICATION ? { google: process.env.NEXT_PUBLIC_GSC_VERIFICATION } : undefined,
   robots: {
     index: true,
     follow: true,
@@ -151,6 +155,8 @@ export default async function RootLayout({
         <Footer settings={settings} />
         <StickyBottomBar />
         <OfferPopup />
+        <VisitBeacon />
+        <GoogleAnalytics />
         <Toaster />
       </body>
     </html>
