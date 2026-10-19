@@ -1,8 +1,8 @@
 import Script from 'next/script';
 
-/** Loads GA4 only when NEXT_PUBLIC_GA_ID (e.g. G-XXXXXXXXXX) is set; otherwise renders nothing. */
+/** Loads GA4 (measurement ID for hamroauto.com.np; NEXT_PUBLIC_GA_ID overrides it). */
 export function GoogleAnalytics() {
-  const id = process.env.NEXT_PUBLIC_GA_ID;
+  const id = process.env.NEXT_PUBLIC_GA_ID || 'G-T0V2M6DFEF';
   if (!id || !/^G-[A-Z0-9]+$/.test(id)) return null;
   return (
     <>
