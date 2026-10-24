@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { VehicleCard } from '@/components/inventory/VehicleCard';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -32,8 +33,16 @@ const SORTS = [
 export function VehicleBrowser({ vehicles, priorityCount = 0, layout = 'bar' }: VehicleBrowserProps) {
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
-  const [brandFilter, setBrandFilter] = useState('all');
-  const [sortOrder, setSortOrder] = useState('latest');
+  // Links such as /inventory?brand=Honda or ?sort=price-low open the page already filtered.
+  const params = useSearchParams();
+  const [brandFilter, setBrandFilter] = useState(() => {
+    const wanted = (params.get('brand') || '').toLowerCase();
+    return BRANDS.find(b => b.toLowerCase() === wanted) ?? 'all';
+  });
+  const [sortOrder, setSortOrder] = useState(() => {
+    const wanted = params.get('sort');
+    return SORTS.some(s => s.value === wanted) ? (wanted as string) : 'latest';
+  });
 
   const brandsInStock = useMemo(() => {
     const present = new Set(vehicles.map(v => v.brand));

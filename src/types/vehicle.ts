@@ -31,6 +31,8 @@ export interface Vehicle {
   status: VehicleStatus;
   created_at: string;
   featured?: boolean;
+  /** Times this vehicle's page was opened in the last 30 days (the admin's Visits data). */
+  view_count?: number;
 }
 
 export interface Inquiry {
