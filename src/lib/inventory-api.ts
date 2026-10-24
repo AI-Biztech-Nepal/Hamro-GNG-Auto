@@ -85,22 +85,6 @@ function mapVehicle(v: PublicVehicle): Vehicle {
 }
 
 /**
- * LOCAL PREVIEW ONLY. Until the backend's public listing includes view counts, `next dev` reads a
- * git-ignored dev-views.json (exported from the real Visits data) so the "most popular" rail can be
- * previewed. It does nothing in production, or once the backend sends the counts itself.
- */
-async function applyDevViews(vehicles: Vehicle[]): Promise<void> {
-  if (process.env.NODE_ENV !== 'development' || vehicles.some(v => (v.view_count ?? 0) > 0)) return;
-  try {
-    const { readFile } = await import('node:fs/promises');
-    const counts = JSON.parse(await readFile(`${process.cwd()}/dev-views.json`, 'utf8')) as Record<string, number>;
-    for (const v of vehicles) v.view_count = counts[v.id] ?? 0;
-  } catch {
-    /* no preview file: leave the counts at zero */
-  }
-}
-
-/**
  * All available vehicles, newest first (matches the backend's default sort),
  * with photoless ("snoozed") entries moved to the bottom of the list.
  */
@@ -112,7 +96,6 @@ export async function fetchInventory(): Promise<Vehicle[]> {
   if (!res.ok) throw new Error(`Failed to load inventory (${res.status})`);
   const data = await res.json();
   const vehicles = (data.vehicles as PublicVehicle[]).map(mapVehicle);
-  await applyDevViews(vehicles);
   // Keep the backend order, then sink every photoless entry to the end.
   return [
     ...vehicles.filter(v => v.has_photos),
