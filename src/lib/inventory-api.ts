@@ -121,6 +121,8 @@ export interface SiteSettings {
   address?: string;
   hero_image_url?: string;
   service_image_url?: string;
+  /** Admin-picked hero photos (max 5, in display order), flagged with the favourite button in the admin panel. */
+  hero_photo_urls?: string[];
 }
 
 /** Site branding/contact info, managed from the Auto-Stock-Manager admin panel. */
