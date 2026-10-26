@@ -42,6 +42,13 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/api/public/vehicles/**',
       },
+      {
+        // The same photos once moved to Supabase Storage: the backend then hands out these CDN links instead
+        protocol: 'https',
+        hostname: 'boiiqzkkbyzqkqsxuzyp.supabase.co',
+        port: '',
+        pathname: '/storage/v1/object/public/asm-photos/**',
+      },
     ],
   },
 };
