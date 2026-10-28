@@ -7,7 +7,7 @@ import { CONTACT_INFO } from '@/lib/constants';
 export const metadata: Metadata = {
   title: 'Two-wheeler Services — Sales, Exchange, Servicing & Paperwork',
   description:
-    'G&G Auto Enterprises handles used bike sales, exchange, mechanical servicing, insurance renewal and ownership transfer for two-wheelers in Nayabasti, Boudha, Kathmandu.',
+    'G&G Auto Enterprises handles second-hand bike sales, exchange, mechanical servicing, insurance renewal and ownership transfer for two-wheelers in Nayabasti, Boudha, Kathmandu.',
   alternates: { canonical: '/services' },
 };
 

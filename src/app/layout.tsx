@@ -19,7 +19,7 @@ export const dynamic = 'force-dynamic';
 const TITLE = 'Secondhand & Reconditioned Honda Bikes and Scooters in Boudha, Kathmandu | G&G Auto';
 const DESCRIPTION =
   'Buy secondhand and reconditioned Honda Dio, Activa, Shine and more at G&G Auto Enterprises, Nayabasti, Boudha, Kathmandu. ' +
-  'Every used bike and scooter is inspected on 40 points, comes with genuine paperwork, ' +
+  'Every second-hand bike and scooter is inspected on 40 points, comes with genuine paperwork, ' +
   'and is sold at a fixed fair price. Buy, sell, exchange and service two-wheelers in one place.';
 
 export const metadata: Metadata = {
@@ -115,7 +115,7 @@ const orgJsonLd = {
   sameAs: [CONTACT_INFO.facebook],
   makesOffer: {
     '@type': 'Offer',
-    itemOffered: { '@type': 'Service', name: 'Used two-wheeler sales, exchange and servicing' },
+    itemOffered: { '@type': 'Service', name: 'Second-hand two-wheeler sales, exchange and servicing' },
   },
 };
 

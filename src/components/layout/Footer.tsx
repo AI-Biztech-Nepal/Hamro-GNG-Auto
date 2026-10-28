@@ -52,7 +52,7 @@ export function Footer({ settings }: { settings: SiteSettings }) {
         <div>
           <h4 className="text-xs font-semibold mb-4 uppercase tracking-[0.14em] text-white/50">Services</h4>
           <ul className="space-y-2.5 text-sm text-white/75 font-medium">
-            <li className="hover:text-white transition-colors">Used Bike Sales</li>
+            <li className="hover:text-white transition-colors">Second-hand Bike Sales</li>
             <li className="hover:text-white transition-colors">Easy Exchange</li>
             <li className="hover:text-white transition-colors">Insurance Renewal</li>
             <li className="hover:text-white transition-colors">Workshop Services</li>
