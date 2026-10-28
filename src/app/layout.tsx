@@ -2,7 +2,6 @@ import type {Metadata} from 'next';
 import './globals.css';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
-import { StickyBottomBar } from '@/components/layout/StickyBottomBar';
 import { Toaster } from '@/components/ui/toaster';
 import { TransitionProvider } from '@/components/layout/TransitionProvider';
 import { OfferPopup } from '@/components/offers/OfferPopup';
@@ -148,12 +147,11 @@ export default async function RootLayout({
       <body className="font-body antialiased min-h-screen">
         <Navbar settings={settings} />
         <TransitionProvider>
-          <main className="flex-grow pb-16 md:pb-0">
+          <main className="flex-grow">
             {children}
           </main>
         </TransitionProvider>
         <Footer settings={settings} />
-        <StickyBottomBar />
         <OfferPopup />
         <VisitBeacon />
         <GoogleAnalytics />

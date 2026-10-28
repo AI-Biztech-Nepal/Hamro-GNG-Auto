@@ -48,7 +48,7 @@ const services = [
     cta: 'Talk to us',
   },
   {
-    title: 'Free appraisal',
+    title: 'Free valuation',
     description: 'Not sure what your bike is worth? Bring it in for a straight valuation.',
     icon: Phone,
     link: '/sell',
