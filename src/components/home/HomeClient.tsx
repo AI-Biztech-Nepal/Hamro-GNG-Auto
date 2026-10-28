@@ -12,6 +12,7 @@ import { BikeSectionRail } from '@/components/home/BikeSectionRail';
 import { BikeCard } from '@/components/home/BikeCard';
 import { BikeFinder, matchesQuery, type FinderQuery } from '@/components/home/BikeFinder';
 import { buildRails, matchesFilter, formatNpr, BUDGET_CAP, type FilterId } from '@/components/home/home-data';
+import { ServicesHero } from '@/components/home/ServicesHero';
 
 const elsewhere = [
   { title: 'Service your bike', body: 'Same-day general servicing and repairs for every major brand.', href: '/book-service' },
@@ -50,13 +51,15 @@ export function HomeClient({ vehicles }: { vehicles: Vehicle[]; settings: SiteSe
   const handsKnown = useMemo(() => inStock.filter(v => v.owners != null).length, [inStock]);
 
   return (
+    <>
+    <ServicesHero />
     <div className="max-w-7xl mx-auto px-4 py-8 sm:py-12 pb-24">
       {/* Brief introduction */}
       <header className="max-w-2xl">
         <span aria-hidden className="block w-8 h-1 bg-brand mb-4" />
-        <h1 className="font-headline font-bold text-3xl md:text-[2.75rem] leading-[1.1] tracking-tight">
+        <h2 className="font-headline font-bold text-3xl md:text-[2.75rem] leading-[1.1] tracking-tight">
           Second-hand bikes &amp; scooters, ready to ride.
-        </h1>
+        </h2>
         <p className="mt-4 text-[15px] md:text-base text-muted-foreground leading-relaxed">
           G&amp;G Auto is a used two-wheeler showroom in Nayabasti, Boudha. Every bike on the
           floor has passed our 40-point inspection, carries genuine paperwork, and is priced
@@ -166,5 +169,6 @@ export function HomeClient({ vehicles }: { vehicles: Vehicle[]; settings: SiteSe
         ))}
       </section>
     </div>
+    </>
   );
 }
