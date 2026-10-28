@@ -54,18 +54,15 @@ export function HomeClient({ vehicles }: { vehicles: Vehicle[]; settings: SiteSe
     <>
     <ServicesHero />
     <div className="max-w-7xl mx-auto px-4 py-8 sm:py-12 pb-24">
-      {/* Brief introduction */}
-      <header className="max-w-2xl">
-        <span aria-hidden className="block w-8 h-1 bg-brand mb-4" />
-        <h2 className="font-headline font-bold text-3xl md:text-[2.75rem] leading-[1.1] tracking-tight">
-          Second-hand bikes &amp; scooters, ready to ride.
-        </h2>
-        <p className="mt-4 text-[15px] md:text-base text-muted-foreground leading-relaxed">
-          G&amp;G Auto is a used two-wheeler showroom in Nayabasti, Boudha. Every bike on the
-          floor has passed our 40-point inspection, carries genuine paperwork, and is priced
-          fixed &mdash; no haggling.
-        </p>
-      </header>
+      {/* The hero above carries the page title; this is just the proof, in one line. */}
+      <ul className="flex flex-wrap gap-x-6 gap-y-2 text-[13px] font-medium text-neutral-700 sm:text-sm">
+        {['40-point inspection', 'Genuine paperwork', 'Fixed prices, no haggling', 'Nayabasti, Boudha'].map(t => (
+          <li key={t} className="flex items-center gap-2">
+            <span aria-hidden className="size-1.5 rounded-full bg-brand" />
+            {t}
+          </li>
+        ))}
+      </ul>
 
       <div className="mt-8">
         <BikeFinder brands={brands} onSearch={setQuery} onClear={() => setQuery(null)} active={query !== null} />

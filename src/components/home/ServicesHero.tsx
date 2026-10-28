@@ -3,11 +3,16 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { CONTACT_INFO } from '@/lib/constants';
 
-const DWELL_MS = 4000;
-const WHATSAPP_URL = `https://wa.me/${CONTACT_INFO.whatsapp}`;
+const DWELL_MS = 5500;
+/** Sticky-note change: the current slide peels off up-left while the next one rolls up from below, together. */
+const PEEL_MS = 1200;
+const PEEL_EASE = 'cubic-bezier(0.45, 0, 0.15, 1)';
+const NOTE_OFF = 'translate3d(-105%,-8%,0) rotate(-10deg)';
+const NOTE_WAIT = 'translate3d(0,14%,0) scale(0.94)';
+const WHATSAPP_URL =`https://wa.me/${CONTACT_INFO.whatsapp}`;
 
 interface Service {
   tab: string;
@@ -113,23 +118,27 @@ export function ServicesHero() {
     >
       <div className="mx-auto grid max-w-[76rem] gap-3 px-4 py-4 sm:px-6 sm:py-5 lg:grid-cols-[16.5rem_minmax(0,1fr)] lg:gap-4 lg:px-8">
         {/* Service menu */}
-        <nav aria-label="Services" className="lg:border lg:border-neutral-200 lg:bg-white">
-          <h1 className="font-headline text-lg font-extrabold uppercase tracking-tight text-neutral-950 lg:border-b lg:border-neutral-200 lg:px-4 lg:py-3.5">
-            What we <span className="text-[#DC2626]">do</span>
+        <nav aria-label="Services" className="lg:border lg:border-neutral-300 lg:bg-neutral-100 lg:p-3 lg:shadow-inner">
+          <h1 className="relative flex items-center gap-2 font-headline text-lg font-extrabold uppercase tracking-tight text-neutral-950 lg:-rotate-1 lg:bg-white lg:px-4 lg:py-3.5 lg:shadow-[0_2px_6px_rgba(0,0,0,0.18)]">
+            <span aria-hidden className="size-2.5 shrink-0 rounded-full bg-[#DC2626] shadow-[0_1px_2px_rgba(0,0,0,0.5)] lg:absolute lg:left-1/2 lg:top-1.5 lg:-translate-x-1/2" />
+            <span className="sr-only">Hamro G&amp;G Auto: second-hand bikes and scooters in Boudha, Kathmandu. </span>
+            <span className="lg:block lg:pt-2">What we <span className="text-[#DC2626]">do</span></span>
           </h1>
-          <ul className="hidden lg:block">
+          <ul className="mt-2 grid grid-cols-2 gap-2.5 py-2 lg:mt-4 lg:block lg:space-y-2.5 lg:py-0">
             {SERVICES.map((s, i) => {
               const on = i === index;
+              // Each note sits at its own slight angle; the active one straightens, lifts and gets a pin.
+              const tilt = on ? 'rotate-0' : i % 2 ? 'rotate-[0.9deg]' : '-rotate-[1.1deg]';
               return (
                 <li key={s.tab}>
                   <button
                     type="button"
                     onClick={() => go(i)}
                     aria-current={on}
-                    className={`group flex w-full items-center justify-between px-4 py-3 text-left text-[14px] font-medium transition-colors ${on ? 'bg-red-50 text-[#DC2626]' : 'text-neutral-700 hover:bg-neutral-50 hover:text-[#DC2626]'}`}
+                    className={`group relative block h-full w-full px-4 py-3 pr-8 text-left text-[14px] font-medium transition-[transform,box-shadow,background-color,color] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${tilt} ${on ? 'scale-[1.03] bg-[#FFF3B0] text-[#DC2626] shadow-[0_8px_16px_-6px_rgba(0,0,0,0.35)]' : 'bg-white text-neutral-700 shadow-[0_1px_3px_rgba(0,0,0,0.2)] hover:-translate-y-0.5 hover:rotate-0 hover:text-[#DC2626] hover:shadow-[0_6px_12px_-6px_rgba(0,0,0,0.3)]'}`}
                   >
+                    <span aria-hidden className={`absolute right-3 top-2.5 size-2 rounded-full bg-[#DC2626] shadow-[0_1px_2px_rgba(0,0,0,0.5)] transition-opacity duration-500 ${on ? 'opacity-100' : 'opacity-0'}`} />
                     {s.tab}
-                    <ChevronRight className={`size-4 transition-transform ${on ? 'translate-x-0.5' : 'text-neutral-300 group-hover:translate-x-0.5 group-hover:text-[#DC2626]'}`} />
                   </button>
                 </li>
               );
@@ -139,7 +148,7 @@ export function ServicesHero() {
 
         {/* Banner */}
         <div
-          className="group/banner relative overflow-hidden border border-neutral-200 bg-white"
+          className="relative overflow-hidden border border-neutral-200 bg-white"
           onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; setPaused(true); }}
           onTouchEnd={(e) => {
             const start = touchStartX.current;
@@ -162,8 +171,18 @@ export function ServicesHero() {
                 <div
                   key={s.tab}
                   aria-hidden={!on}
-                  className={`col-start-1 row-start-1 grid will-change-transform lg:h-[min(60svh,27rem)] lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] ${on ? 'opacity-100 transition-transform duration-[500ms] ease-[cubic-bezier(0.65,0,0.15,1)] motion-reduce:duration-0' : near ? 'pointer-events-none opacity-0 [transition:transform_500ms_cubic-bezier(0.65,0,0.15,1),opacity_0s_linear_500ms] motion-reduce:[transition:none]' : 'pointer-events-none opacity-0'}`}
-                  style={{ transform: `translate3d(${offset * 100}%,0,0)` }}
+                  className={`col-start-1 row-start-1 grid will-change-[transform,opacity] lg:h-[min(60svh,27rem)] lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] ${on ? '' : 'pointer-events-none'}`}
+                  style={{
+                    transform: offset === 0 ? 'translate3d(0,0,0)' : offset < 0 ? NOTE_OFF : NOTE_WAIT,
+                    opacity: on ? 1 : 0,
+                    zIndex: on ? 10 : offset < 0 ? 20 : 0,
+                    // Only the outgoing and incoming notes animate; the rest re-park unseen.
+                    transition: reduceMotion || !near
+                      ? 'none'
+                      : on
+                        ? `transform ${PEEL_MS}ms ${PEEL_EASE}, opacity 700ms ease-out`
+                        : `transform ${PEEL_MS}ms ${PEEL_EASE}, opacity 700ms ease-in 300ms`,
+                  }}
                 >
                   {/* Words */}
                   <div className="order-2 flex flex-col justify-center px-5 pb-12 pt-5 sm:px-8 lg:order-1 lg:px-10 lg:py-0">
@@ -200,24 +219,6 @@ export function ServicesHero() {
               );
             })}
           </div>
-
-          {/* Side arrows, shown on hover like a shop banner */}
-          <button
-            type="button"
-            onClick={() => go(index - 1)}
-            aria-label="Previous service"
-            className="absolute left-0 top-1/2 z-10 grid h-14 w-9 -translate-y-1/2 place-items-center bg-black/35 text-white opacity-100 transition hover:bg-black/60 lg:opacity-0 lg:group-hover/banner:opacity-100"
-          >
-            <ChevronLeft className="size-6" />
-          </button>
-          <button
-            type="button"
-            onClick={() => go(index + 1)}
-            aria-label="Next service"
-            className="absolute right-0 top-1/2 z-10 grid h-14 w-9 -translate-y-1/2 place-items-center bg-black/35 text-white opacity-100 transition hover:bg-black/60 lg:opacity-0 lg:group-hover/banner:opacity-100"
-          >
-            <ChevronRight className="size-6" />
-          </button>
 
           {/* Dots */}
           <div role="group" aria-label="Choose a service" className="absolute inset-x-0 bottom-3 z-10 flex justify-center gap-2">
