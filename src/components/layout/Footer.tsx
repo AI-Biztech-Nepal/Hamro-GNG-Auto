@@ -9,7 +9,7 @@ import type { SiteSettings } from '@/lib/inventory-api';
 export function Footer({ settings }: { settings: SiteSettings }) {
   const logoImage = CONTACT_INFO.logoUrl;
   const businessName = settings?.business_name || CONTACT_INFO.businessName;
-  const contactPhone = settings?.contact_phone || CONTACT_INFO.phone;
+  const contactPhone = CONTACT_INFO.phone;
   const contactEmail = settings?.contact_email || CONTACT_INFO.email;
   const address = settings?.address || CONTACT_INFO.address;
 

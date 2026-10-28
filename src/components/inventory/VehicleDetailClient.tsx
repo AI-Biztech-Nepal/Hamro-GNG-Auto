@@ -73,7 +73,7 @@ export function VehicleDetailClient({ vehicle }: { vehicle: Vehicle }) {
     strip.scrollTo({ left: el.offsetLeft - (strip.clientWidth - el.clientWidth) / 2, behavior: reducedMotion ? 'auto' : 'smooth' });
   }, [current, reducedMotion]);
 
-  const whatsappMessage = `Hello Hamro G&G Auto, I am interested in the ${vehicle.title} (${vehicle.year} model) priced at NPR ${vehicle.price.toLocaleString()}. Is it still available?`;
+  const whatsappMessage = `Namaste Hamro G&G Auto! 🙏 I visited your website, hamroauto.com.np, and I'm interested in the ${vehicle.title} (${vehicle.year} model) priced at NPR ${vehicle.price.toLocaleString()}. Is it still available?`;
   const whatsappUrl = `https://wa.me/${CONTACT_INFO.whatsapp}?text=${encodeURIComponent(whatsappMessage)}`;
   const images = vehicle.image_urls?.length ? vehicle.image_urls : ['https://picsum.photos/seed/vehicle/800/600'];
   const isSold = vehicle.status === 'sold';

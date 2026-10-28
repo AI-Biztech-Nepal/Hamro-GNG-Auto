@@ -24,7 +24,7 @@ interface BikeCardProps {
 export function BikeCard({ vehicle, badge, isPriority = false }: BikeCardProps) {
   const href = `/inventory/${vehicle.id}`;
   const whatsappMessage = encodeURIComponent(
-    `Namaste! I am interested in ${vehicle.title}${vehicle.registration_number ? ` (${vehicle.registration_number})` : ''}, ${formatNpr(vehicle.price)}. Is it still available?`,
+    `Namaste! 🙏 I found you through your website, hamroauto.com.np, and I'm interested in ${vehicle.title}${vehicle.registration_number ? ` (${vehicle.registration_number})` : ''}, ${formatNpr(vehicle.price)}. Is it still available?`,
   );
   // Only show what is actually recorded: an empty "0 km" or a made-up lot number would mislead.
   const specs = [

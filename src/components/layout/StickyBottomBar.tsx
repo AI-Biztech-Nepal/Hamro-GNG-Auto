@@ -4,7 +4,7 @@ import { Phone, MessageCircle } from 'lucide-react';
 import { CONTACT_INFO } from '@/lib/constants';
 
 export function StickyBottomBar() {
-  const whatsappUrl = `https://wa.me/${CONTACT_INFO.whatsapp}?text=${encodeURIComponent("Hello Hamro G&G Auto, I am interested in your bikes.")}`;
+  const whatsappUrl = `https://wa.me/${CONTACT_INFO.whatsapp}?text=${encodeURIComponent("Namaste Hamro G&G Auto! 🙏 I visited your website, hamroauto.com.np, and I'm interested in your bikes.")}`;
 
   return (
     <div className="sticky-bottom-bar shadow-xl">
