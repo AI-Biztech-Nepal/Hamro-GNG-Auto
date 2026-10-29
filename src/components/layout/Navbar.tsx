@@ -4,8 +4,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { Menu, X, Wrench } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Menu, X } from 'lucide-react';
 import { CONTACT_INFO } from '@/lib/constants';
 import type { SiteSettings } from '@/lib/inventory-api';
 
@@ -22,9 +21,9 @@ export function Navbar({ settings }: { settings: SiteSettings }) {
     { name: 'Sell Bike', href: '/sell' },
     { name: 'Exchange', href: '/exchange' },
     { name: 'Offers', href: '/offers' },
+    { name: 'Book service', href: '/book-service' },
     { name: 'About us', href: '/about' },
   ];
-  const onService = pathname === '/book-service';
 
   return (
     <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-border">
@@ -55,12 +54,6 @@ export function Navbar({ settings }: { settings: SiteSettings }) {
                 {link.name}
               </Link>
             ))}
-
-            <div className="flex items-center gap-2 pl-1">
-              <Button size="sm" className={`font-semibold gap-2 px-4 bg-brand text-brand-foreground hover:bg-brand/90 ${onService ? 'ring-2 ring-offset-2 ring-brand' : ''}`} asChild>
-                <Link href="/book-service"><Wrench className="w-4 h-4" /> Book service</Link>
-              </Button>
-            </div>
           </div>
 
           {/* Mobile menu button */}
@@ -91,9 +84,6 @@ export function Navbar({ settings }: { settings: SiteSettings }) {
               {link.name}
             </Link>
           ))}
-          <Link href="/book-service" onClick={() => setIsOpen(false)} className={`mt-1 block px-3 py-2.5 rounded-md text-sm font-semibold text-center bg-brand text-brand-foreground ${onService ? 'ring-2 ring-offset-2 ring-brand' : ''}`}>
-            Book service
-          </Link>
         </div>
       )}
     </nav>
