@@ -1,14 +1,14 @@
 "use client"
 
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
-import { Phone, MessageCircle, MapPin } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import { CONTACT_INFO, OUTLETS } from '@/lib/constants';
 import { ShowroomMap } from '@/components/about/ShowroomMap';
 
-const PARTNERS = [
-  { name: 'Chandan Prasad Gupta', photo: '/team/cp.jpg', pos: '50% 22%' },
-  { name: 'Tulsi Khadka', photo: '/team/tp.jpg', pos: '50% 30%' },
-  { name: 'Laxman Gautam', photo: '/team/lp.jpg', pos: '50% 25%' },
+const FOUNDERS = [
+  { name: 'Laxman Gautam', photo: '/team/lp.jpg', pos: '50% 25%', quote: 'A bike is sold once. A name is earned every day.' },
+  { name: 'Chandan Prasad Gupta', photo: '/team/cp.jpg', pos: '50% 22%', quote: 'If I would not ride it, we do not sell it.' },
+  { name: 'Tulsi Khadka', photo: '/team/tp.jpg', pos: '50% 30%', quote: 'Your word and our word should weigh the same.' },
 ];
 
 const PROMISES = [
@@ -141,17 +141,17 @@ function Promises() {
   );
 }
 
-function Partners() {
+function Founders() {
   return (
     <section className="bg-surface border-y border-border">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16 md:py-24">
         <Reveal>
-          <h2 className="font-headline font-bold text-3xl md:text-5xl tracking-tight text-balance max-w-2xl leading-[1.08]">Three partners. One name on the door.</h2>
+          <h2 className="font-headline font-bold text-3xl md:text-5xl tracking-tight text-balance max-w-2xl leading-[1.08]">Three co-founders. One name on the door.</h2>
           <p className="mt-4 text-lg text-muted-foreground max-w-[56ch] leading-relaxed">If you want to know who stands behind your bike, this is who.</p>
         </Reveal>
         <div className="mt-12 grid gap-10 sm:grid-cols-3 items-start">
-          {PARTNERS.map((p, i) => (
-            <Reveal key={p.name} delay={i * 100} className={i === 1 ? 'sm:mt-14' : ''}>
+          {FOUNDERS.map((p, i) => (
+            <Reveal key={p.name} delay={i * 100}>
               <figure className="group">
                 <div className="aspect-[4/5] overflow-hidden bg-secondary">
                   <img
@@ -164,7 +164,10 @@ function Partners() {
                 </div>
                 <figcaption className="mt-4 border-t border-foreground pt-3">
                   <p className="font-headline font-semibold text-xl">{p.name}</p>
-                  <p className="text-sm text-muted-foreground">Partner, G&amp;G Auto</p>
+                  <p className="text-sm text-muted-foreground">Co-founder, G&amp;G Auto</p>
+                  <blockquote className="mt-3 font-headline italic text-lg leading-snug text-foreground/80">
+                    <span aria-hidden className="text-brand text-3xl leading-none align-[-0.3em] mr-1">&ldquo;</span>{p.quote}<span aria-hidden className="text-brand text-3xl leading-none align-[-0.3em] ml-1">&rdquo;</span>
+                  </blockquote>
                 </figcaption>
               </figure>
             </Reveal>
@@ -180,7 +183,7 @@ function Visit() {
     <section className="max-w-6xl mx-auto px-4 sm:px-6 py-16 md:py-24">
       <div className="grid md:grid-cols-[0.8fr_1.4fr] gap-10 md:gap-14 items-start">
         <Reveal>
-          <h2 className="font-headline font-bold text-3xl md:text-4xl tracking-tight text-balance">Two doors, one road.</h2>
+          <h2 className="font-headline font-bold text-3xl md:text-4xl tracking-tight text-balance">Our two branches.</h2>
           <p className="mt-3 text-muted-foreground leading-relaxed">{CONTACT_INFO.address}, {CONTACT_INFO.addressLocality}. About 50 metres apart.</p>
           <ul className="mt-6 border-t border-foreground">
             {OUTLETS.map(o => (
@@ -200,10 +203,6 @@ function Visit() {
               </li>
             ))}
           </ul>
-          <div className="mt-6 flex flex-col gap-3">
-            <a href={`tel:${CONTACT_INFO.phone}`} className="inline-flex justify-center items-center gap-2 h-12 px-6 rounded-md bg-brand text-brand-foreground font-semibold hover:bg-brand/90 transition-colors"><Phone className="w-4 h-4" /> Call {CONTACT_INFO.phone}</a>
-            <a href={`https://wa.me/${CONTACT_INFO.whatsapp}`} className="inline-flex justify-center items-center gap-2 h-12 px-6 rounded-md border border-border font-semibold hover:bg-muted transition-colors"><MessageCircle className="w-4 h-4" /> WhatsApp</a>
-          </div>
         </Reveal>
         <Reveal delay={100}>
           <ShowroomMap />
@@ -219,7 +218,7 @@ export function AboutClient() {
       <Hero />
       <Story />
       <Promises />
-      <Partners />
+      <Founders />
       <Visit />
     </>
   );

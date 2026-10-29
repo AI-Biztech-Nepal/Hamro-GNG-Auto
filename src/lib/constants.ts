@@ -25,8 +25,8 @@ export const CONTACT_INFO = {
 
 /** Both outlets sit about 50 m apart on the same road in Nayabasti. Coordinates are the Google Maps pins. */
 export const OUTLETS = [
-  { name: 'Main office', where: 'Opposite Everest Petrol Pump', lat: 27.7115453, lng: 85.3694116 },
-  { name: 'Showroom', where: 'Hamro G&G Auto Enterprise', lat: 27.7114563, lng: 85.3689337 },
+  { name: 'Head office', where: 'Opposite Everest Petrol Pump', lat: 27.71136, lng: 85.36945 },
+  { name: 'Branch', where: 'Hamro G&G Auto Enterprise', lat: 27.71098, lng: 85.36849 },
 ];
 
 export const BRANDS = [

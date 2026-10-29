@@ -55,7 +55,7 @@ export function ShowroomMap() {
     <div
       ref={box}
       role="region"
-      aria-label="Map of the G&G Auto main office and showroom in Nayabasti, Boudha"
+      aria-label="Map of the G&G Auto head office and branch in Nayabasti, Boudha"
       className="h-[360px] md:h-[480px] w-full rounded-xl overflow-hidden border border-border bg-muted"
     />
   );
