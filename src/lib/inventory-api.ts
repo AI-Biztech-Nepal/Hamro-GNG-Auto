@@ -153,7 +153,8 @@ export interface LeadInput {
 
 /** Submits a Sell / Exchange / Book Service form to the Auto-Stock-Manager admin's Leads screen. */
 export async function submitLead(lead: LeadInput): Promise<void> {
-  const res = await fetch(`${API_BASE}/api/public/leads`, {
+  // Same-origin relay (src/app/api/leads): the backend's CORS list blocks this site's direct POSTs.
+  const res = await fetch('/api/leads', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(lead),
