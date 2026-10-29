@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { HeroSlide } from '@/lib/hero-photos';
 
-const DWELL_MS = 5500;
+const DWELL_MS = 3000;
 
 export function HeroSlideshow({ slides }: { slides: HeroSlide[] }) {
   const count = slides.length;

@@ -6,9 +6,9 @@ import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
 import { CONTACT_INFO } from '@/lib/constants';
 
-const DWELL_MS = 5500;
+const DWELL_MS = 3000;
 /** Sticky-note change: the current slide peels off up-left while the next one rolls up from below, together. */
-const PEEL_MS = 1200;
+const PEEL_MS = 800;
 const PEEL_EASE = 'cubic-bezier(0.45, 0, 0.15, 1)';
 const NOTE_OFF = 'translate3d(-105%,-8%,0) rotate(-10deg)';
 const NOTE_WAIT = 'translate3d(0,14%,0) scale(0.94)';
