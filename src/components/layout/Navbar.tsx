@@ -19,7 +19,7 @@ export function Navbar({ settings }: { settings: SiteSettings }) {
   const links = [
     { name: 'Home', href: '/' },
     { name: 'Inventory', href: '/inventory' },
-    { name: 'Services', href: '/services' },
+    { name: 'About us', href: '/about' },
     { name: 'Sell Bike', href: '/sell' },
     { name: 'Exchange', href: '/exchange' },
     { name: 'Offers', href: '/offers' },
@@ -56,11 +56,8 @@ export function Navbar({ settings }: { settings: SiteSettings }) {
             ))}
 
             <div className="flex items-center gap-2 pl-1">
-              <Button variant="ghost" size="sm" className="font-semibold gap-2" asChild>
-                <Link href="/book-service"><Wrench className="w-4 h-4" /> Service</Link>
-              </Button>
-              <Button size="sm" className="font-semibold px-4 bg-brand text-brand-foreground hover:bg-brand/90" asChild>
-                <Link href="/inventory">Browse</Link>
+              <Button size="sm" className="font-semibold gap-2 px-4 bg-brand text-brand-foreground hover:bg-brand/90" asChild>
+                <Link href="/book-service"><Wrench className="w-4 h-4" /> Book service</Link>
               </Button>
             </div>
           </div>
@@ -93,6 +90,9 @@ export function Navbar({ settings }: { settings: SiteSettings }) {
               {link.name}
             </Link>
           ))}
+          <Link href="/book-service" onClick={() => setIsOpen(false)} className="block px-3 py-2.5 rounded-md text-sm font-semibold text-brand">
+            Book service
+          </Link>
         </div>
       )}
     </nav>
