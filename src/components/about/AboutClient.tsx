@@ -6,9 +6,9 @@ import { CONTACT_INFO, OUTLETS } from '@/lib/constants';
 import { ShowroomMap } from '@/components/about/ShowroomMap';
 
 const FOUNDERS = [
-  { name: 'Laxman Gautam', photo: '/team/lp.jpg', pos: '50% 25%', quote: 'I valued the name G&G, and I had to bring it to action.' },
-  { name: 'Chandan Prasad Gupta', photo: '/team/cp.jpg', pos: '50% 22%', quote: 'I thought of G&G as Good and Genuine, and built the business on it.' },
   { name: 'Tulsi Khadka', photo: '/team/tp.jpg', pos: '50% 30%', quote: 'Building mutual trust with our customers has always been our main target.' },
+  { name: 'Chandan Prasad Gupta', photo: '/team/cp.jpg', pos: '50% 22%', quote: 'I thought of G&G as Good and Genuine, and built the business on it.' },
+  { name: 'Laxman Gautam', photo: '/team/lp.jpg', pos: '50% 25%', quote: 'I valued the name G&G, and I had to bring it to action.' },
 ];
 
 const PROMISES = [
