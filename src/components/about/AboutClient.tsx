@@ -6,9 +6,9 @@ import { CONTACT_INFO, OUTLETS } from '@/lib/constants';
 import { ShowroomMap } from '@/components/about/ShowroomMap';
 
 const FOUNDERS = [
-  { name: 'Tulsi Khadka', photo: '/team/tp.jpg', pos: '50% 30%', quote: 'Building mutual trust with our customers has always been our main target.' },
-  { name: 'Chandan Prasad Gupta', photo: '/team/cp.jpg', pos: '50% 22%', quote: 'I thought of G&G as Good and Genuine, and built the business on it.' },
-  { name: 'Laxman Gautam', photo: '/team/lp.jpg', pos: '50% 25%', quote: 'I valued the name G&G, and I had to bring it to action.' },
+  { name: 'Tulsi Khadka', photo: '/team/tp.jpg', pos: '50% 30%', quote: 'A used bike is a big purchase for most families. We earn their trust by being honest about every bike, including its flaws.' },
+  { name: 'Chandan Prasad Gupta', photo: '/team/cp.jpg', pos: '50% 22%', quote: 'Good and Genuine is the standard we set for ourselves: fair prices, clear paperwork, and nothing hidden from the buyer.' },
+  { name: 'Laxman Gautam', photo: '/team/lp.jpg', pos: '50% 25%', quote: 'A name only means something if you live up to it. Every day we work to make sure our customers ride away without a doubt.' },
 ];
 
 const PROMISES = [
@@ -146,7 +146,7 @@ function Founders() {
     <section className="bg-surface border-y border-border">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16 md:py-24">
         <Reveal>
-          <h2 className="font-headline font-bold text-3xl md:text-5xl tracking-tight text-balance max-w-2xl leading-[1.08]">Three co-founders. One name on the door.</h2>
+          <h2 className="font-headline font-bold text-3xl md:text-5xl tracking-tight text-balance max-w-2xl leading-[1.08]">Message from our founders</h2>
           <p className="mt-4 text-lg text-muted-foreground max-w-[56ch] leading-relaxed">If you want to know who stands behind your bike, this is who.</p>
         </Reveal>
         <div className="mt-12 grid gap-10 sm:grid-cols-3 items-start">
