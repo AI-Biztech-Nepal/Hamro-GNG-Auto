@@ -1,8 +1,20 @@
 
 import type {NextConfig} from 'next';
 
+const securityHeaders = [
+  { key: 'X-Content-Type-Options', value: 'nosniff' },
+  { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+  { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+  { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+  { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' },
+];
+
 const nextConfig: NextConfig = {
-  /* config options here */
+  poweredByHeader: false,
+  async headers() {
+    // shortcut: no Content-Security-Policy yet (GA, maps, inline JSON-LD need a tested allow-list), add one after testing.
+    return [{ source: '/:path*', headers: securityHeaders }];
+  },
   typescript: {
     ignoreBuildErrors: true,
   },

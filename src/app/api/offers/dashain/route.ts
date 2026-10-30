@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { clientIp, rateLimited } from '@/lib/rate-limit';
 
 const API_BASE =
   process.env.NEXT_PUBLIC_INVENTORY_API_URL || 'https://api.hamroauto.com.np';
@@ -12,6 +13,9 @@ const ACTIONS = ['check', 'spin'] as const;
  * depend on the backend's CORS allow-list including this site.
  */
 export async function POST(request: NextRequest) {
+  if (rateLimited(`spin:${clientIp(request)}`, 20, 60_000)) {
+    return NextResponse.json({ ok: false, msg: 'Too many tries. Please wait a minute or ask our staff.' }, { status: 429 });
+  }
   const body = await request.json().catch(() => null);
   const action = body?.action;
   if (!ACTIONS.includes(action)) {
