@@ -105,6 +105,8 @@ export async function fetchInventory(): Promise<Vehicle[]> {
 
 /** Single vehicle with its full photo gallery. Returns null if not found or not available (e.g. sold). */
 export async function fetchVehicleById(id: string): Promise<Vehicle | null> {
+  // The id goes straight into the backend URL; only real UUIDs may pass (blocks ../ path tricks).
+  if (!/^[0-9a-f-]{36}$/i.test(id)) return null;
   const res = await fetch(`${API_BASE}/api/public/vehicles/${id}`, {
     signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     next: { revalidate: 60, tags: ['storefront-data'] },

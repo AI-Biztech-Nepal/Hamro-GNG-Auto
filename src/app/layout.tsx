@@ -142,7 +142,7 @@ export default async function RootLayout({
         <link rel="preload" as="image" href="/logo.png" fetchPriority="high" />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd).replace(/</g, '\\u003c') }}
         />
       </head>
       <body className="font-body antialiased min-h-screen">
