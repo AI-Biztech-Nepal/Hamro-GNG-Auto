@@ -10,7 +10,7 @@ export function Footer({ settings }: { settings: SiteSettings }) {
   const logoImage = CONTACT_INFO.logoUrl;
   const businessName = settings?.business_name || CONTACT_INFO.businessName;
   const contactPhone = CONTACT_INFO.phone;
-  const contactEmail = settings?.contact_email || CONTACT_INFO.email;
+  const contactEmail = CONTACT_INFO.email; // fixed here: the backend setting still holds the old info@ address
   const address = settings?.address || CONTACT_INFO.address;
 
   const whatsappUrl = `https://wa.me/${CONTACT_INFO.whatsapp}`;

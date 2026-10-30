@@ -10,7 +10,7 @@ export const GOOGLE_REVIEW_URL =
 export const CONTACT_INFO = {
   phone: '9860087161',
   whatsapp: '9779808027608', // wa.me wants the country code; without +977 it dials a wrong number
-  email: 'info@ggautonp.com',
+  email: 'chandan9808027608@gmail.com',
   address: 'Nayabasti, Boudha',
   addressLocality: 'Kathmandu',
   region: 'Bagmati Province',
