@@ -18,6 +18,7 @@ import { submitLead } from '@/lib/inventory-api';
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   phone: z.string().min(10, "Please enter a valid phone number"),
+  email: z.string().email("Please enter a valid email address"),
   vehicle_model: z.string().min(2, "Please specify your bike/scooter model"),
   service_type: z.string().min(1, "Please select a service type"),
   preferred_date: z.string().min(1, "A preferred date is required."),
@@ -33,6 +34,7 @@ export default function BookServicePage() {
     defaultValues: {
       name: "",
       phone: "",
+      email: "",
       vehicle_model: "",
       service_type: "",
       preferred_date: "",
@@ -46,6 +48,7 @@ export default function BookServicePage() {
         type: 'service',
         name: values.name,
         phone: values.phone,
+        email: values.email,
         message: `Service Booking: ${values.vehicle_model}. Type: ${values.service_type}. Preferred Date: ${formatBSDate(values.preferred_date)} BS (${values.preferred_date} AD)`,
         requested_service: values.service_type,
         vehicle_type: values.vehicle_model,
@@ -143,6 +146,17 @@ export default function BookServicePage() {
                       <FormItem>
                         <FormLabel className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Phone Number</FormLabel>
                         <FormControl><Input placeholder="98XXXXXXXX" className="h-11 rounded-md" {...field} /></FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Email</FormLabel>
+                        <FormControl><Input type="email" autoComplete="email" placeholder="you@example.com" className="h-11 rounded-md" {...field} /></FormControl>
                         <FormMessage />
                       </FormItem>
                     )}

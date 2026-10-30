@@ -18,10 +18,14 @@ interface BikeCardProps {
   vehicle: Vehicle;
   badge?: Badge;
   isPriority?: boolean;
+  /** Show the whole photo at its own ratio (letterboxed over a soft blur) instead of cropping it to the frame. */
+  keepRatio?: boolean;
 }
 
 /** A rail card: photo, a few real specs, price, and one-tap View / WhatsApp / Call. */
-export function BikeCard({ vehicle, badge, isPriority = false }: BikeCardProps) {
+export function BikeCard({ vehicle, badge, isPriority = false, keepRatio = false }: BikeCardProps) {
+  const isSold = vehicle.status === 'sold';
+  const isReserved = vehicle.status === 'reserved';
   const href = `/inventory/${vehicle.id}`;
   const whatsappMessage = encodeURIComponent(
     `Namaste! 🙏 I found you through your website, hamroauto.com.np, and I'm interested in ${vehicle.title}${vehicle.registration_number ? ` (${vehicle.registration_number})` : ''}, ${formatNpr(vehicle.price)}. Is it still available?`,
@@ -34,27 +38,50 @@ export function BikeCard({ vehicle, badge, isPriority = false }: BikeCardProps) 
   ].filter(Boolean) as { icon: typeof Calendar; text: string }[];
 
   return (
-    <div className="group relative flex h-full flex-col justify-between overflow-hidden rounded-xl border border-border bg-background shadow-sm transition-all duration-200 hover:border-brand hover:shadow-lg">
+    <div className={cn('group relative flex h-full flex-col justify-between overflow-hidden border border-border bg-background transition-colors duration-200 hover:border-brand', isSold && 'opacity-90')}>
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-muted">
         <Link href={href} aria-label={vehicle.title}>
+          {keepRatio && (
+            <Image
+              src={vehicle.image_urls[0]}
+              alt=""
+              aria-hidden="true"
+              fill
+              loading="lazy"
+              sizes="64px"
+              className={cn('scale-125 object-cover opacity-70 blur-xl', isSold && 'grayscale')}
+            />
+          )}
           <Image
             src={vehicle.image_urls[0]}
             alt={vehicle.title}
             fill
             priority={isPriority}
             loading={isPriority ? 'eager' : 'lazy'}
-            sizes="290px"
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            sizes={keepRatio ? '(max-width: 640px) 50vw, (max-width: 1280px) 33vw, 25vw' : '290px'}
+            className={cn(
+              keepRatio ? 'object-contain' : 'object-cover transition-transform duration-300 group-hover:scale-105',
+              isSold && 'grayscale',
+            )}
           />
         </Link>
-        {badge && (
+        {isSold && (
+          <span className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/30">
+            <span className="border-2 border-white px-4 py-1 text-sm font-bold uppercase tracking-[0.2em] text-white">Sold out</span>
+          </span>
+        )}
+        {isReserved ? (
+          <span className="absolute top-2.5 left-2.5 rounded bg-amber-500 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-black">
+            Reserved
+          </span>
+        ) : badge && !isSold && (
           <span className={cn('absolute top-2.5 left-2.5 rounded px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide', BADGE_STYLE[badge])}>
             {badge}
           </span>
         )}
-        <span className="absolute bottom-2 right-2 flex items-center gap-1 rounded bg-black/75 px-2 py-0.5 text-[10px] font-semibold text-emerald-400 backdrop-blur-sm">
+        {!isSold && <span className="absolute bottom-2 right-2 flex items-center gap-1 rounded bg-black/75 px-2 py-0.5 text-[10px] font-semibold text-emerald-400 backdrop-blur-sm">
           <ShieldCheck className="h-3 w-3" /> Inspected
-        </span>
+        </span>}
       </div>
 
       <div className="flex flex-1 flex-col justify-between gap-3 p-3.5">
@@ -86,7 +113,7 @@ export function BikeCard({ vehicle, badge, isPriority = false }: BikeCardProps) 
           <Link href={href} className="flex-1 rounded-lg bg-brand px-3 py-2 text-center text-xs font-semibold tracking-tight text-brand-foreground transition-opacity hover:opacity-90">
             View Details
           </Link>
-          <a
+          {!isSold && <a
             href={`https://wa.me/${CONTACT_INFO.whatsapp}?text=${whatsappMessage}`}
             target="_blank"
             rel="noopener noreferrer"
@@ -94,14 +121,14 @@ export function BikeCard({ vehicle, badge, isPriority = false }: BikeCardProps) 
             className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-2 text-emerald-600 transition-colors hover:bg-emerald-500/20"
           >
             <MessageCircle className="h-4 w-4" />
-          </a>
-          <a
+          </a>}
+          {!isSold && <a
             href={`tel:${CONTACT_INFO.phone}`}
             aria-label="Call the showroom"
             className="rounded-lg bg-muted p-2 text-foreground transition-colors hover:bg-muted/70"
           >
             <Phone className="h-4 w-4" />
-          </a>
+          </a>}
         </div>
       </div>
     </div>

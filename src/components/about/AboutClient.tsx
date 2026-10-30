@@ -6,9 +6,9 @@ import { CONTACT_INFO, OUTLETS } from '@/lib/constants';
 import { ShowroomMap } from '@/components/about/ShowroomMap';
 
 const FOUNDERS = [
-  { name: 'Tulsi Khadka', photo: '/team/tp.jpg', pos: '50% 30%', quote: 'A used bike is a big purchase for most families. We earn their trust by being honest about every bike, including its flaws.' },
-  { name: 'Chandan Prasad Gupta', photo: '/team/cp.jpg', pos: '50% 22%', quote: 'Good and Genuine is the standard we set for ourselves: fair prices, clear paperwork, and nothing hidden from the buyer.' },
-  { name: 'Laxman Gautam', photo: '/team/lp.jpg', pos: '50% 25%', quote: 'A name only means something if you live up to it. Every day we work to make sure our customers ride away without a doubt.' },
+  { name: 'Tulsi Khadka', role: 'Co-founder', photo: '/team/tp.jpg', pos: '50% 30%', quote: 'A used bike is a big purchase for most families. We earn their trust by being honest about every bike, including its flaws.' },
+  { name: 'Chandan Prasad Gupta', role: 'Founder', photo: '/team/cp.jpg', pos: '50% 22%', quote: 'Good and Genuine is the standard we set for ourselves: fair prices, clear paperwork, and nothing hidden from the buyer.' },
+  { name: 'Laxman Gautam', role: 'Co-founder', photo: '/team/lp.jpg', pos: '50% 25%', quote: 'A name only means something if you live up to it. Every day we work to make sure our customers ride away without a doubt.' },
 ];
 
 const PROMISES = [
@@ -57,8 +57,8 @@ function Hero() {
       <div className="relative md:pb-16">
         <span aria-hidden className="hidden md:block absolute -top-4 right-[-1rem] w-[34%] h-[55%] bg-brand" />
         <div ref={photo} className="relative md:ml-auto md:w-[72%] will-change-transform">
-          <div className="about-photo aspect-[4/3] md:aspect-[16/11] overflow-hidden bg-secondary">
-            <img src="/hero/handover.jpg" alt="Keys being handed over at the G&G showroom" className="h-full w-full object-cover" style={{ objectPosition: '55% 40%' }} />
+          <div className="about-photo aspect-video overflow-hidden bg-secondary">
+            <img src="/hero/showroom-premium.jpg" srcSet="/hero/showroom-premium-1000.jpg 1000w, /hero/showroom-premium.jpg 1672w" sizes="(min-width: 768px) 72vw, 100vw" width={1672} height={940} alt="The G&G showroom floor with bikes and scooters on display" className="h-full w-full object-cover" />
           </div>
         </div>
         <div className="about-panel relative mt-[-3rem] mx-3 md:mx-0 md:mt-0 md:absolute md:left-0 md:bottom-0 md:w-[54%] bg-white p-6 md:p-10 shadow-[0_18px_40px_-20px_rgba(0,0,0,0.4)]">
@@ -164,7 +164,7 @@ function Founders() {
                 </div>
                 <figcaption className="mt-4 border-t border-foreground pt-3">
                   <p className="font-headline font-semibold text-xl">{p.name}</p>
-                  <p className="text-sm text-muted-foreground">Co-founder, G&amp;G Auto</p>
+                  <p className="text-sm text-muted-foreground">{p.role}, G&amp;G Auto</p>
                   <blockquote className="mt-3 font-headline italic text-lg leading-snug text-foreground/80">
                     <span aria-hidden className="text-brand text-3xl leading-none align-[-0.3em] mr-1">&ldquo;</span>{p.quote}<span aria-hidden className="text-brand text-3xl leading-none align-[-0.3em] ml-1">&rdquo;</span>
                   </blockquote>

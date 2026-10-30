@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { VehicleCard } from '@/components/inventory/VehicleCard';
+import { BikeCard } from '@/components/home/BikeCard';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search } from 'lucide-react';
@@ -33,6 +33,9 @@ const SORTS = [
 export function VehicleBrowser({ vehicles, priorityCount = 0, layout = 'bar' }: VehicleBrowserProps) {
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
+  const [yearFilter, setYearFilter] = useState('all');
+  const [minPrice, setMinPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
   // Links such as /inventory?brand=Honda or ?sort=price-low open the page already filtered.
   const params = useSearchParams();
   const [brandFilter, setBrandFilter] = useState(() => {
@@ -49,13 +52,19 @@ export function VehicleBrowser({ vehicles, priorityCount = 0, layout = 'bar' }: 
     return BRANDS.filter(b => present.has(b));
   }, [vehicles]);
 
+  const yearsInStock = useMemo(() => Array.from(new Set(vehicles.map(v => v.year))).sort((a, b) => b - a), [vehicles]);
+
   const filteredVehicles = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    const min = minPrice ? Number(minPrice) : 0;
+    const max = maxPrice ? Number(maxPrice) : Infinity;
     return vehicles.filter(v => {
-      const matchesSearch = v.title.toLowerCase().includes(search.toLowerCase()) ||
-                           v.brand.toLowerCase().includes(search.toLowerCase());
+      const matchesSearch = !q || [v.title, v.brand, v.model].some(s => s.toLowerCase().includes(q));
+      const matchesYear = yearFilter === 'all' || v.year === Number(yearFilter);
+      const matchesPrice = v.price >= min && v.price <= max;
       const matchesType = typeFilter === 'all' || v.type === typeFilter;
       const matchesBrand = brandFilter === 'all' || v.brand === brandFilter;
-      return matchesSearch && matchesType && matchesBrand;
+      return matchesSearch && matchesType && matchesBrand && matchesYear && matchesPrice;
     }).sort((a, b) => {
       // Snoozed (photoless) entries always sink to the bottom, whatever the sort.
       if (a.has_photos !== b.has_photos) return a.has_photos ? -1 : 1;
@@ -65,7 +74,7 @@ export function VehicleBrowser({ vehicles, priorityCount = 0, layout = 'bar' }: 
       if (sortOrder === 'name-desc') return b.title.localeCompare(a.title);
       return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
     });
-  }, [vehicles, search, typeFilter, brandFilter, sortOrder]);
+  }, [vehicles, search, typeFilter, brandFilter, yearFilter, minPrice, maxPrice, sortOrder]);
 
   const isFiltered = filteredVehicles.length !== vehicles.length;
   const sidebar = layout === 'sidebar';
@@ -74,6 +83,9 @@ export function VehicleBrowser({ vehicles, priorityCount = 0, layout = 'bar' }: 
     setSearch('');
     setTypeFilter('all');
     setBrandFilter('all');
+    setYearFilter('all');
+    setMinPrice('');
+    setMaxPrice('');
     setSortOrder('latest');
   };
 
@@ -90,6 +102,25 @@ export function VehicleBrowser({ vehicles, priorityCount = 0, layout = 'bar' }: 
     </button>
   );
 
+  const digits = (s: string) => s.replace(/\D/g, '').slice(0, 9);
+
+  const priceInputs = (cls: string) => (
+    <div className="grid grid-cols-2 gap-2">
+      <Input inputMode="numeric" placeholder="Min NPR" aria-label="Minimum price" className={cls} value={minPrice} onChange={(e) => setMinPrice(digits(e.target.value))} />
+      <Input inputMode="numeric" placeholder="Max NPR" aria-label="Maximum price" className={cls} value={maxPrice} onChange={(e) => setMaxPrice(digits(e.target.value))} />
+    </div>
+  );
+
+  const yearSelect = (cls: string) => (
+    <Select value={yearFilter} onValueChange={setYearFilter}>
+      <SelectTrigger className={cls} aria-label="Model year"><SelectValue placeholder="Year" /></SelectTrigger>
+      <SelectContent>
+        <SelectItem value="all">Any year</SelectItem>
+        {yearsInStock.map(y => <SelectItem key={y} value={String(y)}>{y}</SelectItem>)}
+      </SelectContent>
+    </Select>
+  );
+
   const railHeading = 'text-[11px] font-bold uppercase tracking-[0.16em] text-brand mb-2';
 
   const rail = (
@@ -97,7 +128,7 @@ export function VehicleBrowser({ vehicles, priorityCount = 0, layout = 'bar' }: 
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
-          placeholder="Search…"
+          placeholder="Search model or brand…"
           className="pl-9 h-10 rounded-md"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -108,6 +139,16 @@ export function VehicleBrowser({ vehicles, priorityCount = 0, layout = 'bar' }: 
         <h4 className={railHeading}>Make</h4>
         {railItem(brandFilter === 'all', () => setBrandFilter('all'), 'All makes')}
         {brandsInStock.map(b => railItem(brandFilter === b, () => setBrandFilter(b), b))}
+      </div>
+
+      <div>
+        <h4 className={railHeading}>Price (NPR)</h4>
+        {priceInputs('h-9 rounded-md text-sm')}
+      </div>
+
+      <div>
+        <h4 className={railHeading}>Year</h4>
+        {yearSelect('h-9 rounded-md')}
       </div>
 
       <div>
@@ -168,6 +209,11 @@ export function VehicleBrowser({ vehicles, priorityCount = 0, layout = 'bar' }: 
           <SelectItem value="name-desc">Name: Z–A</SelectItem>
         </SelectContent>
       </Select>
+
+      <div className="col-span-full grid grid-cols-1 sm:grid-cols-3 gap-3">
+        {yearSelect('h-11 rounded-md')}
+        <div className="sm:col-span-2">{priceInputs('h-11 rounded-md')}</div>
+      </div>
     </div>
   );
 
@@ -193,7 +239,7 @@ export function VehicleBrowser({ vehicles, priorityCount = 0, layout = 'bar' }: 
     )}>
       {filteredVehicles.length > 0 ? (
         filteredVehicles.map((vehicle, index) => (
-          <VehicleCard key={vehicle.id} vehicle={vehicle} isPriority={index < priorityCount} />
+          <BikeCard key={vehicle.id} vehicle={vehicle} isPriority={index < priorityCount} keepRatio />
         ))
       ) : (
         <div className="col-span-full py-20 text-center space-y-3">

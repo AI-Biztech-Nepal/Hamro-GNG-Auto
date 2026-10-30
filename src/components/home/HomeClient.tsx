@@ -22,7 +22,7 @@ export function HomeClient({ vehicles }: { vehicles: Vehicle[]; settings: SiteSe
   const [filter, setFilter] = useState<FilterId>('all');
 
   // The brand tiles always show the whole stock; the quick filter only narrows the rails.
-  const inStock = useMemo(() => vehicles.filter(v => v.has_photos && v.status === 'available'), [vehicles]);
+  const inStock = useMemo(() => vehicles.filter(v => v.has_photos && v.status !== 'sold'), [vehicles]);
   const filtered = useMemo(() => inStock.filter(v => matchesFilter(v, filter)), [inStock, filter]);
   const rails = useMemo(() => buildRails(filtered), [filtered]);
 

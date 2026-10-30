@@ -42,7 +42,7 @@ const newestFirst = (a: Vehicle, b: Vehicle) => new Date(b.created_at).getTime()
  *  - Fresh arrivals: the most recently added.
  */
 export function buildRails(all: Vehicle[]) {
-  const list = all.filter(v => v.has_photos && v.status === 'available');
+  const list = all.filter(v => v.has_photos && v.status !== 'sold');
 
   const popular = list
     .filter(v => (v.view_count ?? 0) > 0)

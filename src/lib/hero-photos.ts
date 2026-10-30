@@ -71,14 +71,14 @@ function adminPickedSlides(vehicles: Vehicle[], urls: string[] | undefined): Her
   if (!Array.isArray(urls)) return [];
   const slides: HeroSlide[] = [];
   for (const src of urls) {
-    const v = vehicles.find(x => x.status === 'available' && x.image_urls.includes(src));
+    const v = vehicles.find(x => x.status !== 'sold' && x.image_urls.includes(src));
     if (v) slides.push({ key: src, vehicleId: v.id, title: v.title, price: v.price, src });
   }
   return slides.slice(0, HERO_MAX_SLIDES);
 }
 
 async function autoSlides(vehicles: Vehicle[]): Promise<HeroSlide[]> {
-  const live = vehicles.filter(v => v.status === 'available' && v.has_photos && v.image_urls.length > 0);
+  const live = vehicles.filter(v => v.status !== 'sold' && v.has_photos && v.image_urls.length > 0);
   const pinned = HERO_PINNED_IDS.map(id => live.find(v => v.id === id)).filter((v): v is Vehicle => !!v);
   const fillers = live
     .filter(v => !HERO_PINNED_IDS.includes(v.id))

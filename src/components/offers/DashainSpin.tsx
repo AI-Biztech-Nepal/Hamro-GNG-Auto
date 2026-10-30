@@ -229,6 +229,7 @@ export function DashainSpin({ prizes, reviewUrl, joinUrl }: { prizes: string[]; 
   const wheelPreloaded = useRef(false);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [bikeNo, setBikeNo] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
@@ -328,6 +329,7 @@ export function DashainSpin({ prizes, reviewUrl, joinUrl }: { prizes: string[]; 
     const plate = bikeNumber.replace(/[^A-Z0-9ऀ-ॿ]/g, '');
     if (name.trim().length < 2) return setError('Please enter your name.');
     if (!/^9\d{9}$/.test(phone.trim())) return setError('Please enter a valid 10-digit mobile number.');
+    if (!/^\S+@\S+\.\S+$/.test(email.trim())) return setError('Please enter a valid email address.');
     if (plate.length < 4 || !/[0-9०-९]/.test(plate)) {
       return setError('Please enter the number plate of your bike, e.g. Ba 70 Pa 1234.');
     }
@@ -349,7 +351,7 @@ export function DashainSpin({ prizes, reviewUrl, joinUrl }: { prizes: string[]; 
     setError('');
     setBusy(true);
     try {
-      const r = await callOffer('spin', { code: bikeNumber, name: name.trim(), phone: phone.trim() });
+      const r = await callOffer('spin', { code: bikeNumber, name: name.trim(), phone: phone.trim(), email: email.trim() });
       if (!r.ok || r.prize == null) {
         setError(r.msg || 'Something went wrong. Please ask our staff.');
         setBusy(false);
@@ -412,6 +414,10 @@ export function DashainSpin({ prizes, reviewUrl, joinUrl }: { prizes: string[]; 
             <div className="space-y-2">
               <Label htmlFor="offer-phone" className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Mobile Number</Label>
               <Input id="offer-phone" type="tel" inputMode="numeric" autoComplete="tel" maxLength={10} value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="98XXXXXXXX" className="h-11 rounded-md" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="offer-email" className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Email</Label>
+              <Input id="offer-email" type="email" autoComplete="email" maxLength={120} value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" className="h-11 rounded-md" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="offer-bike" className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Bike Lot No.</Label>

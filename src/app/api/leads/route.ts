@@ -12,6 +12,7 @@ const leadSchema = z.object({
   type: z.enum(['sell', 'exchange', 'service']),
   name: z.string().trim().min(1).max(100),
   phone: z.string().trim().min(7).max(20).regex(/^[0-9+\-\s()]+$/),
+  email: z.string().trim().email().max(120),
   message: z.string().max(2000).optional(),
   images: z.array(z.string().max(700_000).regex(/^data:image\/(jpeg|png|webp);base64,/)).max(8).optional(),
   requested_service: z.string().max(100).optional(),
@@ -43,7 +44,8 @@ export async function POST(request: NextRequest) {
     const res = await fetch(`${API_BASE}/api/public/leads`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(lead.data), // only the validated fields are forwarded
+      // Only validated fields are forwarded; the email is also written into the message so it shows on the admin's Leads screen.
+      body: JSON.stringify({ ...lead.data, message: `${lead.data.message ?? ''} Email: ${lead.data.email}`.trim() }),
       signal: AbortSignal.timeout(15000),
       cache: 'no-store',
     });

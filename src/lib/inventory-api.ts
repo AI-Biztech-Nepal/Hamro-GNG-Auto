@@ -32,7 +32,7 @@ interface PublicVehicle {
   color: string | null;
   registration_number: string | null;
   price: number | null;
-  status: 'available';
+  status: 'available' | 'reserved' | 'sold';
   created_at: string | null;
   cover_photo?: string | null;
   image_urls: string[];
@@ -77,7 +77,7 @@ function mapVehicle(v: PublicVehicle): Vehicle {
     image_urls: hasPhotos ? photos : ['https://placehold.co/800x600'],
     has_photos: hasPhotos,
     condition: v.condition,
-    status: 'available',
+    status: v.status === 'sold' || v.status === 'reserved' ? v.status : 'available',
     created_at: v.created_at ?? new Date().toISOString(),
     featured: false,
     view_count: v.view_count ?? 0,
@@ -141,6 +141,7 @@ export interface LeadInput {
   type: 'sell' | 'exchange' | 'service';
   name: string;
   phone: string;
+  email: string;
   message?: string;
   images?: string[];
   /** Selected service, e.g. "Oil Change" — used for Book Service submissions. */

@@ -12,18 +12,19 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Bike, CheckCircle2, Loader2 } from 'lucide-react';
 import { submitLead } from '@/lib/inventory-api';
-import { VehiclePhotoUploader } from '@/components/VehiclePhotoUploader';
+import { VehiclePhotoUploader, REQUIRED_PHOTO_SLOTS } from '@/components/VehiclePhotoUploader';
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
-  phone: z.string().min(10, { message: "Please enter a valid phone number." }),
+  phone: z.string().regex(/^\+?\d{10,13}$/, { message: "Enter a valid phone number, digits only." }),
+  email: z.string().email({ message: "Enter a valid email address." }),
   brand: z.string().min(1, { message: "Brand is required." }),
   model: z.string().min(1, { message: "Model is required." }),
-  year: z.string().min(4, { message: "Year is required." }),
-  km_run: z.string().min(1, { message: "Mileage is required." }),
-  expected_price: z.string().min(1, { message: "Please specify your expected price." }),
+  year: z.string().regex(/^(19|20)\d{2}$/, { message: "Enter a 4-digit year, e.g. 2022." }),
+  km_run: z.string().regex(/^\d{1,6}$/, { message: "Enter the KM run as a number." }),
+  expected_price: z.string().regex(/^\d{4,9}$/, { message: "Enter your expected price as a number." }),
   message: z.string().optional(),
-  images: z.array(z.string()).min(1, "Please upload at least one image of your bike."),
+  images: z.array(z.string()).length(REQUIRED_PHOTO_SLOTS.length).refine(a => a.every(Boolean), "Please upload all 4 photos."),
 });
 
 export default function SellPage() {
@@ -36,13 +37,14 @@ export default function SellPage() {
     defaultValues: {
       name: "",
       phone: "",
+      email: "",
       brand: "",
       model: "",
       year: "",
       km_run: "",
       expected_price: "",
       message: "",
-      images: [],
+      images: REQUIRED_PHOTO_SLOTS.map(() => ''),
     },
   });
 
@@ -53,7 +55,8 @@ export default function SellPage() {
         type: 'sell',
         name: values.name,
         phone: values.phone,
-        message: `Sell Inquiry: ${values.brand} ${values.model} (${values.year}). KM: ${values.km_run}. Expected Price: NPR ${values.expected_price}. ${values.message || ''}`,
+        email: values.email,
+        message: `Sell Inquiry: ${values.brand} ${values.model} (${values.year}). KM: ${values.km_run}. Expected Price: NPR ${values.expected_price}. ${values.message || ''} Photos in order: ${REQUIRED_PHOTO_SLOTS.join(', ')}.`,
         images: values.images,
       });
       setSubmitted(true);
@@ -137,7 +140,18 @@ export default function SellPage() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Phone Number</FormLabel>
-                          <FormControl><Input placeholder="98XXXXXXXX" className="h-11 rounded-md" {...field} /></FormControl>
+                          <FormControl><Input placeholder="98XXXXXXXX" inputMode="numeric" className="h-11 rounded-md" {...field} /></FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem className="col-span-full">
+                          <FormLabel className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Email</FormLabel>
+                          <FormControl><Input type="email" autoComplete="email" placeholder="you@example.com" className="h-11 rounded-md" {...field} /></FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -170,7 +184,7 @@ export default function SellPage() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Model Year</FormLabel>
-                          <FormControl><Input placeholder="2022" className="h-11 rounded-md" {...field} /></FormControl>
+                          <FormControl><Input placeholder="2022" inputMode="numeric" maxLength={4} className="h-11 rounded-md" {...field} /></FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -181,7 +195,7 @@ export default function SellPage() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Total KM Run</FormLabel>
-                          <FormControl><Input placeholder="12000" className="h-11 rounded-md" {...field} /></FormControl>
+                          <FormControl><Input placeholder="12000" inputMode="numeric" className="h-11 rounded-md" {...field} /></FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -192,7 +206,7 @@ export default function SellPage() {
                       render={({ field }) => (
                         <FormItem className="col-span-full">
                           <FormLabel className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Expected Price (NPR)</FormLabel>
-                          <FormControl><Input placeholder="e.g. 185000" className="h-11 rounded-md" {...field} /></FormControl>
+                          <FormControl><Input placeholder="e.g. 185000" inputMode="numeric" className="h-11 rounded-md" {...field} /></FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -203,7 +217,7 @@ export default function SellPage() {
                       <VehiclePhotoUploader
                         images={form.watch('images')}
                         onChange={(images) => form.setValue('images', images, { shouldValidate: true })}
-                        maxImages={6}
+                        slotLabels={REQUIRED_PHOTO_SLOTS}
                         error={form.formState.errors.images?.message}
                       />
                     </div>

@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
         'Content-Type': 'application/json',
         ...(visitorIp ? { 'X-Forwarded-For': visitorIp } : {}),
       },
-      body: JSON.stringify({ code: body.code, name: body.name, phone: body.phone }),
+      body: JSON.stringify({ code: body.code, name: body.name, phone: body.phone, email: typeof body.email === 'string' ? body.email.slice(0, 120) : undefined }),
       signal: AbortSignal.timeout(10000),
       cache: 'no-store',
     });

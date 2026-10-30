@@ -236,7 +236,7 @@ export function VehicleDetailClient({ vehicle }: { vehicle: Vehicle }) {
             </span>
           </div>
           <p className="mt-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-brand">
-            {isSold ? 'Sold' : 'Available now'}
+            {isSold ? 'Sold' : vehicle.status === 'reserved' ? 'Reserved' : 'Available now'}
             <span className="ml-2 font-normal normal-case tracking-normal text-muted-foreground">
               {isSold ? '' : 'Fixed price · genuine paperwork'}
             </span>

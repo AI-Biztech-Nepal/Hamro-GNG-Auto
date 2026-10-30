@@ -1,5 +1,5 @@
 
-export type VehicleStatus = 'available' | 'sold';
+export type VehicleStatus = 'available' | 'reserved' | 'sold';
 export type VehicleType = 'bike' | 'scooter';
 
 export interface Vehicle {

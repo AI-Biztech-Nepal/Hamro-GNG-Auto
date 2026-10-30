@@ -11,15 +11,16 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { RefreshCw, CheckCircle2, Loader2 } from 'lucide-react';
 import { submitLead } from '@/lib/inventory-api';
-import { VehiclePhotoUploader } from '@/components/VehiclePhotoUploader';
+import { VehiclePhotoUploader, REQUIRED_PHOTO_SLOTS } from '@/components/VehiclePhotoUploader';
 
 const formSchema = z.object({
   name: z.string().min(2, "Name is required"),
-  phone: z.string().min(10, "Valid phone number required"),
+  phone: z.string().regex(/^\+?\d{10,13}$/, "Enter a valid phone number, digits only"),
+  email: z.string().email("Enter a valid email address"),
   old_bike: z.string().min(2, "Please enter your current bike model"),
-  old_year: z.string().min(4, "Enter manufacturing year"),
+  old_year: z.string().regex(/^(19|20)\d{2}$/, "Enter a 4-digit year, e.g. 2019"),
   interested_in: z.string().min(2, "What bike are you looking for?"),
-  images: z.array(z.string()).min(1, "Please upload at least one image for evaluation."),
+  images: z.array(z.string()).length(REQUIRED_PHOTO_SLOTS.length).refine(a => a.every(Boolean), "Please upload all 4 photos."),
 });
 
 export default function ExchangePage() {
@@ -32,10 +33,11 @@ export default function ExchangePage() {
     defaultValues: {
       name: "",
       phone: "",
+      email: "",
       old_bike: "",
       old_year: "",
       interested_in: "",
-      images: []
+      images: REQUIRED_PHOTO_SLOTS.map(() => '')
     },
   });
 
@@ -46,7 +48,8 @@ export default function ExchangePage() {
         type: 'exchange',
         name: values.name,
         phone: values.phone,
-        message: `Exchange Inquiry: ${values.old_bike} (${values.old_year}) for ${values.interested_in}. Photos provided: ${values.images.length}`,
+        email: values.email,
+        message: `Exchange Inquiry: ${values.old_bike} (${values.old_year}) for ${values.interested_in}. Photos in order: ${REQUIRED_PHOTO_SLOTS.join(', ')}.`,
         images: values.images,
       });
       setSubmitted(true);
@@ -126,7 +129,14 @@ export default function ExchangePage() {
                 <FormField control={form.control} name="phone" render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Phone Number</FormLabel>
-                    <FormControl><Input placeholder="98XXXXXXXX" className="h-11 rounded-md" {...field} /></FormControl>
+                    <FormControl><Input placeholder="98XXXXXXXX" inputMode="numeric" className="h-11 rounded-md" {...field} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+                <FormField control={form.control} name="email" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Email</FormLabel>
+                    <FormControl><Input type="email" autoComplete="email" placeholder="you@example.com" className="h-11 rounded-md" {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
@@ -145,7 +155,7 @@ export default function ExchangePage() {
                   <FormField control={form.control} name="old_year" render={({ field }) => (
                     <FormItem className="col-span-2 sm:col-span-1">
                       <FormLabel className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Year</FormLabel>
-                      <FormControl><Input placeholder="2018" className="h-11 rounded-md" {...field} /></FormControl>
+                      <FormControl><Input placeholder="2018" inputMode="numeric" maxLength={4} className="h-11 rounded-md" {...field} /></FormControl>
                       <FormMessage />
                     </FormItem>
                   )} />
@@ -164,7 +174,7 @@ export default function ExchangePage() {
                 <VehiclePhotoUploader
                   images={form.watch('images')}
                   onChange={(images) => form.setValue('images', images, { shouldValidate: true })}
-                  maxImages={6}
+                  slotLabels={REQUIRED_PHOTO_SLOTS}
                   error={form.formState.errors.images?.message}
                 />
                 <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest mt-4">Provide clear photos. Large images are automatically optimized for fast upload.</p>
