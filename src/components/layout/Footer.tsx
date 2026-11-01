@@ -82,7 +82,13 @@ export function Footer({ settings }: { settings: SiteSettings }) {
         </div>
       </div>
       <div className="max-w-7xl mx-auto px-4 mt-14 pt-8 border-t border-white/10 text-[11px] text-white/45 tracking-wide uppercase font-semibold">
-        <p>&copy; {new Date().getFullYear()} {businessName}</p>
+        <p>
+          &copy; {new Date().getFullYear()} {businessName}
+          <span aria-hidden className="mx-2">&middot;</span>
+          <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
+          <span aria-hidden className="mx-2">&middot;</span>
+          <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
+        </p>
       </div>
     </footer>
   );
