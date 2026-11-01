@@ -2,8 +2,8 @@
 "use client"
 
 import Link from 'next/link';
-import { Phone, Mail, MapPin, Facebook, MessageCircle } from 'lucide-react';
-import { CONTACT_INFO } from '@/lib/constants';
+import { Phone, Mail, MapPin, Facebook, MessageCircle, Star } from 'lucide-react';
+import { CONTACT_INFO, GOOGLE_PROFILE_URL } from '@/lib/constants';
 import type { SiteSettings } from '@/lib/inventory-api';
 
 export function Footer({ settings }: { settings: SiteSettings }) {
@@ -73,6 +73,10 @@ export function Footer({ settings }: { settings: SiteSettings }) {
             <li className="flex items-center gap-3">
               <Mail className="w-4 h-4 shrink-0" />
               <a href={`mailto:${contactEmail}`} className="hover:text-white">{contactEmail}</a>
+            </li>
+            <li className="flex items-center gap-3">
+              <Star className="w-4 h-4 shrink-0" />
+              <a href={GOOGLE_PROFILE_URL} target="_blank" rel="noopener noreferrer" className="hover:text-white">Find us on Google</a>
             </li>
           </ul>
         </div>

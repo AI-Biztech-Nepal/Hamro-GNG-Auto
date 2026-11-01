@@ -3,9 +3,14 @@ export const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL || 'https://hamroauto.com.np'
 ).replace(/\/$/, '');
 
+const GOOGLE_PLACE_ID = 'ChIJcRmLdk4b6zkRI2pToermlUw';
+
 /** The showroom's Google review page (same link the Offers backend hands out as `review_url`). */
-export const GOOGLE_REVIEW_URL =
-  'https://search.google.com/local/writereview?placeid=ChIJcRmLdk4b6zkRI2pToermlUw';
+export const GOOGLE_REVIEW_URL = `https://search.google.com/local/writereview?placeid=${GOOGLE_PLACE_ID}`;
+
+/** The showroom's Google Business Profile on Maps (reviews, photos, directions), built from the same place id. */
+export const GOOGLE_PROFILE_URL =
+  `https://www.google.com/maps/search/?api=1&query=Hamro%20G%26G%20Auto%20Enterprises&query_place_id=${GOOGLE_PLACE_ID}`;
 
 export const CONTACT_INFO = {
   phone: '9860087161',

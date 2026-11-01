@@ -9,7 +9,7 @@ import { VisitBeacon } from '@/components/analytics/VisitBeacon';
 import { ContactGate } from '@/components/contact/ContactGate';
 import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics';
 import { fetchSettings, type SiteSettings } from '@/lib/inventory-api';
-import { CONTACT_INFO, SITE_URL } from '@/lib/constants';
+import { CONTACT_INFO, GOOGLE_PROFILE_URL, SITE_URL } from '@/lib/constants';
 
 // Render at request time so a slow/unreachable backend never blocks the build.
 // Per-fetch `next: { revalidate, tags }` in inventory-api still caches responses
@@ -113,7 +113,8 @@ const orgJsonLd = {
       closes: '19:00',
     },
   ],
-  sameAs: [CONTACT_INFO.facebook],
+  // The same business on Facebook and Google: this is what ties the website to the Google Business Profile.
+  sameAs: [CONTACT_INFO.facebook, GOOGLE_PROFILE_URL],
   makesOffer: {
     '@type': 'Offer',
     itemOffered: { '@type': 'Service', name: 'Second-hand two-wheeler sales, exchange and servicing' },
