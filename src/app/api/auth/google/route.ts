@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { clientIp, rateLimited } from '@/lib/rate-limit';
-import { createSession, SESSION_COOKIE, SESSION_MAX_AGE } from '@/lib/session';
+import { setSessionCookie } from '@/lib/session';
 
 const CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
@@ -23,12 +23,6 @@ export async function POST(request: NextRequest) {
 
   const user = { sub: t.sub, name: t.name || t.email, email: t.email, picture: t.picture };
   const out = NextResponse.json(user);
-  out.cookies.set(SESSION_COOKIE, createSession(user), {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    path: '/',
-    maxAge: SESSION_MAX_AGE,
-  });
+  setSessionCookie(out, user);
   return out;
 }

@@ -81,7 +81,7 @@ const sections: LegalSection[] = [
     id: 'google-sign-in',
     title: 'Signing in with Google',
     body: [
-      'Signing in is optional. It uses your Google account to show who you are on the site, and you do not need it to browse or enquire. Keep your Google account secure: you are responsible for what happens while you are signed in on your device. You can sign out at any time, and we may disable sign-in for an account that is misused.',
+      'Signing in is optional. It uses your Google account to show who you are on the site, and you do not need it to browse or enquire. Keep your Google account secure: you are responsible for what happens while you are signed in on your device. You can sign out at any time, and we may disable sign-in for an account that is misused. If you add your phone number when you create your account, on the Account page or in the call and WhatsApp prompt, you agree that we may call or WhatsApp you about bikes, offers and servicing, and you can ask us to stop at any time.',
     ],
   },
   {

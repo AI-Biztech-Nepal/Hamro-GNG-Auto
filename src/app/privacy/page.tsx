@@ -26,6 +26,7 @@ const sections: LegalSection[] = [
         list: [
           'Enquiry forms. When you use the Sell, Exchange or Book Service forms, or the contact prompt on a bike, we receive your name, phone number and email, plus whatever you add: your message, vehicle details, a preferred date and any photos you upload.',
           'Google sign-in. If you choose to sign in on the Account page, Google gives us your name, email address and profile photo. We never see your Google password.',
+          'Your phone number. If you add it when you create an account (on the Account page, or in the prompt that appears before the Call and WhatsApp buttons), we save it together with your name, your email and anything you tell us you are looking for, as an enquiry for our team.',
           'Offers. If you join an offer such as the Dashain gift wheel, we receive the contact details you enter and the result of your spin.',
           'Visit data. We note which pages are opened, using a random visit ID stored in your browser, and we use Google Analytics to see how the site is used. Neither identifies you by name.',
         ],
@@ -41,6 +42,7 @@ const sections: LegalSection[] = [
         list: [
           'To reply to your enquiry by phone, WhatsApp or email.',
           'To arrange a viewing, a valuation of the bike you want to sell or exchange, or a service slot.',
+          'To call or WhatsApp you about bikes, offers and servicing, if you gave us your number when you created an account. You can ask us to stop at any time.',
           'To keep you signed in if you use Google sign-in.',
           'To understand which pages are useful and fix what is not.',
           'To keep records of our sales and enquiries, and to protect the site from spam and misuse.',
@@ -55,7 +57,7 @@ const sections: LegalSection[] = [
     body: [
       {
         list: [
-          'gg_session: set only if you sign in with Google, so you stay signed in. It lasts up to 30 days and is removed when you sign out.',
+          'gg_session: set only if you sign in with Google, so you stay signed in. It holds your name, email and, if you add it, your phone number. It lasts up to 30 days and is removed when you sign out.',
           'Browser storage: a random visit ID, your last contact details (so forms are quicker next time) and the result of an offer you played. These stay on your device.',
           'Google Analytics: sets its own cookies to measure site usage.',
         ],
@@ -89,7 +91,7 @@ const sections: LegalSection[] = [
     id: 'how-long-we-keep-it',
     title: 'How long we keep it',
     body: [
-      'We keep an enquiry for as long as we need it to deal with your request and for our sales and service records, then delete it. Sign-in details are not stored in a database: they live in your cookie until it expires or you sign out.',
+      'We keep an enquiry for as long as we need it to deal with your request and for our sales and service records, then delete it. Your Google sign-in details are not stored in a database: they live in your cookie until it expires or you sign out. A phone number you add to your account is kept with our enquiries until you ask us to delete it.',
     ],
   },
   {
