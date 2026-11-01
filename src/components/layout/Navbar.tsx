@@ -23,6 +23,7 @@ export function Navbar({ settings }: { settings: SiteSettings }) {
     { name: 'Offers', href: '/offers' },
     { name: 'Book service', href: '/book-service' },
     { name: 'About us', href: '/about' },
+    { name: 'Account', href: '/account' },
   ];
 
   return (
