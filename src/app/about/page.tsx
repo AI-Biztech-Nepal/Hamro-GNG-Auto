@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { AboutClient } from '@/components/about/AboutClient';
+import { fetchGoogleReviews } from '@/lib/google-reviews';
 
 export const metadata: Metadata = {
   title: 'About G&G Auto: Good and Genuine Second-hand Bikes in Boudha',
@@ -8,6 +9,6 @@ export const metadata: Metadata = {
   alternates: { canonical: '/about' },
 };
 
-export default function AboutPage() {
-  return <AboutClient />;
+export default async function AboutPage() {
+  return <AboutClient googleReviews={await fetchGoogleReviews()} />;
 }

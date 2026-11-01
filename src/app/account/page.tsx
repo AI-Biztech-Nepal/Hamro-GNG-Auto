@@ -34,7 +34,10 @@ export default function AccountPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ credential }),
         });
-        if (res.ok) setUser(await res.json());
+        if (res.ok) {
+          setUser(await res.json());
+          window.dispatchEvent(new Event('gg-auth'));
+        }
         else toast({ title: 'Sign-in failed', description: 'Please try again.', variant: 'destructive' });
       },
     });
@@ -45,6 +48,7 @@ export default function AccountPage() {
     await fetch('/api/auth/logout', { method: 'POST' });
     (window as any).google?.accounts?.id.disableAutoSelect();
     setUser(null);
+    window.dispatchEvent(new Event('gg-auth'));
   }
 
   return (

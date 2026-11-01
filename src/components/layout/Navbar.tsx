@@ -2,18 +2,32 @@
 "use client"
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { Menu, X } from 'lucide-react';
+import { Menu, User, X } from 'lucide-react';
 import { CONTACT_INFO } from '@/lib/constants';
 import type { SiteSettings } from '@/lib/inventory-api';
 
 export function Navbar({ settings }: { settings: SiteSettings }) {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
+  const [picture, setPicture] = useState<string | null>(null);
+
+  // The account page fires 'gg-auth' after sign-in/out so the icon updates without a reload.
+  useEffect(() => {
+    const load = () =>
+      fetch('/api/auth/me').then((r) => r.json()).then((u) => setPicture(u?.picture ?? null)).catch(() => setPicture(null));
+    load();
+    window.addEventListener('gg-auth', load);
+    return () => window.removeEventListener('gg-auth', load);
+  }, []);
 
   // Backend `settings.logo_url` is a stock placeholder; the real brand mark ships in /public.
   const logoImage = CONTACT_INFO.logoUrl;
+
+  const accountClass = `inline-flex h-10 w-10 items-center justify-center rounded-full overflow-hidden bg-brand text-brand-foreground shadow-sm transition hover:bg-brand/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 ${
+    pathname === '/account' ? 'ring-2 ring-brand ring-offset-2' : ''
+  }`;
 
   const links = [
     { name: 'Home', href: '/' },
@@ -23,7 +37,6 @@ export function Navbar({ settings }: { settings: SiteSettings }) {
     { name: 'Offers', href: '/offers' },
     { name: 'Book service', href: '/book-service' },
     { name: 'About us', href: '/about' },
-    { name: 'Account', href: '/account' },
   ];
 
   return (
@@ -55,10 +68,24 @@ export function Navbar({ settings }: { settings: SiteSettings }) {
                 {link.name}
               </Link>
             ))}
+            <Link href="/account" aria-label="Account" title="Account" className={accountClass}>
+              {picture ? (
+                <img src={picture} alt="" referrerPolicy="no-referrer" className="h-full w-full rounded-full object-cover" />
+              ) : (
+                <User className="h-5 w-5" strokeWidth={2.25} />
+              )}
+            </Link>
           </div>
 
-          {/* Mobile menu button */}
-          <div className="md:hidden flex items-center">
+          {/* Mobile account + menu button */}
+          <div className="md:hidden flex items-center gap-2">
+            <Link href="/account" aria-label="Account" className={accountClass}>
+              {picture ? (
+                <img src={picture} alt="" referrerPolicy="no-referrer" className="h-full w-full rounded-full object-cover" />
+              ) : (
+                <User className="h-5 w-5" strokeWidth={2.25} />
+              )}
+            </Link>
             <button
               onClick={() => setIsOpen(!isOpen)}
               aria-label={isOpen ? 'Close menu' : 'Open menu'}

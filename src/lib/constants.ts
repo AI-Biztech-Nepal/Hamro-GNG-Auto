@@ -3,7 +3,7 @@ export const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL || 'https://hamroauto.com.np'
 ).replace(/\/$/, '');
 
-const GOOGLE_PLACE_ID = 'ChIJcRmLdk4b6zkRI2pToermlUw';
+export const GOOGLE_PLACE_ID = 'ChIJcRmLdk4b6zkRI2pToermlUw';
 
 /** The showroom's Google review page (same link the Offers backend hands out as `review_url`). */
 export const GOOGLE_REVIEW_URL = `https://search.google.com/local/writereview?placeid=${GOOGLE_PLACE_ID}`;

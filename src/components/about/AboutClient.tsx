@@ -1,8 +1,9 @@
 "use client"
 
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
-import { MapPin } from 'lucide-react';
-import { CONTACT_INFO, OUTLETS } from '@/lib/constants';
+import { MapPin, Star } from 'lucide-react';
+import { CONTACT_INFO, GOOGLE_PROFILE_URL, GOOGLE_REVIEW_URL, OUTLETS } from '@/lib/constants';
+import type { GoogleReviews } from '@/lib/google-reviews';
 import { ShowroomMap } from '@/components/about/ShowroomMap';
 
 const FOUNDERS = [
@@ -212,7 +213,83 @@ function Visit() {
   );
 }
 
-export function AboutClient() {
+function Stars({ n, className = 'w-4 h-4' }: { n: number; className?: string }) {
+  return (
+    <span className="inline-flex gap-0.5 text-brand" role="img" aria-label={`${n} out of 5 stars`}>
+      {[1, 2, 3, 4, 5].map(i => (
+        <Star key={i} className={className} fill={i <= Math.round(n) ? 'currentColor' : 'none'} strokeWidth={1.75} />
+      ))}
+    </span>
+  );
+}
+
+function Reviewer({ r }: { r: GoogleReviews['reviews'][number] }) {
+  return (
+    <div className="flex items-center gap-3">
+      {r.photo ? (
+        <img src={r.photo} alt="" loading="lazy" referrerPolicy="no-referrer" className="h-11 w-11 rounded-full object-cover ring-2 ring-brand ring-offset-2 ring-offset-foreground" />
+      ) : (
+        <span aria-hidden className="grid h-11 w-11 place-items-center rounded-full bg-brand font-headline font-semibold text-brand-foreground">{r.author.charAt(0)}</span>
+      )}
+      <div className="min-w-0 text-sm">
+        <p className="font-headline font-semibold truncate">{r.author}</p>
+        <p className="text-background/70">{r.when}</p>
+      </div>
+    </div>
+  );
+}
+
+function Reviews({ data }: { data: GoogleReviews }) {
+  const top = data.reviews.slice(0, 3);
+  // Lead with a review short enough to set large; a wall of text would break the feature.
+  const lead = top.find(r => r.text.length <= 300) ?? top[0];
+  const rest = top.filter(r => r !== lead);
+  return (
+    <section className="relative overflow-hidden bg-foreground text-background">
+      <span aria-hidden className="pointer-events-none absolute -top-10 right-2 sm:right-10 select-none font-headline font-bold leading-none text-brand/15 text-[18rem] md:text-[28rem]">&rdquo;</span>
+      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-20 md:py-28">
+        <Reveal>
+          <h2 className="font-headline font-bold text-3xl md:text-5xl tracking-tight text-balance max-w-[18ch]">Buyers say it better than we do.</h2>
+          <p className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-1 text-background/80">
+            <Stars n={data.rating} className="w-5 h-5" />
+            <span><strong className="font-headline font-semibold text-background">{data.rating.toFixed(1)}</strong> from {data.total} Google reviews</span>
+          </p>
+        </Reveal>
+
+        <Reveal delay={100} className="mt-14 md:mt-20">
+          <figure className="max-w-4xl p-7 md:p-12 rounded-2xl border border-background/15 bg-background/[0.06] shadow-[0_18px_40px_-18px_rgba(0,0,0,0.55)] review-card" style={{ '--dur': '8s', '--r': '0.25deg' } as CSSProperties}>
+            <Stars n={lead.rating} className="w-6 h-6" />
+            <blockquote className="mt-6 font-headline font-medium italic text-2xl md:text-4xl leading-snug text-balance line-clamp-[8]">{lead.text}</blockquote>
+            <figcaption className="mt-8"><Reviewer r={lead} /></figcaption>
+          </figure>
+        </Reveal>
+
+        {rest.length > 0 && (
+          <div className="mt-10 md:mt-12 grid gap-6 md:gap-8 md:grid-cols-2">
+            {rest.map((r, i) => (
+              <Reveal key={r.author + i} delay={i * 120} className={i === 1 ? 'md:mt-10' : ''}>
+                <figure className="p-6 md:p-8 rounded-2xl border border-background/15 bg-background/[0.06] shadow-[0_18px_40px_-18px_rgba(0,0,0,0.55)] review-card" style={{ '--dur': `${6 + i * 1.5}s`, '--delay': `${-i * 2}s`, '--r': i ? '-0.4deg' : '0.4deg' } as CSSProperties}>
+                  <Stars n={r.rating} />
+                  <blockquote className="mt-4 text-lg leading-relaxed text-background/90 line-clamp-5">{r.text}</blockquote>
+                  <figcaption className="mt-6"><Reviewer r={r} /></figcaption>
+                </figure>
+              </Reveal>
+            ))}
+          </div>
+        )}
+
+        <Reveal delay={100}>
+          <p className="mt-14 flex flex-wrap gap-x-8 gap-y-3 text-sm font-semibold">
+            <a href={GOOGLE_PROFILE_URL} target="_blank" rel="noopener noreferrer" className="border-b-2 border-brand pb-1 hover:text-brand transition-colors">Read all reviews on Google</a>
+            <a href={GOOGLE_REVIEW_URL} target="_blank" rel="noopener noreferrer" className="border-b-2 border-transparent pb-1 text-background/80 hover:border-brand hover:text-background transition-colors">Write a review</a>
+          </p>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+export function AboutClient({ googleReviews }: { googleReviews: GoogleReviews | null }) {
   return (
     <>
       <Hero />
@@ -220,6 +297,7 @@ export function AboutClient() {
       <Promises />
       <Founders />
       <Visit />
+      {googleReviews && googleReviews.reviews.length > 0 && <Reviews data={googleReviews} />}
     </>
   );
 }
