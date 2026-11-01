@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const name = vehicle.title.replace(/\s+/g, ' ').trim();
   const price = `NPR ${vehicle.price.toLocaleString()}`;
   const isHonda = vehicle.brand?.toLowerCase() === 'honda';
-  const title = `Secondhand ${name} for sale in Kathmandu — ${price}`;
+  const title = `Second Hand ${name} for Sale in Kathmandu, Nepal — ${price}`;
   const description =
     `${vehicle.year} ${name}, ${vehicle.condition.toLowerCase()} condition` +
     (vehicle.engine_cc ? `, ${vehicle.engine_cc}cc` : '') +
