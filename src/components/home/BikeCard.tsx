@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { Phone, MessageCircle, ShieldCheck, Gauge, Calendar, Hash, Eye } from 'lucide-react';
 import type { Vehicle } from '@/types/vehicle';
 import { CONTACT_INFO } from '@/lib/constants';
+import { vehiclePageUrl } from '@/lib/vehicle-link';
 import { formatNpr, type Badge } from '@/components/home/home-data';
 import { cn } from '@/lib/utils';
 
@@ -28,7 +29,7 @@ export function BikeCard({ vehicle, badge, isPriority = false, keepRatio = false
   const isReserved = vehicle.status === 'reserved';
   const href = `/inventory/${vehicle.id}`;
   const whatsappMessage = encodeURIComponent(
-    `Namaste! 🙏 I found you through your website, hamroauto.com.np, and I'm interested in ${vehicle.title}${vehicle.registration_number ? ` (${vehicle.registration_number})` : ''}, ${formatNpr(vehicle.price)}. Is it still available?`,
+    `Namaste! 🙏 I found you through your website, hamroauto.com.np, and I'm interested in ${vehicle.title}${vehicle.registration_number ? ` (${vehicle.registration_number})` : ''}, ${formatNpr(vehicle.price)}. Is it still available?\n\n${vehiclePageUrl(vehicle.id)}`,
   );
   // Only show what is actually recorded: an empty "0 km" or a made-up lot number would mislead.
   const specs = [
@@ -115,6 +116,8 @@ export function BikeCard({ vehicle, badge, isPriority = false, keepRatio = false
           </Link>
           {!isSold && <a
             href={`https://wa.me/${CONTACT_INFO.whatsapp}?text=${whatsappMessage}`}
+            data-vehicle-id={vehicle.id}
+            data-vehicle-title={vehicle.title}
             target="_blank"
             rel="noopener noreferrer"
             aria-label="WhatsApp inquiry"
@@ -124,6 +127,8 @@ export function BikeCard({ vehicle, badge, isPriority = false, keepRatio = false
           </a>}
           {!isSold && <a
             href={`tel:${CONTACT_INFO.phone}`}
+            data-vehicle-id={vehicle.id}
+            data-vehicle-title={vehicle.title}
             aria-label="Call the showroom"
             className="rounded-lg bg-muted p-2 text-foreground transition-colors hover:bg-muted/70"
           >

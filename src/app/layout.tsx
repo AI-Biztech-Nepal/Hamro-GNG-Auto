@@ -6,7 +6,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { TransitionProvider } from '@/components/layout/TransitionProvider';
 import { OfferPopup } from '@/components/offers/OfferPopup';
 import { VisitBeacon } from '@/components/analytics/VisitBeacon';
-import { ContactClickTracker } from '@/components/analytics/ContactClickTracker';
+import { ContactGate } from '@/components/contact/ContactGate';
 import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics';
 import { fetchSettings, type SiteSettings } from '@/lib/inventory-api';
 import { CONTACT_INFO, SITE_URL } from '@/lib/constants';
@@ -156,7 +156,7 @@ export default async function RootLayout({
         <Footer settings={settings} />
         <OfferPopup />
         <VisitBeacon />
-        <ContactClickTracker />
+        <ContactGate />
         <GoogleAnalytics />
         <Toaster />
       </body>

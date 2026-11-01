@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, Pause, Play, Phone, MessageCircle, Share2, ShieldCheck, FileCheck, MapPin } from 'lucide-react';
 import { CONTACT_INFO } from '@/lib/constants';
+import { vehiclePageUrl } from '@/lib/vehicle-link';
 import { Vehicle } from '@/types/vehicle';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -73,7 +74,7 @@ export function VehicleDetailClient({ vehicle }: { vehicle: Vehicle }) {
     strip.scrollTo({ left: el.offsetLeft - (strip.clientWidth - el.clientWidth) / 2, behavior: reducedMotion ? 'auto' : 'smooth' });
   }, [current, reducedMotion]);
 
-  const whatsappMessage = `Namaste Hamro G&G Auto! 🙏 I visited your website, hamroauto.com.np, and I'm interested in the ${vehicle.title} (${vehicle.year} model) priced at NPR ${vehicle.price.toLocaleString()}. Is it still available?`;
+  const whatsappMessage = `Namaste Hamro G&G Auto! 🙏 I visited your website, hamroauto.com.np, and I'm interested in the ${vehicle.title} (${vehicle.year} model) priced at NPR ${vehicle.price.toLocaleString()}. Is it still available?\n\n${vehiclePageUrl(vehicle.id)}`;
   const whatsappUrl = `https://wa.me/${CONTACT_INFO.whatsapp}?text=${encodeURIComponent(whatsappMessage)}`;
   const images = vehicle.image_urls?.length ? vehicle.image_urls : ['https://picsum.photos/seed/vehicle/800/600'];
   const isSold = vehicle.status === 'sold';
@@ -245,7 +246,7 @@ export function VehicleDetailClient({ vehicle }: { vehicle: Vehicle }) {
           {!isSold && (
             <div className="mt-6 grid grid-cols-2 gap-3">
               <Button className="h-12 text-base font-semibold gap-2" asChild>
-                <a href={`tel:${CONTACT_INFO.phone}`}>
+                <a href={`tel:${CONTACT_INFO.phone}`} data-vehicle-id={vehicle.id} data-vehicle-title={vehicle.title}>
                   <Phone className="w-4 h-4" /> Call
                 </a>
               </Button>
@@ -253,7 +254,7 @@ export function VehicleDetailClient({ vehicle }: { vehicle: Vehicle }) {
                 className="h-12 text-base font-semibold gap-2 bg-[#25D366] hover:bg-[#25D366]/90 text-white border-none"
                 asChild
               >
-                <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
+                <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" data-vehicle-id={vehicle.id} data-vehicle-title={vehicle.title}>
                   <MessageCircle className="w-4 h-4" /> WhatsApp
                 </a>
               </Button>
