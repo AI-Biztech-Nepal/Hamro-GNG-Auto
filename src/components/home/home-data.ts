@@ -3,6 +3,7 @@ import type { Vehicle } from '@/types/vehicle';
 /** Quick filters above the rails. Each one narrows every rail on the page at once. */
 export const FILTERS = [
   { id: 'all', label: 'All Bikes & Scooters' },
+  { id: 'under-1l', label: 'Under NPR 1 Lakh' },
   { id: 'under-1-5l', label: 'Under NPR 1.5 Lakh' },
   { id: 'under-2l', label: 'Under NPR 2.0 Lakh' },
   { id: 'scooters', label: 'Scooters Only' },
@@ -22,8 +23,9 @@ export const daysOld = (v: Vehicle) => (Date.now() - new Date(v.created_at).getT
 
 export function matchesFilter(v: Vehicle, filter: FilterId): boolean {
   switch (filter) {
-    case 'under-1-5l': return v.price > 0 && v.price <= 150000;
-    case 'under-2l': return v.price > 0 && v.price <= 200000;
+    case 'under-1l': return v.price > 0 && v.price <= BUDGET_CAP;
+    case 'under-1-5l': return v.price > 0 && v.price <= MID_CAP;
+    case 'under-2l': return v.price > 0 && v.price <= UPPER_CAP;
     case 'scooters': return v.type === 'scooter';
     case 'commuter': return v.engine_cc != null && v.engine_cc >= 125 && v.engine_cc <= 160;
     case 'recent': return daysOld(v) <= 14;
