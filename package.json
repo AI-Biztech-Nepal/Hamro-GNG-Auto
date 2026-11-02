@@ -44,7 +44,7 @@
     "genkit": "^1.28.0",
     "lucide-react": "^0.475.0",
     "maplibre-gl": "^4.7.1",
-    "next": "15.5.27",
+    "next": "15.5.28",
     "patch-package": "^8.0.0",
     "qrcode.react": "^4.2.0",
     "react": "^19.2.1",
