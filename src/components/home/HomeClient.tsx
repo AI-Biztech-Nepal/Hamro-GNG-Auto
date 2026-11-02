@@ -72,6 +72,17 @@ export function HomeClient({ vehicles }: { vehicles: Vehicle[]; settings: SiteSe
             badges={rails.badges}
             viewAllLink="/inventory?sort=latest"
           />
+          <section className="py-6">
+            <div className="mb-4 border-b border-border pb-2">
+              <h2 className="font-headline text-xl font-bold tracking-tight text-foreground md:text-2xl">Available stock</h2>
+              <p className="mt-0.5 text-xs text-muted-foreground md:text-sm">A look at what is on the showroom floor right now</p>
+            </div>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {filtered.slice(0, 20).map(bike => (
+                <BikeCard key={bike.id} vehicle={bike} badge={rails.badges.get(bike.id)} />
+              ))}
+            </div>
+          </section>
         </>
       )}
 
