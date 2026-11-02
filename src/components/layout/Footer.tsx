@@ -46,6 +46,7 @@ export function Footer({ settings }: { settings: SiteSettings }) {
             <li><Link href="/inventory" className="hover:text-white transition-colors">All Inventory</Link></li>
             <li><Link href="/sell" className="hover:text-white transition-colors">Sell Your Bike</Link></li>
             <li><Link href="/exchange" className="hover:text-white transition-colors">Exchange Offers</Link></li>
+            <li><Link href="/faq" className="hover:text-white transition-colors">FAQ</Link></li>
           </ul>
         </div>
 
