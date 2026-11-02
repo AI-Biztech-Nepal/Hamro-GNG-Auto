@@ -23,7 +23,7 @@ export function BikeSectionRail({ title, subtitle, bikes, badges, viewAllLink, p
   if (!bikes.length) return null;
 
   const scroll = (dir: 'left' | 'right') =>
-    scroller.current?.scrollBy({ left: dir === 'left' ? -320 : 320, behavior: 'smooth' });
+    scroller.current && scroller.current.scrollBy({ left: (dir === 'left' ? -1 : 1) * scroller.current.clientWidth, behavior: 'smooth' });
 
   return (
     <section className="py-6">
@@ -36,22 +36,26 @@ export function BikeSectionRail({ title, subtitle, bikes, badges, viewAllLink, p
           <Link href={viewAllLink} className="flex items-center gap-1 text-xs font-semibold text-brand hover:underline md:text-sm">
             See all <ArrowRight className="h-3.5 w-3.5" />
           </Link>
-          <div className="ml-1 hidden items-center gap-1 md:flex">
-            <button onClick={() => scroll('left')} aria-label="Scroll left" className="rounded-full border border-border p-1.5 text-foreground transition-colors hover:bg-muted">
-              <ChevronLeft className="h-4 w-4" />
-            </button>
-            <button onClick={() => scroll('right')} aria-label="Scroll right" className="rounded-full border border-border p-1.5 text-foreground transition-colors hover:bg-muted">
-              <ChevronRight className="h-4 w-4" />
-            </button>
-          </div>
         </div>
       </div>
 
-      <div ref={scroller} className="-mx-4 flex snap-x gap-4 overflow-x-auto scroll-smooth px-4 pb-3 pt-1 [scrollbar-width:thin]">
-        {bikes.map((bike, i) => (
-          <div key={bike.id} className="w-[275px] shrink-0 snap-start md:w-[290px]">
-            <BikeCard vehicle={bike} badge={badges.get(bike.id)} isPriority={priority && i < 3} />
-          </div>
+      <div className="group/rail relative">
+        <div ref={scroller} className="-mx-4 flex snap-x gap-4 overflow-x-auto scroll-smooth px-4 pb-3 pt-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {bikes.map((bike, i) => (
+            <div key={bike.id} className="w-[275px] shrink-0 snap-start md:w-[290px] lg:w-[calc((100%-3rem)/4)]">
+              <BikeCard vehicle={bike} badge={badges.get(bike.id)} isPriority={priority && i < 4} />
+            </div>
+          ))}
+        </div>
+        {bikes.length > 1 && (['left', 'right'] as const).map(dir => (
+          <button
+            key={dir}
+            onClick={() => scroll(dir)}
+            aria-label={dir === 'left' ? 'Scroll left' : 'Scroll right'}
+            className={`absolute top-[38%] z-10 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-black/25 text-white opacity-60 backdrop-blur-sm transition hover:bg-black/55 hover:opacity-100 md:flex ${dir === 'left' ? 'left-1' : 'right-1'}`}
+          >
+            {dir === 'left' ? <ChevronLeft className="h-7 w-7" /> : <ChevronRight className="h-7 w-7" />}
+          </button>
         ))}
       </div>
     </section>
