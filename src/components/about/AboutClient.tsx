@@ -68,6 +68,14 @@ function Hero() {
             Good and <span className="text-brand">genuine.</span>
           </h1>
           <p className="mt-4 text-muted-foreground">That is what G&amp;G stands for.</p>
+          <ul className="mt-5 grid grid-cols-1 gap-y-2 text-sm font-medium text-neutral-700 sm:grid-cols-2 sm:gap-x-6">
+            {['40-point inspection', 'Genuine paperwork', 'Fixed prices, no haggling', 'Nayabasti, Boudha'].map(t => (
+              <li key={t} className="flex items-center gap-2">
+                <span aria-hidden className="size-1.5 rounded-full bg-brand" />
+                {t}
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
       <div className="mt-10 grid sm:grid-cols-2 gap-x-10">
