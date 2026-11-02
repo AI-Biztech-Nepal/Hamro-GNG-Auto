@@ -16,7 +16,7 @@ const PROMISES = [
   { big: '40', title: 'points checked', body: 'Engine, brakes, frame, electrics, tyres. If a bike fails a check, it is fixed or it does not go on the floor.' },
   { big: 'Real', title: 'paperwork', body: 'Blue book, ownership and transfer handled cleanly. What the papers say is what the bike is.' },
   { big: '1', title: 'price, no haggling', body: 'The tag is the price for everyone. Nobody pays more for being polite or less for being loud.' },
-  { big: 'Same', title: 'door after the sale', body: 'Servicing, insurance renewal and exchange happen in the showroom you bought from.' },
+  { big: 'After', title: 'sales service', body: 'Servicing, insurance renewal and exchange happen in the showroom you bought from.' },
 ];
 
 /** Rises into place once, the first time it scrolls into view. */
