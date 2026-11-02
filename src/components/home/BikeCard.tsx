@@ -68,14 +68,18 @@ export function BikeCard({ vehicle, badge, isPriority = false, keepRatio = false
         </Link>
         {isSold && (
           <span className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/30">
-            <span className="border-2 border-white px-4 py-1 text-sm font-bold uppercase tracking-[0.2em] text-white">Sold out</span>
+            <span className="rounded bg-red-600 px-4 py-1 text-sm font-bold uppercase tracking-[0.2em] text-white shadow-lg">Sold</span>
           </span>
         )}
-        {isReserved ? (
-          <span className="absolute top-2.5 left-2.5 rounded bg-amber-500 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-black">
-            Reserved
+        {isSold ? (
+          <span className="absolute top-2.5 left-2.5 rounded bg-red-600 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-white">
+            Sold
           </span>
-        ) : badge && !isSold && (
+        ) : isReserved ? (
+          <span className="absolute top-2.5 left-2.5 rounded bg-amber-500 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-black">
+            Booked
+          </span>
+        ) : badge && (
           <span className={cn('absolute top-2.5 left-2.5 rounded px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide', BADGE_STYLE[badge])}>
             {badge}
           </span>

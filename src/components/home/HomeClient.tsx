@@ -22,7 +22,7 @@ export function HomeClient({ vehicles }: { vehicles: Vehicle[]; settings: SiteSe
   const [filter, setFilter] = useState<FilterId>('all');
 
   // The brand tiles always show the whole stock; the quick filter only narrows the rails.
-  const inStock = useMemo(() => vehicles.filter(v => v.has_photos && v.status !== 'sold'), [vehicles]);
+  const inStock = useMemo(() => vehicles.filter(v => v.has_photos), [vehicles]);
   const filtered = useMemo(() => inStock.filter(v => matchesFilter(v, filter)), [inStock, filter]);
   const rails = useMemo(() => buildRails(filtered), [filtered]);
 
@@ -42,7 +42,7 @@ export function HomeClient({ vehicles }: { vehicles: Vehicle[]; settings: SiteSe
 
       <div className="mt-6"><FilterPills active={filter} onSelect={setFilter} /></div>
 
-      <BrandGrid vehicles={inStock} />
+      <BrandGrid vehicles={inStock.filter(v => v.status !== 'sold')} />
 
       {filtered.length === 0 ? (
         <p className="py-16 text-center text-sm text-muted-foreground">
@@ -78,7 +78,7 @@ export function HomeClient({ vehicles }: { vehicles: Vehicle[]; settings: SiteSe
               <p className="mt-0.5 text-xs text-muted-foreground md:text-sm">A look at what is on the showroom floor right now</p>
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {filtered.slice(0, 20).map(bike => (
+              {[...filtered].sort((a, b) => Number(a.status === 'sold') - Number(b.status === 'sold')).slice(0, 20).map(bike => (
                 <BikeCard key={bike.id} vehicle={bike} badge={rails.badges.get(bike.id)} />
               ))}
             </div>
@@ -88,7 +88,7 @@ export function HomeClient({ vehicles }: { vehicles: Vehicle[]; settings: SiteSe
 
       <div className="mt-6 text-center">
         <Link href="/inventory" className="inline-flex items-center gap-2 rounded-lg border border-border px-5 py-2.5 text-sm font-semibold hover:border-brand hover:text-brand transition-colors">
-          Browse all {inStock.length} bikes &amp; scooters <ArrowUpRight className="w-4 h-4" />
+          Browse all {inStock.filter(v => v.status !== 'sold').length} bikes &amp; scooters <ArrowUpRight className="w-4 h-4" />
         </Link>
       </div>
 

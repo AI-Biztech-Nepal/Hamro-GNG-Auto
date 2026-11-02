@@ -181,7 +181,7 @@ export function VehicleDetailClient({ vehicle }: { vehicle: Vehicle }) {
 
             {isSold && (
               <div className="absolute inset-0 bg-black/55 flex items-center justify-center">
-                <span className="text-white font-bold text-3xl md:text-5xl tracking-[0.2em] border-2 border-white px-6 py-3">SOLD</span>
+                <span className="bg-red-600 text-white font-bold text-3xl md:text-5xl tracking-[0.2em] px-6 py-3 shadow-lg">SOLD</span>
               </div>
             )}
           </div>
@@ -237,7 +237,7 @@ export function VehicleDetailClient({ vehicle }: { vehicle: Vehicle }) {
             </span>
           </div>
           <p className="mt-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-brand">
-            {isSold ? 'Sold' : vehicle.status === 'reserved' ? 'Reserved' : 'Available now'}
+            {isSold ? 'Sold' : vehicle.status === 'reserved' ? 'Booked' : 'Available now'}
             <span className="ml-2 font-normal normal-case tracking-normal text-muted-foreground">
               {isSold ? '' : 'Fixed price · genuine paperwork'}
             </span>

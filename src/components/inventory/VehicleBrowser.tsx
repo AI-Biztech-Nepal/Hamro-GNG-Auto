@@ -68,6 +68,8 @@ export function VehicleBrowser({ vehicles, priorityCount = 0, layout = 'bar' }: 
     }).sort((a, b) => {
       // Snoozed (photoless) entries always sink to the bottom, whatever the sort.
       if (a.has_photos !== b.has_photos) return a.has_photos ? -1 : 1;
+      // Sold bikes stay listed, after everything still available.
+      if ((a.status === 'sold') !== (b.status === 'sold')) return a.status === 'sold' ? 1 : -1;
       if (sortOrder === 'price-low') return a.price - b.price;
       if (sortOrder === 'price-high') return b.price - a.price;
       if (sortOrder === 'name-asc') return a.title.localeCompare(b.title);
