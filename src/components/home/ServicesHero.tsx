@@ -21,8 +21,9 @@ interface Service {
   href: string;
   image: string;
   alt: string;
-  /** CSS object-position so the vehicle stays framed when the banner crops. */
-  focus: string;
+  /** Studio shots are shown whole (never cropped through the vehicle); these are the photo's top and bottom edge colours, which fill any band around it. Showroom scenes fill the frame around `focus` instead. */
+  bands?: [string, string];
+  focus?: string;
 }
 
 const SERVICES: Service[] = [
@@ -31,18 +32,18 @@ const SERVICES: Service[] = [
     lead: 'Walk the floor at our Nayabasti, Boudha showroom. Inspected bikes and scooters, genuine paperwork, fixed prices.',
     cta: 'Browse the floor',
     href: '#stock',
-    image: '/hero/showroom.jpg',
-    alt: 'A rider leaning on a scooter on the Hamro Auto showroom floor',
+    image: '/hero/showroom-gg.jpg',
     focus: '40% 45%',
+    alt: 'A rider leaning on a scooter on the Hamro Auto showroom floor',
   },
   {
     tab: 'Exchange facility',
     lead: 'Trade in the bike you ride today and put its value toward one from our floor, settled in a single visit.',
     cta: 'Get an appraisal',
     href: '/exchange',
-    image: '/hero/handover.jpg',
-    alt: 'Two people shaking hands over a set of keys in the showroom',
+    image: '/hero/handover-gg.jpg',
     focus: '50% 50%',
+    alt: 'Two people shaking hands over a set of keys in the showroom',
   },
   {
     tab: 'Servicing and repair',
@@ -50,8 +51,8 @@ const SERVICES: Service[] = [
     cta: 'Book a slot',
     href: '/book-service',
     image: '/hero/grazia.jpg',
+    bands: ['#d2c6b8', '#ab9d8d'],
     alt: 'A red Honda scooter shown in a studio',
-    focus: '62% 50%',
   },
   {
     tab: 'Insurance renewal',
@@ -59,8 +60,8 @@ const SERVICES: Service[] = [
     cta: 'Ask at the counter',
     href: '/services',
     image: '/hero/vespa.jpg',
+    bands: ['#e9dfd3', '#afa395'],
     alt: 'A light blue Vespa scooter in a studio',
-    focus: '50% 50%',
   },
   {
     tab: 'Ownership transfer',
@@ -68,8 +69,8 @@ const SERVICES: Service[] = [
     cta: 'Talk to us',
     href: WHATSAPP_URL,
     image: '/hero/ray.jpg',
+    bands: ['#fcf3e8', '#c8b29c'],
     alt: 'An orange and black Yamaha scooter in a studio',
-    focus: '50% 50%',
   },
   {
     tab: 'Free valuation',
@@ -77,8 +78,8 @@ const SERVICES: Service[] = [
     cta: 'Value my bike',
     href: '/sell',
     image: '/hero/dio.jpg',
+    bands: ['#fbf5ea', '#c1af9a'],
     alt: 'A black and gold Honda Dio scooter in a studio',
-    focus: '50% 50%',
   },
 ];
 
@@ -222,17 +223,17 @@ export function ServicesHero() {
                     </div>
 
                     {/* Photo */}
-                    <div className="relative">
+                    <div className="relative" style={s.bands ? { background: `linear-gradient(${s.bands[0]} 50%, ${s.bands[1]} 50%)` } : undefined}>
                       <Image
                         src={s.image}
                         alt={s.alt}
                         fill
                         priority={i === 0}
                         sizes="(max-width: 1024px) 60vw, 40vw"
-                        className="object-cover"
-                        style={{ objectPosition: s.focus }}
+                        className={s.bands ? 'object-contain' : 'object-cover'}
+                        style={s.bands ? undefined : { objectPosition: s.focus }}
                       />
-                      <div aria-hidden className="absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-white to-transparent" />
+                      <div aria-hidden className={`absolute inset-y-0 left-0 bg-gradient-to-r from-white to-transparent ${s.bands ? 'w-[12%]' : 'w-1/3'}`} />
                     </div>
                   </div>
                 );

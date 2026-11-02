@@ -5,7 +5,7 @@ import type { Vehicle } from '@/types/vehicle';
 
 // Logo files live in /public/brands/<slug>.svg. A brand without a file shows its name instead,
 // so adding a logo later is just dropping a file in and listing its slug here.
-const LOGOS = new Map([['honda', 'png'], ['yamaha', 'svg'], ['suzuki', 'svg'], ['hero', 'svg'], ['bajaj', 'png']]);
+const LOGOS = new Map([['honda', 'png'], ['yamaha', 'svg'], ['suzuki', 'svg'], ['hero', 'svg'], ['bajaj', 'png'], ['tvs', 'png']]);
 
 const slugOf = (brand: string) => brand.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
@@ -13,8 +13,8 @@ const slugOf = (brand: string) => brand.toLowerCase().replace(/[^a-z0-9]+/g, '-'
 export function BrandGrid({ vehicles }: { vehicles: Vehicle[] }) {
   const counts = new Map<string, number>();
   for (const v of vehicles) if (v.brand?.trim()) counts.set(v.brand, (counts.get(v.brand) ?? 0) + 1);
-  // "Other" is a catch-all rather than a make, so it always goes last.
-  const brands = [...counts.entries()].sort((a, b) => (a[0] === 'Other' ? 1 : b[0] === 'Other' ? -1 : b[1] - a[1]));
+  // "Other" is a catch-all rather than a make, so it gets no tile.
+  const brands = [...counts.entries()].filter(([b]) => b !== 'Other').sort((a, b) => b[1] - a[1]);
   if (!brands.length) return null;
 
   return (

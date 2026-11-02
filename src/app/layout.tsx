@@ -7,6 +7,7 @@ import { TransitionProvider } from '@/components/layout/TransitionProvider';
 import { OfferPopup } from '@/components/offers/OfferPopup';
 import { VisitBeacon } from '@/components/analytics/VisitBeacon';
 import { ContactGate } from '@/components/contact/ContactGate';
+import { AuthGate } from '@/components/auth/AuthGate';
 import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics';
 import { fetchSettings, type SiteSettings } from '@/lib/inventory-api';
 import { CONTACT_INFO, GOOGLE_PROFILE_URL, SITE_URL } from '@/lib/constants';
@@ -158,6 +159,7 @@ export default async function RootLayout({
         <OfferPopup />
         <VisitBeacon />
         <ContactGate />
+        <AuthGate />
         <GoogleAnalytics />
         <Toaster />
       </body>

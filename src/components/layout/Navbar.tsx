@@ -14,10 +14,9 @@ export function Navbar({ settings }: { settings: SiteSettings }) {
   const [picture, setPicture] = useState<string | null>(null);
 
   // The account page fires 'gg-auth' after sign-in/out so the icon updates without a reload.
-  // The photo shows only once the account has its phone number: signed in with Google but no number is not an account yet.
   useEffect(() => {
     const load = () =>
-      fetch('/api/auth/me').then((r) => r.json()).then((u) => setPicture(u?.phone ? u.picture ?? null : null)).catch(() => setPicture(null));
+      fetch('/api/auth/me').then((r) => r.json()).then((u) => setPicture(u?.picture ?? null)).catch(() => setPicture(null));
     load();
     window.addEventListener('gg-auth', load);
     return () => window.removeEventListener('gg-auth', load);
