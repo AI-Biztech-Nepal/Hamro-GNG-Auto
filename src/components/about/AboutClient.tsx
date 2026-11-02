@@ -7,9 +7,9 @@ import type { GoogleReviews } from '@/lib/google-reviews';
 import { ShowroomMap } from '@/components/about/ShowroomMap';
 
 const FOUNDERS = [
-  { name: 'Tulsi Khadka', role: 'Co-founder', photo: '/team/tp.jpg', pos: '50% 30%', quote: 'A used bike is a big purchase for most families. We earn their trust by being honest about every bike, including its flaws.' },
-  { name: 'Chandan Prasad Gupta', role: 'Founder', photo: '/team/cp.jpg', pos: '50% 22%', quote: 'Good and Genuine is the standard we set for ourselves: fair prices, clear paperwork, and nothing hidden from the buyer.' },
-  { name: 'Laxman Gautam', role: 'Co-founder', photo: '/team/lp.jpg', pos: '50% 25%', quote: 'A name only means something if you live up to it. Every day we work to make sure our customers ride away without a doubt.' },
+  { name: 'Tulsi Khadka', role: 'Co-founder', photo: '/team/tp.jpg', pos: '50% 30%', quote: 'Buying a second-hand bike is a big decision for any family. When we started G&G Auto in 2020, I wanted to make that decision easier by bringing honesty and transparency into every purchase. A bike may be pre-owned, but the trust behind its sale should always be genuine. We believe every customer deserves a fair deal, honest information and a bike they can ride with confidence.' },
+  { name: 'Chandan Prasad Gupta', role: 'Founder', photo: '/team/cp.jpg', pos: '50% 22%', quote: 'When I founded G&G Auto in 2020, my vision was to create more than just a second-hand bike dealership. I wanted to build a company where honesty, quality and customer trust come first. We started with a simple belief: every customer deserves a good bike at a fair price, without hidden surprises. Today, that belief continues to guide everything we do. Our goal is to make buying and selling pre-owned bikes in Nepal a more transparent, reliable and confident experience.' },
+  { name: 'Laxman Gautam', role: 'Co-founder', photo: '/team/lp.jpg', pos: '50% 25%', quote: 'A company’s real success is measured not by how many bikes it sells, but by how many customers leave with confidence and satisfaction. Since our beginning in 2020, we have worked to make every customer experience simple, transparent and dependable. At G&G Auto, we stand behind the bikes we sell and the promises we make. My commitment is to ensure that every customer rides away with peace of mind and a reason to trust us again.' },
 ];
 
 const PROMISES = [
