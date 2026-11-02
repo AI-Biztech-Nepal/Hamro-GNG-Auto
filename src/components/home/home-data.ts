@@ -14,6 +14,8 @@ export type FilterId = (typeof FILTERS)[number]['id'];
 
 /** The "budget deals" rail shows bikes at or under this price. */
 export const BUDGET_CAP = 100000;
+export const MID_CAP = 150000;
+export const UPPER_CAP = 200000;
 
 const DAY = 24 * 60 * 60 * 1000;
 export const daysOld = (v: Vehicle) => (Date.now() - new Date(v.created_at).getTime()) / DAY;
@@ -58,6 +60,16 @@ export function buildRails(all: Vehicle[]) {
     .slice(0, 12);
 
   // A bike counts as a fresh arrival for its first month, then moves on to Available stock.
+  const budgetMid = list
+    .filter(v => v.price > BUDGET_CAP && v.price <= MID_CAP)
+    .sort((a, b) => a.price - b.price)
+    .slice(0, 12);
+
+  const budgetUpper = list
+    .filter(v => v.price > MID_CAP && v.price <= UPPER_CAP)
+    .sort((a, b) => a.price - b.price)
+    .slice(0, 12);
+
   const fresh = list.filter(v => daysOld(v) <= FRESH_DAYS).sort(newestFirst).slice(0, 12);
 
   const badges = new Map<string, Badge>();
@@ -65,7 +77,7 @@ export function buildRails(all: Vehicle[]) {
   fresh.filter(v => daysOld(v) <= 7).forEach(v => { if (!badges.has(v.id)) badges.set(v.id, 'Fresh Arrival'); });
   budget.slice(0, 3).forEach(v => { if (!badges.has(v.id)) badges.set(v.id, 'Lowest Price'); });
 
-  return { popular, budget, fresh, badges, total: list.length };
+  return { popular, budget, budgetMid, budgetUpper, fresh, badges, total: list.length };
 }
 
 /** "1,65,000" style, matching how prices are written elsewhere on the site. */

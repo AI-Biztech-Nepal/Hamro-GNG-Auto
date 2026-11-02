@@ -116,12 +116,16 @@ button, a {
 .animate-marquee {
   animation: marquee 38s linear infinite;
 }
+.animate-marquee-reverse {
+  animation: marquee 30s linear infinite reverse;
+}
 .marquee-mask {
   -webkit-mask-image: linear-gradient(to right, transparent, #000 6rem, #000 calc(100% - 6rem), transparent);
   mask-image: linear-gradient(to right, transparent, #000 6rem, #000 calc(100% - 6rem), transparent);
 }
 @media (prefers-reduced-motion: reduce) {
-  .animate-marquee {
+  .animate-marquee,
+  .animate-marquee-reverse {
     animation: none;
   }
 }

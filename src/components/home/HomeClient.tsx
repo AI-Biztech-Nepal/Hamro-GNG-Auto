@@ -10,7 +10,7 @@ import { FilterPills } from '@/components/home/FilterPills';
 import { BrandGrid } from '@/components/home/BrandGrid';
 import { BikeSectionRail } from '@/components/home/BikeSectionRail';
 import { BikeCard } from '@/components/home/BikeCard';
-import { buildRails, matchesFilter, formatNpr, BUDGET_CAP, type FilterId } from '@/components/home/home-data';
+import { buildRails, matchesFilter, formatNpr, BUDGET_CAP, MID_CAP, UPPER_CAP, type FilterId } from '@/components/home/home-data';
 import { ServicesHero } from '@/components/home/ServicesHero';
 
 const elsewhere = [
@@ -64,6 +64,20 @@ export function HomeClient({ vehicles }: { vehicles: Vehicle[]; settings: SiteSe
             title={`Budget deals: under ${formatNpr(BUDGET_CAP)}`}
             subtitle="The most affordable bikes on the floor, cheapest first"
             bikes={rails.budget}
+            badges={rails.badges}
+            viewAllLink="/inventory?sort=price-low"
+          />
+          <BikeSectionRail
+            title={`Budget deals: ${formatNpr(BUDGET_CAP)} to ${formatNpr(MID_CAP)}`}
+            subtitle="Step up a little, cheapest first"
+            bikes={rails.budgetMid}
+            badges={rails.badges}
+            viewAllLink="/inventory?sort=price-low"
+          />
+          <BikeSectionRail
+            title={`Budget deals: ${formatNpr(MID_CAP)} to ${formatNpr(UPPER_CAP)}`}
+            subtitle="More bike for the money, cheapest first"
+            bikes={rails.budgetUpper}
             badges={rails.badges}
             viewAllLink="/inventory?sort=price-low"
           />

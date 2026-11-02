@@ -17,30 +17,38 @@ export function BrandGrid({ vehicles }: { vehicles: Vehicle[] }) {
   const brands = [...counts.entries()].filter(([b]) => b !== 'Other').sort((a, b) => b[1] - a[1]);
   if (!brands.length) return null;
 
+  const tile = ([brand, count]: [string, number], extra = '', k = 0) => {
+    const slug = slugOf(brand);
+    return (
+      <Link
+        key={`${brand}-${k}`}
+        href={`/inventory?brand=${encodeURIComponent(brand)}`}
+        className={`flex flex-col items-center justify-center gap-2 rounded-xl border border-border bg-background px-3 py-4 text-center transition-all hover:border-brand hover:shadow-md ${extra}`}
+      >
+        <span className="flex h-9 w-full items-center justify-center">
+          {LOGOS.has(slug) ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={`/brands/${slug}.${LOGOS.get(slug)}`} alt={brand} className="max-h-9 max-w-full object-contain" loading="lazy" />
+          ) : (
+            <span className="font-headline text-base font-bold tracking-tight text-foreground">{brand === 'Other' ? 'Other brands' : brand}</span>
+          )}
+        </span>
+        <span className="text-[11px] text-muted-foreground">{count} available</span>
+      </Link>
+    );
+  };
+
   return (
     <section className="py-6">
       <h2 className="mb-3 font-headline text-lg font-bold text-foreground md:text-xl">Shop by brand</h2>
-      <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-7">
-        {brands.map(([brand, count]) => {
-          const slug = slugOf(brand);
-          return (
-            <Link
-              key={brand}
-              href={`/inventory?brand=${encodeURIComponent(brand)}`}
-              className="flex flex-col items-center justify-center gap-2 rounded-xl border border-border bg-background px-3 py-4 text-center transition-all hover:border-brand hover:shadow-md"
-            >
-              <span className="flex h-9 w-full items-center justify-center">
-                {LOGOS.has(slug) ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={`/brands/${slug}.${LOGOS.get(slug)}`} alt={brand} className="max-h-9 max-w-full object-contain" loading="lazy" />
-                ) : (
-                  <span className="font-headline text-base font-bold tracking-tight text-foreground">{brand === 'Other' ? 'Other brands' : brand}</span>
-                )}
-              </span>
-              <span className="text-[11px] text-muted-foreground">{count} available</span>
-            </Link>
-          );
-        })}
+      {/* Phones: one line that drifts left to right (the list is doubled so the loop is seamless). */}
+      <div className="marquee-mask overflow-hidden md:hidden">
+        <div className="animate-marquee-reverse flex w-max gap-3">
+          {[...brands, ...brands].map((b, i) => tile(b, 'w-32 shrink-0', i))}
+        </div>
+      </div>
+      <div className="hidden grid-cols-4 gap-3 md:grid md:grid-cols-7">
+        {brands.map(b => tile(b))}
       </div>
     </section>
   );
