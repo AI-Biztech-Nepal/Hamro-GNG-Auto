@@ -1,16 +1,15 @@
 
 "use client"
 
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import Link from 'next/link';
 import { ArrowUpRight } from 'lucide-react';
 import type { Vehicle } from '@/types/vehicle';
 import type { SiteSettings } from '@/lib/inventory-api';
-import { FilterPills } from '@/components/home/FilterPills';
 import { BrandGrid } from '@/components/home/BrandGrid';
 import { BikeSectionRail } from '@/components/home/BikeSectionRail';
 import { BikeCard } from '@/components/home/BikeCard';
-import { buildRails, matchesFilter, formatNpr, BUDGET_CAP, MID_CAP, UPPER_CAP, type FilterId } from '@/components/home/home-data';
+import { buildRails, formatNpr, BUDGET_CAP, MID_CAP, UPPER_CAP } from '@/components/home/home-data';
 import { ServicesHero } from '@/components/home/ServicesHero';
 
 const elsewhere = [
@@ -19,12 +18,8 @@ const elsewhere = [
 ];
 
 export function HomeClient({ vehicles }: { vehicles: Vehicle[]; settings: SiteSettings }) {
-  const [filter, setFilter] = useState<FilterId>('all');
-
-  // The brand tiles always show the whole stock; the quick filter only narrows the rails.
   const inStock = useMemo(() => vehicles.filter(v => v.has_photos), [vehicles]);
-  const filtered = useMemo(() => inStock.filter(v => matchesFilter(v, filter)), [inStock, filter]);
-  const rails = useMemo(() => buildRails(filtered), [filtered]);
+  const rails = useMemo(() => buildRails(inStock), [inStock]);
   // A bike lives in one place: Fresh arrivals for its first month, Available stock after.
   const freshIds = useMemo(() => new Set(rails.fresh.map(v => v.id)), [rails]);
 
@@ -32,24 +27,10 @@ export function HomeClient({ vehicles }: { vehicles: Vehicle[]; settings: SiteSe
     <>
     <ServicesHero />
     <div className="max-w-7xl mx-auto px-4 py-8 sm:py-12 pb-24">
-      {/* The hero above carries the page title; this is just the proof, in one line. */}
-      <ul className="grid grid-cols-2 gap-x-4 gap-y-2 text-[13px] font-medium text-neutral-700 sm:flex sm:flex-wrap sm:gap-x-6 sm:text-sm">
-        {['40-point inspection', 'Genuine paperwork', 'Fixed prices, no haggling', 'Nayabasti, Boudha'].map(t => (
-          <li key={t} className="flex items-center gap-2">
-            <span aria-hidden className="size-1.5 rounded-full bg-brand" />
-            {t}
-          </li>
-        ))}
-      </ul>
-
-      <div className="mt-6"><FilterPills active={filter} onSelect={setFilter} /></div>
-
       <BrandGrid vehicles={inStock.filter(v => v.status !== 'sold')} />
 
-      {filtered.length === 0 ? (
-        <p className="py-16 text-center text-sm text-muted-foreground">
-          No bikes match this filter right now. <button className="text-brand underline" onClick={() => setFilter('all')}>Show everything</button>
-        </p>
+      {inStock.length === 0 ? (
+        <p className="py-16 text-center text-sm text-muted-foreground">No bikes are listed right now. Please check back soon.</p>
       ) : (
         <>
           <BikeSectionRail
@@ -94,7 +75,7 @@ export function HomeClient({ vehicles }: { vehicles: Vehicle[]; settings: SiteSe
               <p className="mt-0.5 text-xs text-muted-foreground md:text-sm">A look at what is on the showroom floor right now</p>
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {filtered.filter(v => !freshIds.has(v.id)).sort((a, b) => Number(a.status === 'sold') - Number(b.status === 'sold')).slice(0, 20).map(bike => (
+              {inStock.filter(v => !freshIds.has(v.id)).sort((a, b) => Number(a.status === 'sold') - Number(b.status === 'sold')).slice(0, 20).map(bike => (
                 <BikeCard key={bike.id} vehicle={bike} badge={rails.badges.get(bike.id)} />
               ))}
             </div>
