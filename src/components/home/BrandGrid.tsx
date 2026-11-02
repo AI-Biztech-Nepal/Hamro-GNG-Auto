@@ -5,7 +5,7 @@ import type { Vehicle } from '@/types/vehicle';
 
 // Logo files live in /public/brands/<slug>.svg. A brand without a file shows its name instead,
 // so adding a logo later is just dropping a file in and listing its slug here.
-const LOGOS = new Set(['honda', 'yamaha', 'suzuki', 'hero', 'bajaj']);
+const LOGOS = new Map([['honda', 'png'], ['yamaha', 'svg'], ['suzuki', 'svg'], ['hero', 'svg'], ['bajaj', 'png']]);
 
 const slugOf = (brand: string) => brand.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
@@ -32,7 +32,7 @@ export function BrandGrid({ vehicles }: { vehicles: Vehicle[] }) {
               <span className="flex h-9 w-full items-center justify-center">
                 {LOGOS.has(slug) ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={`/brands/${slug}.svg`} alt={brand} className="max-h-9 max-w-full object-contain" loading="lazy" />
+                  <img src={`/brands/${slug}.${LOGOS.get(slug)}`} alt={brand} className="max-h-9 max-w-full object-contain" loading="lazy" />
                 ) : (
                   <span className="font-headline text-base font-bold tracking-tight text-foreground">{brand === 'Other' ? 'Other brands' : brand}</span>
                 )}
