@@ -39,7 +39,7 @@ export function BrandGrid({ vehicles }: { vehicles: Vehicle[] }) {
   };
 
   return (
-    <section className="py-6">
+    <section className="pb-6 pt-2">
       <h2 className="mb-3 font-headline text-lg font-bold text-foreground md:text-xl">Shop by brand</h2>
       {/* Phones: one line that drifts left to right (the list is doubled so the loop is seamless). */}
       <div className="marquee-mask overflow-hidden md:hidden">

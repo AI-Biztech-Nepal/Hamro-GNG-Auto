@@ -26,7 +26,7 @@ export function HomeClient({ vehicles }: { vehicles: Vehicle[]; settings: SiteSe
   return (
     <>
     <ServicesHero />
-    <div className="max-w-7xl mx-auto px-4 py-8 sm:py-12 pb-24">
+    <div className="max-w-7xl mx-auto px-4 pt-0 pb-24">
       <BrandGrid vehicles={inStock.filter(v => v.status !== 'sold')} />
 
       {inStock.length === 0 ? (
