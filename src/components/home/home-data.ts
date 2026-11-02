@@ -41,6 +41,9 @@ const newestFirst = (a: Vehicle, b: Vehicle) => new Date(b.created_at).getTime()
  *  - Budget deals: everything at or under BUDGET_CAP, cheapest first.
  *  - Fresh arrivals: the most recently added.
  */
+/** How long a bike stays under Fresh arrivals. */
+export const FRESH_DAYS = 30;
+
 export function buildRails(all: Vehicle[]) {
   const list = all.filter(v => v.has_photos && v.status !== 'sold');
 
@@ -54,7 +57,8 @@ export function buildRails(all: Vehicle[]) {
     .sort((a, b) => a.price - b.price)
     .slice(0, 12);
 
-  const fresh = [...list].sort(newestFirst).slice(0, 12);
+  // A bike counts as a fresh arrival for its first month, then moves on to Available stock.
+  const fresh = list.filter(v => daysOld(v) <= FRESH_DAYS).sort(newestFirst).slice(0, 12);
 
   const badges = new Map<string, Badge>();
   popular.slice(0, 3).forEach(v => badges.set(v.id, 'Most Viewed'));

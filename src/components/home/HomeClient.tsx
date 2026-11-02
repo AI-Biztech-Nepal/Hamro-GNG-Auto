@@ -25,6 +25,8 @@ export function HomeClient({ vehicles }: { vehicles: Vehicle[]; settings: SiteSe
   const inStock = useMemo(() => vehicles.filter(v => v.has_photos), [vehicles]);
   const filtered = useMemo(() => inStock.filter(v => matchesFilter(v, filter)), [inStock, filter]);
   const rails = useMemo(() => buildRails(filtered), [filtered]);
+  // A bike lives in one place: Fresh arrivals for its first month, Available stock after.
+  const freshIds = useMemo(() => new Set(rails.fresh.map(v => v.id)), [rails]);
 
   return (
     <>
@@ -78,7 +80,7 @@ export function HomeClient({ vehicles }: { vehicles: Vehicle[]; settings: SiteSe
               <p className="mt-0.5 text-xs text-muted-foreground md:text-sm">A look at what is on the showroom floor right now</p>
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {[...filtered].sort((a, b) => Number(a.status === 'sold') - Number(b.status === 'sold')).slice(0, 20).map(bike => (
+              {filtered.filter(v => !freshIds.has(v.id)).sort((a, b) => Number(a.status === 'sold') - Number(b.status === 'sold')).slice(0, 20).map(bike => (
                 <BikeCard key={bike.id} vehicle={bike} badge={rails.badges.get(bike.id)} />
               ))}
             </div>
