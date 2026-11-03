@@ -99,7 +99,7 @@ export function BikeCard({ vehicle, badge, isPriority = false, keepRatio = false
               </h3>
             </Link>
             {!isSold && <Link
-              href="/exchange"
+              href={`/exchange?vehicle=${vehicle.id}`}
               className="flex shrink-0 items-center gap-1 rounded-md border border-brand/40 px-1.5 py-1 text-[11px] font-semibold leading-none text-brand transition-colors hover:bg-brand hover:text-brand-foreground"
             >
               <ArrowLeftRight className="h-3 w-3" /> Exchange
