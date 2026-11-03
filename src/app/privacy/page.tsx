@@ -25,7 +25,7 @@ const sections: LegalSection[] = [
       {
         list: [
           'Enquiry forms. When you use the Sell, Exchange or Book Service forms, or the contact prompt on a bike, we receive your name, phone number and email, plus whatever you add: your message, vehicle details, a preferred date and any photos you upload.',
-          'Google sign-in. If you choose to sign in on the Account page, Google gives us your name, email address and profile photo. We never see your Google password.',
+          'Google sign-in. If you choose to sign in on the Account page, Google gives us your name, email address and profile photo. We save your name and email as an account record for our team. We never see your Google password.',
           'Your phone number. If you add it when you create an account (on the Account page, or in the prompt that appears before the Call and WhatsApp buttons), we save it together with your name, your email and anything you tell us you are looking for, as an enquiry for our team.',
           'Offers. If you join an offer such as the Dashain gift wheel, we receive the contact details you enter and the result of your spin.',
           'Visit data. We note which pages are opened, using a random visit ID stored in your browser, and we use Google Analytics to see how the site is used. Neither identifies you by name.',
@@ -91,7 +91,7 @@ const sections: LegalSection[] = [
     id: 'how-long-we-keep-it',
     title: 'How long we keep it',
     body: [
-      'We keep an enquiry for as long as we need it to deal with your request and for our sales and service records, then delete it. Your Google sign-in details are not stored in a database: they live in your cookie until it expires or you sign out. A phone number you add to your account is kept with our enquiries until you ask us to delete it.',
+      'We keep an enquiry for as long as we need it to deal with your request and for our sales and service records, then delete it. Your account record (name and email), and any phone number you add to your account, are kept with our enquiries until you ask us to delete them. Your profile photo is not stored in a database: it lives in your cookie until it expires or you sign out.',
     ],
   },
   {
@@ -123,7 +123,7 @@ export default function PrivacyPage() {
     <LegalPage
       title="Privacy Policy"
       intro="What we collect when you use this website, why, who sees it, and how to have it changed or deleted. Short and in plain words."
-      updated="1 November 2026"
+      updated="3 November 2026"
       sections={sections}
       sibling={{ href: '/terms', label: 'Read the Terms of Service' }}
     />

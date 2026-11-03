@@ -33,7 +33,7 @@ Generate the secret with `openssl rand -base64 32` (or `node -e "console.log(req
 
 ### How it works
 - `/account` loads Google's button script. On sign-in, Google gives the browser an ID token.
-- `POST /api/auth/google` ([route](../src/app/api/auth/google/route.ts)) checks the token with Google (`oauth2.googleapis.com/tokeninfo`), requires `aud` to equal your client ID and a verified email, then sets the `gg_session` cookie (httpOnly, SameSite=Lax, Secure in production, 30 days). The cookie is an HMAC-signed payload; logic in [src/lib/session.ts](../src/lib/session.ts).
+- `POST /api/auth/google` ([route](../src/app/api/auth/google/route.ts)) checks the token with Google (`oauth2.googleapis.com/tokeninfo`), requires `aud` to equal your client ID and a verified email, then sets the `gg_session` cookie (httpOnly, SameSite=Lax, Secure in production, 30 days). The cookie is an HMAC-signed payload; logic in [src/lib/session.ts](../src/lib/session.ts). It also records the account as a `signup` lead on the backend (Marketing > Leads > Accounts), one entry per email.
 - `GET /api/auth/me` returns the current user or `null`. `POST /api/auth/logout` clears the cookie.
 - The navbar calls `/api/auth/me` and swaps the red person icon for the Google profile photo. `/account` fires a `gg-auth` window event after sign-in/out so it updates without a reload.
 
@@ -44,7 +44,7 @@ Generate the secret with `openssl rand -base64 32` (or `node -e "console.log(req
 4. Common failures: "origin not allowed" means the origin is missing in the Cloud Console (the port matters); sign-in "failed" toast means `AUTH_SECRET` is missing or the client ID does not match between build and server.
 
 ### Known limits
-- Signing in does not yet pre-fill or save anything on the Sell / Exchange / Book Service forms; there is no user database.
+- Signing in does not yet pre-fill or save anything on the Sell / Exchange / Book Service forms; the only record of an account is its `signup` lead.
 - No token-replay check beyond Google's own verification.
 - Rate limiting is in-memory (single server process only).
 
