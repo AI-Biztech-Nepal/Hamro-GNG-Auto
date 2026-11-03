@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Phone, MessageCircle, ShieldCheck, Gauge, Calendar, Hash, Eye } from 'lucide-react';
+import { ArrowLeftRight, Phone, MessageCircle, ShieldCheck, Gauge, Calendar, Hash, Eye } from 'lucide-react';
 import type { Vehicle } from '@/types/vehicle';
 import { CONTACT_INFO } from '@/lib/constants';
 import { vehiclePageUrl } from '@/lib/vehicle-link';
@@ -91,11 +91,20 @@ export function BikeCard({ vehicle, badge, isPriority = false, keepRatio = false
 
       <div className="flex flex-1 flex-col justify-between gap-3 p-3.5">
         <div>
-          <Link href={href}>
-            <h3 className="line-clamp-1 text-sm font-semibold leading-snug text-foreground transition-colors group-hover:text-brand md:text-base">
-              {vehicle.title}
-            </h3>
-          </Link>
+          {/* On a narrow card (two columns on a phone) the button wraps under the name rather than squeezing it. */}
+          <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1.5">
+            <Link href={href} className="min-w-0">
+              <h3 className="line-clamp-1 text-sm font-semibold leading-snug text-foreground transition-colors group-hover:text-brand md:text-base">
+                {vehicle.title}
+              </h3>
+            </Link>
+            {!isSold && <Link
+              href="/exchange"
+              className="flex shrink-0 items-center gap-1 rounded-md border border-brand/40 px-1.5 py-1 text-[11px] font-semibold leading-none text-brand transition-colors hover:bg-brand hover:text-brand-foreground"
+            >
+              <ArrowLeftRight className="h-3 w-3" /> Exchange
+            </Link>}
+          </div>
 
           <div className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-md bg-muted/60 px-2 py-1.5 text-[11px] text-muted-foreground">
             {specs.map(({ icon: Icon, text }) => (
