@@ -23,6 +23,7 @@ const SORTS = [
   { value: 'price-low', label: 'Price: low to high' },
   { value: 'price-high', label: 'Price: high to low' },
   { value: 'name-asc', label: 'Name: A–Z' },
+  { value: 'name-desc', label: 'Name: Z–A' },
 ];
 
 /**
@@ -46,11 +47,6 @@ export function VehicleBrowser({ vehicles, priorityCount = 0, layout = 'bar' }: 
     const wanted = params.get('sort');
     return SORTS.some(s => s.value === wanted) ? (wanted as string) : 'latest';
   });
-
-  const brandsInStock = useMemo(() => {
-    const present = new Set(vehicles.map(v => v.brand));
-    return BRANDS.filter(b => present.has(b));
-  }, [vehicles]);
 
   const yearsInStock = useMemo(() => Array.from(new Set(vehicles.map(v => v.year))).sort((a, b) => b - a), [vehicles]);
 
@@ -91,31 +87,64 @@ export function VehicleBrowser({ vehicles, priorityCount = 0, layout = 'bar' }: 
     setSortOrder('latest');
   };
 
-  const railItem = (active: boolean, onClick: () => void, label: string) => (
-    <button
-      key={label}
-      onClick={onClick}
-      className={cn(
-        'block w-full text-left text-sm py-1 transition-colors',
-        active ? 'text-brand font-semibold' : 'text-muted-foreground hover:text-foreground',
-      )}
-    >
-      {label}
-    </button>
-  );
-
   const digits = (s: string) => s.replace(/\D/g, '').slice(0, 9);
 
-  const priceInputs = (cls: string) => (
-    <div className="grid grid-cols-2 gap-2">
-      <Input inputMode="numeric" placeholder="Min NPR" aria-label="Minimum price" className={cls} value={minPrice} onChange={(e) => setMinPrice(digits(e.target.value))} />
-      <Input inputMode="numeric" placeholder="Max NPR" aria-label="Maximum price" className={cls} value={maxPrice} onChange={(e) => setMaxPrice(digits(e.target.value))} />
+  // One set of controls, drawn the same way on phones (the card above the list) and on laptops (the left rail):
+  // Search, Type, Sort, Year, Price, always in this order and under the same headings.
+  const heading = 'mb-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-brand';
+  const field = (label: string, node: React.ReactNode) => (
+    <div>
+      <h4 className={heading}>{label}</h4>
+      {node}
     </div>
   );
 
-  const yearSelect = (cls: string) => (
+  const searchBox = (
+    <div className="relative">
+      <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+      <Input
+        type="search"
+        placeholder="Search by brand or model..."
+        aria-label="Search by brand or model"
+        className="h-11 rounded-md pl-10"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
+    </div>
+  );
+
+  const typeTabs = (
+    <div role="tablist" aria-label="Vehicle type" className="grid grid-cols-3 gap-1 rounded-lg bg-muted p-1">
+      {[{ value: 'all', label: 'All' }, { value: 'bike', label: 'Bikes' }, { value: 'scooter', label: 'Scooters' }].map(t => (
+        <button
+          key={t.value}
+          type="button"
+          role="tab"
+          aria-selected={typeFilter === t.value}
+          onClick={() => setTypeFilter(t.value)}
+          className={cn(
+            'h-9 touch-manipulation rounded-md text-sm font-semibold transition-colors',
+            typeFilter === t.value ? 'bg-brand text-brand-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground',
+          )}
+        >
+          {t.label}
+        </button>
+      ))}
+    </div>
+  );
+
+  const sortSelect = (
+    <Select value={sortOrder} onValueChange={setSortOrder}>
+      <SelectTrigger className="h-11 rounded-md" aria-label="Sort by"><SelectValue placeholder="Sort by" /></SelectTrigger>
+      <SelectContent>
+        {SORTS.map(o => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+      </SelectContent>
+    </Select>
+  );
+
+  const yearSelect = (
     <Select value={yearFilter} onValueChange={setYearFilter}>
-      <SelectTrigger className={cls} aria-label="Model year"><SelectValue placeholder="Year" /></SelectTrigger>
+      <SelectTrigger className="h-11 rounded-md" aria-label="Model year"><SelectValue placeholder="Year" /></SelectTrigger>
       <SelectContent>
         <SelectItem value="all">Any year</SelectItem>
         {yearsInStock.map(y => <SelectItem key={y} value={String(y)}>{y}</SelectItem>)}
@@ -123,112 +152,46 @@ export function VehicleBrowser({ vehicles, priorityCount = 0, layout = 'bar' }: 
     </Select>
   );
 
-  const railHeading = 'text-[11px] font-bold uppercase tracking-[0.16em] text-brand mb-2';
-
-  const rail = (
-    <div className="space-y-7">
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-        <Input
-          placeholder="Search model or brand…"
-          className="pl-9 h-10 rounded-md"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-      </div>
-
-      <div>
-        <h4 className={railHeading}>Make</h4>
-        {railItem(brandFilter === 'all', () => setBrandFilter('all'), 'All makes')}
-        {brandsInStock.map(b => railItem(brandFilter === b, () => setBrandFilter(b), b))}
-      </div>
-
-      <div>
-        <h4 className={railHeading}>Price (NPR)</h4>
-        {priceInputs('h-9 rounded-md text-sm')}
-      </div>
-
-      <div>
-        <h4 className={railHeading}>Year</h4>
-        {yearSelect('h-9 rounded-md')}
-      </div>
-
-      <div>
-        <h4 className={railHeading}>Type</h4>
-        {railItem(typeFilter === 'all', () => setTypeFilter('all'), 'All types')}
-        {railItem(typeFilter === 'bike', () => setTypeFilter('bike'), 'Bikes')}
-        {railItem(typeFilter === 'scooter', () => setTypeFilter('scooter'), 'Scooters')}
-      </div>
-
-      <div>
-        <h4 className={railHeading}>Sort</h4>
-        {SORTS.map(s => railItem(sortOrder === s.value, () => setSortOrder(s.value), s.label))}
-      </div>
-
-      {isFiltered && (
-        <button onClick={clearFilters} className="text-sm font-semibold text-foreground underline underline-offset-2 hover:no-underline">
-          Clear all filters
-        </button>
-      )}
+  const priceInputs = (
+    <div className="grid grid-cols-2 gap-2">
+      <Input inputMode="numeric" placeholder="Min" aria-label="Minimum price in NPR" className="h-11 rounded-md" value={minPrice} onChange={(e) => setMinPrice(digits(e.target.value))} />
+      <Input inputMode="numeric" placeholder="Max" aria-label="Maximum price in NPR" className="h-11 rounded-md" value={maxPrice} onChange={(e) => setMaxPrice(digits(e.target.value))} />
     </div>
   );
 
-  const bar = (
-    <div className="bg-card p-3 rounded-lg border border-border grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-3">
-      <div className="relative col-span-1 md:col-span-1 lg:col-span-2">
-        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-        <Input
-          placeholder="Search by brand or model..."
-          className="pl-10 h-11 rounded-md"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-      </div>
+  // A brand picked from a "Shop by brand" tile has no dropdown of its own, so it shows here and can be removed.
+  const brandChip = brandFilter !== 'all' && (
+    <button
+      type="button"
+      onClick={() => setBrandFilter('all')}
+      className="flex w-fit items-center gap-1.5 rounded-full border border-brand/40 bg-brand/5 px-3 py-1 text-xs font-semibold text-brand"
+      aria-label={`Remove the ${brandFilter} filter`}
+    >
+      {brandFilter} <X className="h-3.5 w-3.5" />
+    </button>
+  );
 
-      {/* All / Bikes / Scooters as tabs (the brand dropdown is gone: the search box finds a brand by name). */}
-      <div role="tablist" aria-label="Vehicle type" className="grid grid-cols-3 gap-1 rounded-lg bg-muted p-1 md:col-span-2 lg:col-span-1">
-        {[{ value: 'all', label: 'All' }, { value: 'bike', label: 'Bikes' }, { value: 'scooter', label: 'Scooters' }].map(t => (
-          <button
-            key={t.value}
-            type="button"
-            role="tab"
-            aria-selected={typeFilter === t.value}
-            onClick={() => setTypeFilter(t.value)}
-            className={cn(
-              'h-9 touch-manipulation rounded-md text-sm font-semibold transition-colors',
-              typeFilter === t.value ? 'bg-brand text-brand-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground',
-            )}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
+  const clearButton = isFiltered && (
+    <button type="button" onClick={clearFilters} className="text-sm font-semibold text-foreground underline underline-offset-2 hover:no-underline">
+      Clear all filters
+    </button>
+  );
 
-      {brandFilter !== 'all' && (
-        <button
-          type="button"
-          onClick={() => setBrandFilter('all')}
-          className="col-span-full flex w-fit items-center gap-1.5 rounded-full border border-brand/40 bg-brand/5 px-3 py-1 text-xs font-semibold text-brand"
-          aria-label={`Remove the ${brandFilter} filter`}
-        >
-          {brandFilter} <X className="h-3.5 w-3.5" />
-        </button>
-      )}
-
-      <Select value={sortOrder} onValueChange={setSortOrder}>
-        <SelectTrigger className="h-11 rounded-md"><SelectValue placeholder="Sort By" /></SelectTrigger>
-        <SelectContent>
-          {SORTS.map(s => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}
-          <SelectItem value="name-desc">Name: Z–A</SelectItem>
-        </SelectContent>
-      </Select>
-
-      <div className="col-span-full grid grid-cols-1 sm:grid-cols-3 gap-3">
-        {yearSelect('h-11 rounded-md')}
-        <div className="sm:col-span-2">{priceInputs('h-11 rounded-md')}</div>
-      </div>
+  const controls = (
+    <div className="space-y-5">
+      {searchBox}
+      {field('Type', typeTabs)}
+      {field('Sort', sortSelect)}
+      {field('Year', yearSelect)}
+      {field('Price (NPR)', priceInputs)}
+      {brandChip}
+      {clearButton}
     </div>
   );
+
+  // Phones and tablets: the controls in a card above the list. Laptops (sidebar layout): the same controls in the left rail.
+  const bar = <div className="rounded-lg border border-border bg-card p-4">{controls}</div>;
+  const rail = controls;
 
   const countLine = isFiltered && vehicles.length > 0 && (
     <div className="flex items-center justify-between gap-4">
@@ -281,7 +244,7 @@ export function VehicleBrowser({ vehicles, priorityCount = 0, layout = 'bar' }: 
     return (
       <div>
         <div className="lg:hidden mb-6">{bar}</div>
-        <div className="lg:grid lg:grid-cols-[180px_minmax(0,1fr)] lg:gap-12">
+        <div className="lg:grid lg:grid-cols-[230px_minmax(0,1fr)] lg:gap-10">
           <aside className="hidden lg:block lg:sticky lg:top-24 lg:self-start">{rail}</aside>
           <div className="space-y-5">
             {countLine}
