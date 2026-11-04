@@ -89,8 +89,6 @@ export function ServicesHero() {
   const [paused, setPaused] = useState(false);
   const [reduceMotion, setReduceMotion] = useState(false);
   const touchStartX = useRef<number | null>(null);
-  const fitRef = useRef<HTMLDivElement>(null);
-  const deskRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -98,21 +96,6 @@ export function ServicesHero() {
     const onChange = () => setReduceMotion(mq.matches);
     mq.addEventListener('change', onChange);
     return () => mq.removeEventListener('change', onChange);
-  }, []);
-
-  // Below lg the desktop banner keeps the fixed width set by .hero-fit in globals.css and is shrunk to the phone's width.
-  useEffect(() => {
-    const fit = fitRef.current, desk = deskRef.current;
-    if (!fit || !desk) return;
-    const update = () => {
-      fit.style.setProperty('--hero-scale', String(fit.clientWidth / desk.offsetWidth));
-      fit.style.setProperty('--hero-h', `${desk.offsetHeight}px`);
-    };
-    update();
-    const ro = new ResizeObserver(update);
-    ro.observe(fit);
-    ro.observe(desk);
-    return () => ro.disconnect();
   }, []);
 
   const go = useCallback((next: number) => setIndex(((next % count) + count) % count), [count]);
@@ -135,9 +118,8 @@ export function ServicesHero() {
       }}
     >
       <h1 className="sr-only">Hamro G&amp;G Auto: second-hand bikes and scooters in Boudha, Kathmandu. What we do.</h1>
-      <div className="mx-auto max-w-[76rem] px-4 py-4 sm:px-6 sm:py-5 lg:px-8">
-        <div ref={fitRef} className="hero-fit-box">
-        <div ref={deskRef} className="hero-fit">
+      {/* Same box as the sections below (max-w-7xl, px-4) so the hero, brands and rails share one left and right edge. */}
+      <div className="mx-auto max-w-7xl px-4 py-4 sm:py-5">
           {/* Banner */}
           <div
             className="relative overflow-hidden border border-neutral-200 bg-white"
@@ -163,7 +145,7 @@ export function ServicesHero() {
                   <div
                     key={s.tab}
                     aria-hidden={!on}
-                    className={`col-start-1 row-start-1 grid h-[27rem] grid-cols-[minmax(0,5fr)_minmax(0,6fr)] will-change-[transform,opacity] lg:h-[min(60svh,27rem)] ${on ? '' : 'pointer-events-none'}`}
+                    className={`col-start-1 row-start-1 grid h-[28rem] grid-rows-[minmax(0,7fr)_minmax(0,3fr)] will-change-[transform,opacity] lg:h-[min(60svh,27rem)] lg:grid-cols-[minmax(0,3fr)_minmax(0,7fr)] lg:grid-rows-1 ${on ? '' : 'pointer-events-none'}`}
                     style={{
                       transform: offset === 0 ? 'translate3d(0,0,0)' : offset < 0 ? NOTE_OFF : NOTE_WAIT,
                       opacity: on ? 1 : 0,
@@ -177,17 +159,17 @@ export function ServicesHero() {
                     }}
                   >
                     {/* Words */}
-                    <div className="flex flex-col justify-center px-10">
-                      <span aria-hidden className="block h-[3px] w-8 bg-[#DC2626]" />
-                      <p className="hero-title mt-3 font-headline text-[clamp(1.5rem,2.8vw,2.4rem)] font-extrabold uppercase leading-[1.05] tracking-tight text-neutral-950">
+                    <div className="order-2 flex min-w-0 flex-col justify-center px-4 py-2 lg:order-1 lg:px-6 lg:py-0">
+                      <span aria-hidden className="hidden h-[3px] w-8 bg-[#DC2626] lg:block" />
+                      <p className="font-headline text-[clamp(1.05rem,4.4vw,1.4rem)] font-extrabold uppercase leading-[1.05] tracking-tight text-neutral-950 lg:mt-3 lg:text-[clamp(1.25rem,2.3vw,2rem)]">
                         {s.tab}
                       </p>
-                      <p className="hero-lead mt-3 max-w-md text-base leading-relaxed text-neutral-600">{s.lead}</p>
+                      <p className="mt-1 line-clamp-2 text-xs leading-snug text-neutral-600 sm:text-sm lg:mt-3 lg:line-clamp-none lg:text-[15px] lg:leading-relaxed">{s.lead}</p>
                       <Link
                         href={s.href}
                         tabIndex={on ? 0 : -1}
                         {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-                        className="hero-cta group mt-5 inline-flex h-11 w-fit items-center gap-2 bg-[#DC2626] px-5 text-[14px] font-semibold uppercase tracking-wide text-white shadow-[0_8px_20px_-8px_rgba(220,38,38,0.8)] transition-colors hover:bg-[#c42020]"
+                        className="group mt-2 inline-flex h-9 w-fit items-center gap-1.5 bg-[#DC2626] px-4 text-xs font-semibold uppercase tracking-wide lg:mt-5 lg:h-11 lg:gap-2 lg:px-5 lg:text-[14px] text-white shadow-[0_8px_20px_-8px_rgba(220,38,38,0.8)] transition-colors hover:bg-[#c42020]"
                       >
                         {s.cta}
                         <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
@@ -195,17 +177,17 @@ export function ServicesHero() {
                     </div>
 
                     {/* Photo */}
-                    <div className="relative" style={s.bands ? { background: `linear-gradient(${s.bands[0]} 50%, ${s.bands[1]} 50%)` } : undefined}>
+                    <div className="relative order-1 lg:order-2" style={s.bands ? { background: `linear-gradient(${s.bands[0]} 50%, ${s.bands[1]} 50%)` } : undefined}>
                       <Image
                         src={s.image}
                         alt={s.alt}
                         fill
                         priority={i === 0}
-                        sizes="(max-width: 1024px) 60vw, 40vw"
+                        sizes="(max-width: 1024px) 100vw, 70vw"
                         className={s.bands ? 'object-contain' : 'object-cover'}
                         style={s.bands ? undefined : { objectPosition: s.focus }}
                       />
-                      <div aria-hidden className={`absolute inset-y-0 left-0 bg-gradient-to-r from-white to-transparent ${s.bands ? 'w-[12%]' : 'w-1/3'}`} />
+                      <div aria-hidden className={`absolute inset-y-0 left-0 hidden bg-gradient-to-r from-white to-transparent lg:block ${s.bands ? 'w-[8%]' : 'w-[16%]'}`} />
                     </div>
                   </div>
                 );
@@ -213,7 +195,7 @@ export function ServicesHero() {
             </div>
 
             {/* Dots */}
-            <div role="group" aria-label="Choose a service" className="absolute inset-x-0 bottom-3 z-10 flex justify-center gap-2">
+            <div role="group" aria-label="Choose a service" className="absolute inset-x-0 bottom-[calc(30%+0.5rem)] z-10 flex justify-center gap-2 lg:bottom-3">
               {SERVICES.map((s, i) => (
                 <button
                   key={s.tab}
@@ -228,8 +210,6 @@ export function ServicesHero() {
               ))}
             </div>
           </div>
-        </div>
-        </div>
       </div>
     </section>
   );
