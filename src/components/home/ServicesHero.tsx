@@ -135,7 +135,7 @@ export function ServicesHero() {
       }}
     >
       <h1 className="sr-only">Hamro G&amp;G Auto: second-hand bikes and scooters in Boudha, Kathmandu. What we do.</h1>
-      <div className="mx-auto max-w-[96rem] px-4 py-4 sm:px-6 sm:py-5 lg:px-8">
+      <div className="mx-auto max-w-[76rem] px-4 py-4 sm:px-6 sm:py-5 lg:px-8">
         <div ref={fitRef} className="hero-fit-box">
         <div ref={deskRef} className="hero-fit">
           {/* Banner */}
@@ -163,7 +163,7 @@ export function ServicesHero() {
                   <div
                     key={s.tab}
                     aria-hidden={!on}
-                    className={`col-start-1 row-start-1 grid h-[34rem] grid-cols-[minmax(0,5fr)_minmax(0,6fr)] will-change-[transform,opacity] lg:h-[min(78svh,40rem)] lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] ${on ? '' : 'pointer-events-none'}`}
+                    className={`col-start-1 row-start-1 grid h-[27rem] grid-cols-[minmax(0,5fr)_minmax(0,6fr)] will-change-[transform,opacity] lg:h-[min(60svh,27rem)] ${on ? '' : 'pointer-events-none'}`}
                     style={{
                       transform: offset === 0 ? 'translate3d(0,0,0)' : offset < 0 ? NOTE_OFF : NOTE_WAIT,
                       opacity: on ? 1 : 0,
@@ -179,7 +179,7 @@ export function ServicesHero() {
                     {/* Words */}
                     <div className="flex flex-col justify-center px-10">
                       <span aria-hidden className="block h-[3px] w-8 bg-[#DC2626]" />
-                      <p className="hero-title mt-3 font-headline text-[clamp(1.5rem,3.2vw,3.25rem)] font-extrabold uppercase leading-[1.05] tracking-tight text-neutral-950">
+                      <p className="hero-title mt-3 font-headline text-[clamp(1.5rem,2.8vw,2.4rem)] font-extrabold uppercase leading-[1.05] tracking-tight text-neutral-950">
                         {s.tab}
                       </p>
                       <p className="hero-lead mt-3 max-w-md text-base leading-relaxed text-neutral-600">{s.lead}</p>
@@ -201,7 +201,7 @@ export function ServicesHero() {
                         alt={s.alt}
                         fill
                         priority={i === 0}
-                        sizes="(max-width: 1024px) 60vw, 60vw"
+                        sizes="(max-width: 1024px) 60vw, 40vw"
                         className={s.bands ? 'object-contain' : 'object-cover'}
                         style={s.bands ? undefined : { objectPosition: s.focus }}
                       />
