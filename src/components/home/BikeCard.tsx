@@ -110,7 +110,7 @@ export function BikeCard({ vehicle, badge, isPriority = false, keepRatio = false
             </Link>}
           </div>
 
-          <dl className="mt-2.5 divide-y divide-border/70 overflow-hidden rounded-md border border-border/70 bg-muted/40 text-[11px] sm:text-xs">
+          <dl className="mt-2.5 divide-y divide-border/70 overflow-hidden rounded-md border border-border/70 bg-muted/40 text-xs">
             {specs.map(({ label, value }) => (
               <div key={label} className="flex items-center justify-between gap-2 px-2 py-1">
                 <dt className="shrink-0 text-muted-foreground">{label}</dt>
@@ -130,7 +130,7 @@ export function BikeCard({ vehicle, badge, isPriority = false, keepRatio = false
         </div>
 
         <div className="space-y-2 border-t border-border pt-3">
-          <Link href={href} className="flex h-10 w-full items-center justify-center gap-1.5 rounded-lg bg-brand text-[13px] font-bold sm:text-sm tracking-tight text-brand-foreground shadow-sm transition-opacity hover:opacity-90">
+          <Link href={href} className="flex h-10 w-full items-center justify-center gap-1.5 rounded-lg bg-brand text-sm font-bold tracking-tight text-brand-foreground shadow-sm transition-opacity hover:opacity-90">
             View Details <ArrowRight className="h-4 w-4" />
           </Link>
           {!isSold && (
@@ -142,16 +142,16 @@ export function BikeCard({ vehicle, badge, isPriority = false, keepRatio = false
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="WhatsApp inquiry"
-                className="flex h-10 items-center justify-center gap-1 rounded-lg bg-[#25D366] text-[12px] font-bold sm:gap-1.5 sm:text-sm text-white shadow-sm transition-colors hover:bg-[#1ebe5a]"
+                className="flex h-10 items-center justify-center gap-1.5 rounded-lg bg-[#25D366] text-sm font-bold text-white shadow-sm transition-colors hover:bg-[#1ebe5a]"
               >
-                <WhatsAppIcon className="h-4 w-4 sm:h-[18px] sm:w-[18px]" /> WhatsApp
+                <WhatsAppIcon className="h-[18px] w-[18px]" /> WhatsApp
               </a>
               <a
                 href={`tel:${CONTACT_INFO.phone}`}
                 data-vehicle-id={vehicle.id}
                 data-vehicle-title={vehicle.title}
                 aria-label="Call the showroom"
-                className="flex h-10 items-center justify-center gap-1 rounded-lg bg-neutral-900 text-[12px] font-bold sm:gap-1.5 sm:text-sm text-white shadow-sm transition-colors hover:bg-neutral-700"
+                className="flex h-10 items-center justify-center gap-1.5 rounded-lg bg-neutral-900 text-sm font-bold text-white shadow-sm transition-colors hover:bg-neutral-700"
               >
                 <Phone className="h-4 w-4" /> Call
               </a>

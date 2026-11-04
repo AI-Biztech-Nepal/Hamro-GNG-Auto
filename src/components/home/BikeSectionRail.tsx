@@ -52,9 +52,9 @@ export function BikeSectionRail({ title, subtitle, bikes, badges, viewAllLink, p
       </div>
 
       <div className="group/rail relative">
-        <div ref={scroller} onScroll={measure} className="-mx-4 flex snap-x gap-3 sm:gap-4 overflow-x-auto scroll-smooth px-4 pb-3 pt-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div ref={scroller} onScroll={measure} className="-mx-4 flex snap-x gap-4 overflow-x-auto scroll-smooth px-4 pb-3 pt-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {bikes.map((bike, i) => (
-            <div key={bike.id} className="w-[calc((100%-0.75rem)/2)] shrink-0 snap-start sm:w-[275px] md:w-[290px] lg:w-[calc((100%-3rem)/4)]">
+            <div key={bike.id} className="w-[275px] shrink-0 snap-start md:w-[290px] lg:w-[calc((100%-3rem)/4)]">
               <BikeCard vehicle={bike} badge={badges.get(bike.id)} isPriority={priority && i < 4} />
             </div>
           ))}
