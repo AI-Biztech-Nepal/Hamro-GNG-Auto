@@ -135,37 +135,9 @@ export function ServicesHero() {
       }}
     >
       <h1 className="sr-only">Hamro G&amp;G Auto: second-hand bikes and scooters in Boudha, Kathmandu. What we do.</h1>
-      <div className="mx-auto max-w-[76rem] px-4 py-4 sm:px-6 sm:py-5 lg:px-8">
+      <div className="mx-auto max-w-[96rem] px-4 py-4 sm:px-6 sm:py-5 lg:px-8">
         <div ref={fitRef} className="hero-fit-box">
-        <div ref={deskRef} className="hero-fit grid grid-cols-1 gap-4 lg:grid-cols-[16.5rem_minmax(0,1fr)]">
-          {/* Service menu */}
-          <nav aria-label="Services" className="hidden border border-neutral-300 lg:block bg-neutral-100 p-3 shadow-inner">
-            <div aria-hidden className="relative -rotate-1 bg-white px-4 py-3.5 font-headline text-lg font-extrabold uppercase tracking-tight text-neutral-950 shadow-[0_2px_6px_rgba(0,0,0,0.18)]">
-              <span className="absolute left-1/2 top-1.5 size-2.5 -translate-x-1/2 rounded-full bg-[#DC2626] shadow-[0_1px_2px_rgba(0,0,0,0.5)]" />
-              <span className="block pt-2">What we <span className="text-[#DC2626]">do</span></span>
-            </div>
-            <ul className="mt-4 space-y-2.5">
-              {SERVICES.map((s, i) => {
-                const on = i === index;
-                // Each note sits at its own slight angle; the active one straightens, lifts and gets a pin.
-                const tilt = on ? 'rotate-0' : i % 2 ? 'rotate-[0.9deg]' : '-rotate-[1.1deg]';
-                return (
-                  <li key={s.tab}>
-                    <button
-                      type="button"
-                      onClick={() => go(i)}
-                      aria-current={on}
-                      className={`group relative block w-full px-4 py-3 pr-8 text-left text-[14px] font-medium transition-[transform,box-shadow,background-color,color] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${tilt} ${on ? 'scale-[1.03] bg-[#FFF3B0] text-[#DC2626] shadow-[0_8px_16px_-6px_rgba(0,0,0,0.35)]' : 'bg-white text-neutral-700 shadow-[0_1px_3px_rgba(0,0,0,0.2)] hover:-translate-y-0.5 hover:rotate-0 hover:text-[#DC2626] hover:shadow-[0_6px_12px_-6px_rgba(0,0,0,0.3)]'}`}
-                    >
-                      <span aria-hidden className={`absolute right-3 top-2.5 size-2 rounded-full bg-[#DC2626] shadow-[0_1px_2px_rgba(0,0,0,0.5)] transition-opacity duration-500 ${on ? 'opacity-100' : 'opacity-0'}`} />
-                      {s.tab}
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          </nav>
-
+        <div ref={deskRef} className="hero-fit">
           {/* Banner */}
           <div
             className="relative overflow-hidden border border-neutral-200 bg-white"
@@ -191,7 +163,7 @@ export function ServicesHero() {
                   <div
                     key={s.tab}
                     aria-hidden={!on}
-                    className={`col-start-1 row-start-1 grid h-[27rem] grid-cols-[minmax(0,5fr)_minmax(0,6fr)] will-change-[transform,opacity] lg:h-[min(60svh,27rem)] ${on ? '' : 'pointer-events-none'}`}
+                    className={`col-start-1 row-start-1 grid h-[34rem] grid-cols-[minmax(0,5fr)_minmax(0,6fr)] will-change-[transform,opacity] lg:h-[min(78svh,40rem)] lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] ${on ? '' : 'pointer-events-none'}`}
                     style={{
                       transform: offset === 0 ? 'translate3d(0,0,0)' : offset < 0 ? NOTE_OFF : NOTE_WAIT,
                       opacity: on ? 1 : 0,
@@ -207,7 +179,7 @@ export function ServicesHero() {
                     {/* Words */}
                     <div className="flex flex-col justify-center px-10">
                       <span aria-hidden className="block h-[3px] w-8 bg-[#DC2626]" />
-                      <p className="hero-title mt-3 font-headline text-[clamp(1.5rem,2.8vw,2.4rem)] font-extrabold uppercase leading-[1.05] tracking-tight text-neutral-950">
+                      <p className="hero-title mt-3 font-headline text-[clamp(1.5rem,3.2vw,3.25rem)] font-extrabold uppercase leading-[1.05] tracking-tight text-neutral-950">
                         {s.tab}
                       </p>
                       <p className="hero-lead mt-3 max-w-md text-base leading-relaxed text-neutral-600">{s.lead}</p>
@@ -229,7 +201,7 @@ export function ServicesHero() {
                         alt={s.alt}
                         fill
                         priority={i === 0}
-                        sizes="(max-width: 1024px) 60vw, 40vw"
+                        sizes="(max-width: 1024px) 60vw, 60vw"
                         className={s.bands ? 'object-contain' : 'object-cover'}
                         style={s.bands ? undefined : { objectPosition: s.focus }}
                       />
