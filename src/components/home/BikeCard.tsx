@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeftRight, ArrowRight, Phone, ShieldCheck, Gauge, Calendar, Hash, Eye } from 'lucide-react';
+import { ArrowLeftRight, ArrowRight, Phone, ShieldCheck, Eye } from 'lucide-react';
 import type { Vehicle } from '@/types/vehicle';
 import { CONTACT_INFO } from '@/lib/constants';
 import { vehiclePageUrl } from '@/lib/vehicle-link';
@@ -33,12 +33,13 @@ export function BikeCard({ vehicle, badge, isPriority = false, keepRatio = false
   const whatsappMessage = encodeURIComponent(
     `Namaste! 🙏 I found you through your website, hamroauto.com.np, and I'm interested in ${vehicle.title}${vehicle.registration_number ? ` (${vehicle.registration_number})` : ''}, ${formatNpr(vehicle.price)}. Is it still available?\n\n${vehiclePageUrl(vehicle.id)}`,
   );
-  // Only show what is actually recorded: an empty "0 km" or a made-up lot number would mislead.
+  // Only show what is actually recorded: an empty "0 km" or a made-up number would mislead.
   const specs = [
-    { icon: Calendar, text: String(vehicle.year) },
-    vehicle.registration_number ? { icon: Hash, text: vehicle.registration_number } : null,
-    vehicle.km_run != null ? { icon: Gauge, text: `${vehicle.km_run.toLocaleString()} km` } : null,
-  ].filter(Boolean) as { icon: typeof Calendar; text: string }[];
+    { label: 'Model', value: String(vehicle.year) },
+    vehicle.registration_number ? { label: 'Vehicle No.', value: vehicle.registration_number } : null,
+    vehicle.engine_cc ? { label: 'Power', value: `${vehicle.engine_cc}cc` } : null,
+    vehicle.km_run != null ? { label: 'Driven', value: `${vehicle.km_run.toLocaleString()} km` } : null,
+  ].filter(Boolean) as { label: string; value: string }[];
 
   return (
     <div className={cn('group relative flex h-full flex-col justify-between overflow-hidden border border-border bg-background transition-colors duration-200 hover:border-brand', isSold && 'opacity-90')}>
@@ -109,12 +110,14 @@ export function BikeCard({ vehicle, badge, isPriority = false, keepRatio = false
             </Link>}
           </div>
 
-          <div className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-md bg-muted/60 px-2 py-1.5 text-[11px] text-muted-foreground">
-            {specs.map(({ icon: Icon, text }) => (
-              <span key={text} className="flex items-center gap-1"><Icon className="h-3 w-3" /> {text}</span>
+          <dl className="mt-2.5 divide-y divide-border/70 overflow-hidden rounded-md border border-border/70 bg-muted/40 text-[11px] sm:text-xs">
+            {specs.map(({ label, value }) => (
+              <div key={label} className="flex items-center justify-between gap-2 px-2 py-1">
+                <dt className="shrink-0 text-muted-foreground">{label}</dt>
+                <dd className="min-w-0 truncate text-right font-semibold tabular-nums text-foreground">{value}</dd>
+              </div>
             ))}
-            {vehicle.engine_cc ? <span>{vehicle.engine_cc}cc</span> : null}
-          </div>
+          </dl>
 
           <div className="mt-3 flex items-baseline justify-between gap-2">
             <span className="font-headline text-lg font-bold tabular-nums text-foreground">{formatNpr(vehicle.price)}</span>
@@ -127,7 +130,7 @@ export function BikeCard({ vehicle, badge, isPriority = false, keepRatio = false
         </div>
 
         <div className="space-y-2 border-t border-border pt-3">
-          <Link href={href} className="flex h-10 w-full items-center justify-center gap-1.5 rounded-lg bg-brand text-sm font-bold tracking-tight text-brand-foreground shadow-sm transition-opacity hover:opacity-90">
+          <Link href={href} className="flex h-10 w-full items-center justify-center gap-1.5 rounded-lg bg-brand text-[13px] font-bold sm:text-sm tracking-tight text-brand-foreground shadow-sm transition-opacity hover:opacity-90">
             View Details <ArrowRight className="h-4 w-4" />
           </Link>
           {!isSold && (
@@ -139,16 +142,16 @@ export function BikeCard({ vehicle, badge, isPriority = false, keepRatio = false
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="WhatsApp inquiry"
-                className="flex h-10 items-center justify-center gap-1.5 rounded-lg bg-[#25D366] text-sm font-bold text-white shadow-sm transition-colors hover:bg-[#1ebe5a]"
+                className="flex h-10 items-center justify-center gap-1 rounded-lg bg-[#25D366] text-[12px] font-bold sm:gap-1.5 sm:text-sm text-white shadow-sm transition-colors hover:bg-[#1ebe5a]"
               >
-                <WhatsAppIcon className="h-[18px] w-[18px]" /> WhatsApp
+                <WhatsAppIcon className="h-4 w-4 sm:h-[18px] sm:w-[18px]" /> WhatsApp
               </a>
               <a
                 href={`tel:${CONTACT_INFO.phone}`}
                 data-vehicle-id={vehicle.id}
                 data-vehicle-title={vehicle.title}
                 aria-label="Call the showroom"
-                className="flex h-10 items-center justify-center gap-1.5 rounded-lg bg-neutral-900 text-sm font-bold text-white shadow-sm transition-colors hover:bg-neutral-700"
+                className="flex h-10 items-center justify-center gap-1 rounded-lg bg-neutral-900 text-[12px] font-bold sm:gap-1.5 sm:text-sm text-white shadow-sm transition-colors hover:bg-neutral-700"
               >
                 <Phone className="h-4 w-4" /> Call
               </a>

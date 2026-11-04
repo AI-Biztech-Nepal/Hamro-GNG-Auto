@@ -2,9 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ArrowRight, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 
 /**
@@ -79,7 +78,7 @@ export function OfferPopup() {
 
         <div
           className="relative overflow-hidden rounded-xl bg-white shadow-2xl"
-          style={{ width: 'min(94vw, calc(80dvh * 1672 / 941))', aspectRatio: `${ART_W} / ${ART_H}` }}
+          style={{ width: 'min(94vw, calc(86dvh * 1672 / 941))', aspectRatio: `${ART_W} / ${ART_H}` }}
         >
           <Image
             src={POSTER}
@@ -98,14 +97,6 @@ export function OfferPopup() {
           </button>
         </div>
 
-        <Link
-          href="/inventory"
-          onClick={() => setOpen(false)}
-          className="mx-auto mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-brand px-3 text-[15px] font-bold text-brand-foreground hover:bg-brand/90"
-          style={{ maxWidth: 'min(94vw, 420px)' }}
-        >
-          See our bikes <ArrowRight className="h-5 w-5" />
-        </Link>
       </DialogContent>
     </Dialog>
   );
