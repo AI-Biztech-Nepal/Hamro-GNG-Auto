@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { ChevronLeft, ChevronRight, ArrowRight, Telescope } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ArrowRight, Search } from 'lucide-react';
 import type { Vehicle } from '@/types/vehicle';
 import { BikeCard } from '@/components/home/BikeCard';
 import type { Badge } from '@/components/home/home-data';
@@ -43,25 +43,23 @@ export function BikeSectionRail({ title, subtitle, bikes, badges, viewAllLink, p
     <section className="py-6">
       <div className="mb-4 flex items-end justify-between gap-3 border-b border-border pb-2">
         <div className="min-w-0">
-          <div className="flex items-center gap-2.5">
-            <h2 className="font-headline text-xl font-bold tracking-tight text-foreground md:text-2xl">{title}</h2>
-            {withSearch && (
-              <Link
-                href="/inventory?search=1"
-                aria-label="Search our inventory"
-                title="Search our inventory"
-                className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand text-brand-foreground shadow-sm ring-1 ring-black/5 transition hover:bg-brand/90 hover:shadow-md active:scale-95"
-              >
-                <Telescope className="h-[18px] w-[18px]" strokeWidth={2.25} />
-              </Link>
-            )}
-          </div>
+          <h2 className="font-headline text-xl font-bold tracking-tight text-foreground md:text-2xl">{title}</h2>
           {subtitle && <p className="mt-0.5 text-xs text-muted-foreground md:text-sm">{subtitle}</p>}
         </div>
         <div className="flex shrink-0 items-center gap-3">
           <Link href={viewAllLink} className="flex items-center gap-1 text-xs font-semibold text-brand hover:underline md:text-sm">
             See all <ArrowRight className="h-3.5 w-3.5" />
           </Link>
+          {withSearch && (
+            <Link
+              href="/inventory?search=1"
+              aria-label="Search our inventory"
+              title="Search our inventory"
+              className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand text-brand-foreground shadow-sm ring-1 ring-black/5 transition hover:bg-brand/90 hover:shadow-md active:scale-95"
+            >
+              <Search className="h-[18px] w-[18px]" strokeWidth={2.5} />
+            </Link>
+          )}
         </div>
       </div>
 
