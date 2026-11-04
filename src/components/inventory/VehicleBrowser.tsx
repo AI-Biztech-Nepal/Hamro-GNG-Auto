@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { BikeCard } from '@/components/home/BikeCard';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import { BRANDS } from '@/lib/constants';
 import { Vehicle } from '@/types/vehicle';
 import { cn } from '@/lib/utils';
@@ -31,13 +31,13 @@ const SORTS = [
  * the filter layout.
  */
 export function VehicleBrowser({ vehicles, priorityCount = 0, layout = 'bar' }: VehicleBrowserProps) {
-  const [search, setSearch] = useState('');
+  const params = useSearchParams();
+  const [search, setSearch] = useState(() => (params.get('q') || '').slice(0, 60));
   const [typeFilter, setTypeFilter] = useState('all');
   const [yearFilter, setYearFilter] = useState('all');
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
   // Links such as /inventory?brand=Honda or ?sort=price-low open the page already filtered.
-  const params = useSearchParams();
   const [brandFilter, setBrandFilter] = useState(() => {
     const wanted = (params.get('brand') || '').toLowerCase();
     return BRANDS.find(b => b.toLowerCase() === wanted) ?? 'all';
@@ -185,24 +185,35 @@ export function VehicleBrowser({ vehicles, priorityCount = 0, layout = 'bar' }: 
         />
       </div>
 
-      <Select value={typeFilter} onValueChange={setTypeFilter}>
-        <SelectTrigger className="h-11 rounded-md"><SelectValue placeholder="Vehicle Type" /></SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All Types</SelectItem>
-          <SelectItem value="bike">Bikes</SelectItem>
-          <SelectItem value="scooter">Scooters</SelectItem>
-        </SelectContent>
-      </Select>
+      {/* All / Bikes / Scooters as tabs (the brand dropdown is gone: the search box finds a brand by name). */}
+      <div role="tablist" aria-label="Vehicle type" className="grid grid-cols-3 gap-1 rounded-lg bg-muted p-1 md:col-span-2 lg:col-span-1">
+        {[{ value: 'all', label: 'All' }, { value: 'bike', label: 'Bikes' }, { value: 'scooter', label: 'Scooters' }].map(t => (
+          <button
+            key={t.value}
+            type="button"
+            role="tab"
+            aria-selected={typeFilter === t.value}
+            onClick={() => setTypeFilter(t.value)}
+            className={cn(
+              'h-9 touch-manipulation rounded-md text-sm font-semibold transition-colors',
+              typeFilter === t.value ? 'bg-brand text-brand-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground',
+            )}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
 
-      <Select value={brandFilter} onValueChange={setBrandFilter}>
-        <SelectTrigger className="h-11 rounded-md"><SelectValue placeholder="Brand" /></SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All Brands</SelectItem>
-          {BRANDS.map(brand => (
-            <SelectItem key={brand} value={brand}>{brand}</SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      {brandFilter !== 'all' && (
+        <button
+          type="button"
+          onClick={() => setBrandFilter('all')}
+          className="col-span-full flex w-fit items-center gap-1.5 rounded-full border border-brand/40 bg-brand/5 px-3 py-1 text-xs font-semibold text-brand"
+          aria-label={`Remove the ${brandFilter} filter`}
+        >
+          {brandFilter} <X className="h-3.5 w-3.5" />
+        </button>
+      )}
 
       <Select value={sortOrder} onValueChange={setSortOrder}>
         <SelectTrigger className="h-11 rounded-md"><SelectValue placeholder="Sort By" /></SelectTrigger>

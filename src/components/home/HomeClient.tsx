@@ -39,7 +39,7 @@ export function HomeClient({ vehicles }: { vehicles: Vehicle[]; settings: SiteSe
             bikes={rails.popular}
             badges={rails.badges}
             viewAllLink="/inventory"
-            searchLink="/inventory"
+            withSearch
             priority
           />
           <BikeSectionRail

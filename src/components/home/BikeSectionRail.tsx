@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { ChevronLeft, ChevronRight, ArrowRight, Telescope } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { ChevronLeft, ChevronRight, ArrowRight, Search } from 'lucide-react';
 import type { Vehicle } from '@/types/vehicle';
 import { BikeCard } from '@/components/home/BikeCard';
 import type { Badge } from '@/components/home/home-data';
@@ -15,13 +16,20 @@ interface BikeSectionRailProps {
   viewAllLink: string;
   /** Load the first cards eagerly when this rail is near the top of the page. */
   priority?: boolean;
-  /** Adds a telescope "search" button right of the title that opens this page (the inventory). */
-  searchLink?: string;
+  /** Adds a "Search by brand or model" box level with the title; submitting opens the inventory already searched. */
+  withSearch?: boolean;
 }
 
 /** A titled, sideways-scrolling row of bike cards, with arrows on larger screens. */
-export function BikeSectionRail({ title, subtitle, bikes, badges, viewAllLink, priority = false, searchLink }: BikeSectionRailProps) {
+export function BikeSectionRail({ title, subtitle, bikes, badges, viewAllLink, priority = false, withSearch = false }: BikeSectionRailProps) {
   const scroller = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+  const [query, setQuery] = useState('');
+  const submitSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    const q = query.trim();
+    router.push(q ? `/inventory?q=${encodeURIComponent(q)}` : '/inventory');
+  };
   // Which arrows make sense: none to the left at the start of the row, none to the right at its end.
   const [edge, setEdge] = useState({ atStart: true, atEnd: false });
   const measure = useCallback(() => {
@@ -41,23 +49,25 @@ export function BikeSectionRail({ title, subtitle, bikes, badges, viewAllLink, p
 
   return (
     <section className="py-6">
-      <div className="mb-4 flex items-end justify-between gap-3 border-b border-border pb-2">
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-x-3 gap-y-2 border-b border-border pb-2">
         <div className="min-w-0">
-          <div className="flex items-center gap-2.5">
-            <h2 className="font-headline text-xl font-bold tracking-tight text-foreground md:text-2xl">{title}</h2>
-            {searchLink && (
-              <Link
-                href={searchLink}
-                aria-label="Search all bikes in our inventory"
-                title="Search our inventory"
-                className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand text-brand-foreground shadow-sm ring-1 ring-black/5 transition hover:bg-brand/90 hover:shadow-md active:scale-95"
-              >
-                <Telescope className="h-[18px] w-[18px]" strokeWidth={2.25} />
-              </Link>
-            )}
-          </div>
+          <h2 className="font-headline text-xl font-bold tracking-tight text-foreground md:text-2xl">{title}</h2>
           {subtitle && <p className="mt-0.5 text-xs text-muted-foreground md:text-sm">{subtitle}</p>}
         </div>
+        {withSearch && (
+          <form onSubmit={submitSearch} role="search" className="order-last relative w-full sm:order-none sm:w-auto sm:min-w-[16rem] sm:max-w-sm sm:flex-1">
+            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search by brand or model..."
+              aria-label="Search bikes by brand or model"
+              enterKeyHint="search"
+              className="h-10 w-full rounded-md border border-input bg-background pl-10 pr-3 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/30"
+            />
+          </form>
+        )}
         <div className="flex shrink-0 items-center gap-3">
           <Link href={viewAllLink} className="flex items-center gap-1 text-xs font-semibold text-brand hover:underline md:text-sm">
             See all <ArrowRight className="h-3.5 w-3.5" />
