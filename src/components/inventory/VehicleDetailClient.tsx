@@ -4,7 +4,9 @@
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, Pause, Play, Phone, MessageCircle, Share2, ShieldCheck, FileCheck, MapPin } from 'lucide-react';
+import { LogoBadge } from '@/components/ui/logo-badge';
+import { WhatsAppIcon } from '@/components/ui/whatsapp-icon';
+import { ChevronLeft, Pause, Play, Phone, Share2, ShieldCheck, FileCheck, MapPin } from 'lucide-react';
 import { CONTACT_INFO } from '@/lib/constants';
 import { vehiclePageUrl } from '@/lib/vehicle-link';
 import { Vehicle } from '@/types/vehicle';
@@ -168,6 +170,8 @@ export function VehicleDetailClient({ vehicle }: { vehicle: Vehicle }) {
               )}
             </Carousel>
 
+            <LogoBadge className="left-3 top-3" />
+
             {images.length > 1 && !reducedMotion && (
               <button
                 onPointerDown={e => e.stopPropagation()}
@@ -255,7 +259,7 @@ export function VehicleDetailClient({ vehicle }: { vehicle: Vehicle }) {
                 asChild
               >
                 <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" data-vehicle-id={vehicle.id} data-vehicle-title={vehicle.title}>
-                  <MessageCircle className="w-4 h-4" /> WhatsApp
+                  <WhatsAppIcon className="w-5 h-5" /> WhatsApp
                 </a>
               </Button>
             </div>
