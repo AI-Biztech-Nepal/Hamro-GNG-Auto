@@ -2,14 +2,14 @@
 "use client"
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { Menu, User, X } from 'lucide-react';
+import { User } from 'lucide-react';
 import { CONTACT_INFO } from '@/lib/constants';
 import type { SiteSettings } from '@/lib/inventory-api';
 
 export function Navbar({ settings }: { settings: SiteSettings }) {
-  const [isOpen, setIsOpen] = useState(false);
+  const stripRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const [picture, setPicture] = useState<string | null>(null);
 
@@ -21,6 +21,12 @@ export function Navbar({ settings }: { settings: SiteSettings }) {
     window.addEventListener('gg-auth', load);
     return () => window.removeEventListener('gg-auth', load);
   }, []);
+
+  // On phones the links sit in a sideways-scrolling strip: scroll the current page's link into view.
+  useEffect(() => {
+    const active = stripRef.current?.querySelector<HTMLElement>('[aria-current="page"]');
+    active?.scrollIntoView({ inline: 'center', block: 'nearest' });
+  }, [pathname]);
 
   // Backend `settings.logo_url` is a stock placeholder; the real brand mark ships in /public.
   const logoImage = CONTACT_INFO.logoUrl;
@@ -77,7 +83,7 @@ export function Navbar({ settings }: { settings: SiteSettings }) {
             </Link>
           </div>
 
-          {/* Mobile account + menu button */}
+          {/* Mobile account (the page links are in the strip below) */}
           <div className="md:hidden flex items-center gap-2">
             <Link href="/account" aria-label="Account" className={accountClass}>
               {picture ? (
@@ -86,34 +92,36 @@ export function Navbar({ settings }: { settings: SiteSettings }) {
                 <User className="h-5 w-5" strokeWidth={2.25} />
               )}
             </Link>
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              aria-label={isOpen ? 'Close menu' : 'Open menu'}
-              className="p-2 rounded-md border border-border"
-            >
-              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile Nav. Its padding makes the link text start exactly under the logo: the header uses px-4 (px-6 from sm) and each link adds px-3. */}
-      {isOpen && (
-        <div className="md:hidden bg-white border-t border-border px-1 py-3 sm:px-3">
-          {links.map((link) => (
+      {/* Phones: every page link stays on screen in one strip under the logo bar (it scrolls sideways when it does not fit).
+          The padding puts the first word exactly under the logo: the bar above uses px-4 (px-6 from sm) and each link adds px-3. */}
+      <div
+        ref={stripRef}
+        className="md:hidden flex gap-1 overflow-x-auto border-t border-border px-1 sm:px-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        role="navigation"
+        aria-label="Pages"
+      >
+        {links.map((link) => {
+          const active = pathname === link.href;
+          return (
             <Link
               key={link.name}
               href={link.href}
-              className={`block px-3 py-2.5 rounded-md text-sm font-semibold ${
-                pathname === link.href ? 'bg-accent text-foreground' : 'text-muted-foreground'
+              aria-current={active ? 'page' : undefined}
+              className={`shrink-0 whitespace-nowrap px-3 py-3 text-sm font-semibold transition-colors ${
+                active
+                  ? 'text-foreground underline underline-offset-8 decoration-2 decoration-brand'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
-              onClick={() => setIsOpen(false)}
             >
               {link.name}
             </Link>
-          ))}
-        </div>
-      )}
+          );
+        })}
+      </div>
     </nav>
   );
 }
