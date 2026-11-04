@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ArrowRight, Telescope } from 'lucide-react';
 import type { Vehicle } from '@/types/vehicle';
 import { BikeCard } from '@/components/home/BikeCard';
 import type { Badge } from '@/components/home/home-data';
@@ -15,10 +15,12 @@ interface BikeSectionRailProps {
   viewAllLink: string;
   /** Load the first cards eagerly when this rail is near the top of the page. */
   priority?: boolean;
+  /** Adds a telescope "search" button right of the title that opens this page (the inventory). */
+  searchLink?: string;
 }
 
 /** A titled, sideways-scrolling row of bike cards, with arrows on larger screens. */
-export function BikeSectionRail({ title, subtitle, bikes, badges, viewAllLink, priority = false }: BikeSectionRailProps) {
+export function BikeSectionRail({ title, subtitle, bikes, badges, viewAllLink, priority = false, searchLink }: BikeSectionRailProps) {
   const scroller = useRef<HTMLDivElement>(null);
   // Which arrows make sense: none to the left at the start of the row, none to the right at its end.
   const [edge, setEdge] = useState({ atStart: true, atEnd: false });
@@ -41,7 +43,19 @@ export function BikeSectionRail({ title, subtitle, bikes, badges, viewAllLink, p
     <section className="py-6">
       <div className="mb-4 flex items-end justify-between gap-3 border-b border-border pb-2">
         <div className="min-w-0">
-          <h2 className="font-headline text-xl font-bold tracking-tight text-foreground md:text-2xl">{title}</h2>
+          <div className="flex items-center gap-2.5">
+            <h2 className="font-headline text-xl font-bold tracking-tight text-foreground md:text-2xl">{title}</h2>
+            {searchLink && (
+              <Link
+                href={searchLink}
+                aria-label="Search all bikes in our inventory"
+                title="Search our inventory"
+                className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand text-brand-foreground shadow-sm ring-1 ring-black/5 transition hover:bg-brand/90 hover:shadow-md active:scale-95"
+              >
+                <Telescope className="h-[18px] w-[18px]" strokeWidth={2.25} />
+              </Link>
+            )}
+          </div>
           {subtitle && <p className="mt-0.5 text-xs text-muted-foreground md:text-sm">{subtitle}</p>}
         </div>
         <div className="flex shrink-0 items-center gap-3">
