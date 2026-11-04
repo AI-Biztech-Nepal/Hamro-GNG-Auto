@@ -97,9 +97,9 @@ export function Navbar({ settings }: { settings: SiteSettings }) {
         </div>
       </div>
 
-      {/* Mobile Nav */}
+      {/* Mobile Nav. Its padding makes the link text start exactly under the logo: the header uses px-4 (px-6 from sm) and each link adds px-3. */}
       {isOpen && (
-        <div className="md:hidden bg-white border-t border-border p-3">
+        <div className="md:hidden bg-white border-t border-border px-1 py-3 sm:px-3">
           {links.map((link) => (
             <Link
               key={link.name}
