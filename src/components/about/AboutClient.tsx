@@ -59,7 +59,7 @@ function Hero() {
         <span aria-hidden className="hidden md:block absolute -top-4 right-[-1rem] w-[34%] h-[55%] bg-brand" />
         <div ref={photo} className="relative md:ml-auto md:w-[72%] will-change-transform">
           <div className="about-photo aspect-video overflow-hidden bg-secondary">
-            <img src="/hero/showroom-about.jpg" width={1024} height={575} alt="Inside the Hamro G&G Auto showroom in Boudha, with used bikes on display and the exchange counter behind" className="h-full w-full object-cover" />
+            <img src="/hero/showroom-yard.jpg" width={1024} height={765} alt="Rows of second-hand bikes and scooters lined up in the Hamro G&G Auto yard in Nayabasti, Boudha" className="h-full w-full object-cover object-[50%_55%]" />
           </div>
         </div>
         <div className="about-panel relative mt-[-3rem] mx-3 md:mx-0 md:mt-0 md:absolute md:left-0 md:bottom-0 md:w-[54%] bg-white p-6 md:p-10 shadow-[0_18px_40px_-20px_rgba(0,0,0,0.4)]">
