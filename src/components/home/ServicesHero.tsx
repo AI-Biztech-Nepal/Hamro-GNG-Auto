@@ -33,8 +33,8 @@ const SERVICES: Service[] = [
     cta: 'Browse the floor',
     href: '#stock',
     image: '/hero/showroom-gg.jpg',
-    focus: '40% 45%',
-    alt: 'A rider leaning on a scooter on the Hamro Auto showroom floor',
+    focus: '50% 40%',
+    alt: 'A smiling Hamro G&G Auto team member welcoming visitors on the showroom floor',
   },
   {
     tab: 'Exchange facility',
