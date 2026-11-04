@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { BikeCard } from '@/components/home/BikeCard';
 import { Input } from '@/components/ui/input';
@@ -74,6 +74,15 @@ export function VehicleBrowser({ vehicles, priorityCount = 0, layout = 'bar' }: 
     });
   }, [vehicles, search, typeFilter, brandFilter, yearFilter, minPrice, maxPrice, sortOrder]);
 
+  // /inventory?search=1 (the search button on the home page) puts the cursor in the search box. The phone card and the
+  // laptop rail each hold one, so pick whichever is on screen.
+  const wantsSearchFocus = params.get('search') === '1';
+  useEffect(() => {
+    if (!wantsSearchFocus) return;
+    const box = Array.from(document.querySelectorAll<HTMLInputElement>('input[data-inventory-search]')).find(el => el.offsetParent !== null);
+    box?.focus({ preventScroll: false });
+  }, [wantsSearchFocus]);
+
   const isFiltered = filteredVehicles.length !== vehicles.length;
   const sidebar = layout === 'sidebar';
 
@@ -104,6 +113,7 @@ export function VehicleBrowser({ vehicles, priorityCount = 0, layout = 'bar' }: 
       <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
       <Input
         type="search"
+        data-inventory-search
         placeholder="Search by brand or model..."
         aria-label="Search by brand or model"
         className="h-11 rounded-md pl-10"
