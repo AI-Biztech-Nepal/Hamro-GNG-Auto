@@ -33,7 +33,7 @@ const SERVICES: Service[] = [
     cta: 'Browse the floor',
     href: '#stock',
     image: '/hero/handover-banner.jpg',
-    focus: '85% 50%',
+    focus: '78% 50%',
     alt: 'A Hamro G&G Auto team member handing a smiling customer the keys to a Honda Dio',
   },
   {
@@ -163,7 +163,7 @@ export function ServicesHero() {
                   <div
                     key={s.tab}
                     aria-hidden={!on}
-                    className={`col-start-1 row-start-1 grid grid-cols-1 will-change-[transform,opacity] lg:h-[min(60svh,27rem)] lg:grid-cols-[minmax(0,3fr)_minmax(0,7fr)] ${on ? '' : 'pointer-events-none'}`}
+                    className={`col-start-1 row-start-1 grid h-[27rem] grid-cols-[minmax(0,3fr)_minmax(0,7fr)] will-change-[transform,opacity] lg:h-[min(60svh,27rem)] ${on ? '' : 'pointer-events-none'}`}
                     style={{
                       transform: offset === 0 ? 'translate3d(0,0,0)' : offset < 0 ? NOTE_OFF : NOTE_WAIT,
                       opacity: on ? 1 : 0,
@@ -177,12 +177,12 @@ export function ServicesHero() {
                     }}
                   >
                     {/* Words */}
-                    <div className="order-2 flex min-w-0 flex-col justify-center px-4 pb-10 pt-4 lg:order-none lg:px-6 lg:py-0">
+                    <div className="flex min-w-0 flex-col justify-center px-3 lg:px-6">
                       <span aria-hidden className="block h-[3px] w-8 bg-[#DC2626]" />
                       <p className="hero-title mt-3 font-headline text-[clamp(1.25rem,2.3vw,2rem)] font-extrabold uppercase leading-[1.05] tracking-tight text-neutral-950">
                         {s.tab}
                       </p>
-                      <p className="hero-lead mt-2 text-[15px] leading-relaxed text-neutral-600">{s.lead}</p>
+                      <p className="hero-lead mt-3 text-[15px] leading-relaxed text-neutral-600">{s.lead}</p>
                       <Link
                         href={s.href}
                         tabIndex={on ? 0 : -1}
@@ -195,7 +195,7 @@ export function ServicesHero() {
                     </div>
 
                     {/* Photo */}
-                    <div className={`relative order-1 lg:order-none lg:aspect-auto ${s.bands ? 'aspect-[4/3]' : 'aspect-[2/1]'}`} style={s.bands ? { background: `linear-gradient(${s.bands[0]} 50%, ${s.bands[1]} 50%)` } : undefined}>
+                    <div className="relative" style={s.bands ? { background: `linear-gradient(${s.bands[0]} 50%, ${s.bands[1]} 50%)` } : undefined}>
                       <Image
                         src={s.image}
                         alt={s.alt}
@@ -205,7 +205,7 @@ export function ServicesHero() {
                         className={s.bands ? 'object-contain' : 'object-cover'}
                         style={s.bands ? undefined : { objectPosition: s.focus }}
                       />
-                      <div aria-hidden className={`absolute inset-y-0 left-0 bg-gradient-to-r from-white to-transparent ${s.bands ? 'w-[8%]' : 'w-[16%]'} hidden lg:block`} />
+                      <div aria-hidden className={`absolute inset-y-0 left-0 bg-gradient-to-r from-white to-transparent ${s.bands ? 'w-[8%]' : 'w-[16%]'}`} />
                     </div>
                   </div>
                 );
