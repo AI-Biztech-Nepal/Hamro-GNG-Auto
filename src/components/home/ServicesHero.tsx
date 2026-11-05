@@ -28,7 +28,7 @@ interface Service {
 
 const SERVICES: Service[] = [
   {
-    tab: 'Second-hand sales',
+    tab: 'Sales and purchase',
     lead: 'Walk the floor at our Nayabasti, Boudha showroom. Inspected bikes and scooters, genuine paperwork, fixed prices.',
     cta: 'Browse the floor',
     href: '#stock',
