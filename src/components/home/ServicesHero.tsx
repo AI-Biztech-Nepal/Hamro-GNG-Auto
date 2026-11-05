@@ -42,8 +42,8 @@ const SERVICES: Service[] = [
     cta: 'Get an appraisal',
     href: '/exchange',
     image: '/hero/handover-banner.jpg',
-    focus: '50% 50%',
-    alt: 'A Hamro G&G Auto team member handing over the keys to a smiling customer beside a Honda Dio',
+    focus: '85% 50%',
+    alt: 'A Hamro G&G Auto team member handing a customer the keys and the paperwork beside a Honda Dio',
   },
   {
     tab: 'Servicing and repair',
