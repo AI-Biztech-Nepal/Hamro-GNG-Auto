@@ -51,8 +51,8 @@ const SERVICES: Service[] = [
     cta: 'Book a slot',
     href: '/book-service',
     image: '/hero/service-banner.jpg',
-    focus: '90% 50%',
-    alt: 'A red Honda Grazia scooter in a bright studio',
+    focus: '100% 50%',
+    alt: 'A red Honda Grazia scooter in a bright showroom',
   },
   {
     tab: 'Insurance renewal',
@@ -60,8 +60,8 @@ const SERVICES: Service[] = [
     cta: 'Ask at the counter',
     href: '/services',
     image: '/hero/insurance-banner.jpg',
-    focus: '90% 50%',
-    alt: 'A light blue Vespa scooter in a bright studio',
+    focus: '100% 50%',
+    alt: 'A light blue Vespa scooter in a bright showroom',
   },
   {
     tab: 'Ownership transfer',
@@ -78,8 +78,8 @@ const SERVICES: Service[] = [
     cta: 'Value my bike',
     href: '/sell',
     image: '/hero/valuation-banner.jpg',
-    focus: '90% 50%',
-    alt: 'A black and gold Honda Dio scooter in a bright studio',
+    focus: '100% 50%',
+    alt: 'A black and gold Honda Dio scooter in a bright showroom',
   },
 ];
 
