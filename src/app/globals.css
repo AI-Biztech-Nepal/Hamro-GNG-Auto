@@ -251,8 +251,10 @@ button, a {
 @media (max-width: 1023px) {
   .hero-fit-box { overflow: hidden; height: calc(var(--hero-h, 440px) * var(--hero-scale, 0.43)); }
   .hero-fit { width: 760px; transform: scale(var(--hero-scale, 0.43)); transform-origin: top left; }
+  /* A shorter banner gives the photo a wider frame, so both people in the handover shot stay in view. */
+  .hero-fit .hero-slide { height: 21rem; }
   .hero-fit .hero-title { font-size: 1.6rem; }
-  .hero-fit .hero-lead { font-size: 1.3rem; line-height: 1.38; margin-top: 0.75rem; display: -webkit-box; -webkit-line-clamp: 6; -webkit-box-orient: vertical; overflow: hidden; }
+  .hero-fit .hero-lead { font-size: 1.3rem; line-height: 1.38; margin-top: 0.75rem; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
   .hero-fit .hero-cta { height: auto; min-height: 3rem; padding: 0.6rem 1rem; font-size: 1.05rem; line-height: 1.2; margin-top: 1.25rem; gap: 0.5rem; }
 }
 

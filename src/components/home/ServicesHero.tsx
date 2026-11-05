@@ -33,7 +33,7 @@ const SERVICES: Service[] = [
     cta: 'Browse the floor',
     href: '#stock',
     image: '/hero/handover-banner.jpg',
-    focus: '78% 50%',
+    focus: '82% 50%',
     alt: 'A Hamro G&G Auto team member handing a smiling customer the keys to a Honda Dio',
   },
   {
@@ -163,7 +163,7 @@ export function ServicesHero() {
                   <div
                     key={s.tab}
                     aria-hidden={!on}
-                    className={`col-start-1 row-start-1 grid h-[27rem] grid-cols-[minmax(0,3fr)_minmax(0,7fr)] will-change-[transform,opacity] lg:h-[min(60svh,27rem)] ${on ? '' : 'pointer-events-none'}`}
+                    className={`hero-slide col-start-1 row-start-1 grid h-[27rem] grid-cols-[minmax(0,3fr)_minmax(0,7fr)] will-change-[transform,opacity] lg:h-[min(60svh,27rem)] ${on ? '' : 'pointer-events-none'}`}
                     style={{
                       transform: offset === 0 ? 'translate3d(0,0,0)' : offset < 0 ? NOTE_OFF : NOTE_WAIT,
                       opacity: on ? 1 : 0,
