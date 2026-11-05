@@ -246,14 +246,7 @@ button, a {
   mask-composite: intersect;
 }
 
-/* Hero on phones: the same 30% text / 70% photo banner as the laptop, drawn 760px wide and shrunk to fit.
-   ServicesHero sets --hero-scale and --hero-h. The type is larger here because the scale brings it back down. */
-@media (max-width: 1023px) {
-  .hero-fit-box { overflow: hidden; height: calc(var(--hero-h, 440px) * var(--hero-scale, 0.43)); }
-  .hero-fit { width: 760px; transform: scale(var(--hero-scale, 0.43)); transform-origin: top left; }
-  .hero-fit .hero-title { font-size: 1.6rem; }
-  .hero-fit .hero-lead { font-size: 1.3rem; line-height: 1.38; margin-top: 0.75rem; display: -webkit-box; -webkit-line-clamp: 6; -webkit-box-orient: vertical; overflow: hidden; }
-  .hero-fit .hero-cta { height: auto; min-height: 3rem; padding: 0.6rem 1rem; font-size: 1.05rem; line-height: 1.2; margin-top: 1.25rem; gap: 0.5rem; }
+/* Hero on phones: the photo sits above the words (see ServicesHero); the laptop keeps the side-by-side banner. */
 }
 
 /* About page: scroll reveal and the map pin */
