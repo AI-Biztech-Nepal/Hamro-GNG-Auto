@@ -41,9 +41,9 @@ const SERVICES: Service[] = [
     lead: 'Trade in the bike you ride today and put its value toward one from our floor, settled in a single visit.',
     cta: 'Get an appraisal',
     href: '/exchange',
-    image: '/hero/handover-gg.jpg',
+    image: '/hero/handover-banner.jpg',
     focus: '50% 50%',
-    alt: 'Two people shaking hands over a set of keys in the showroom',
+    alt: 'A Hamro G&G Auto team member handing over the keys to a smiling customer beside a Honda Dio',
   },
   {
     tab: 'Servicing and repair',
