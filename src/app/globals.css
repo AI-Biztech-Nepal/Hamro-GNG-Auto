@@ -247,7 +247,6 @@ button, a {
 }
 
 /* Hero on phones: the photo sits above the words (see ServicesHero); the laptop keeps the side-by-side banner. */
-}
 
 /* About page: scroll reveal and the map pin */
 .about-reveal { opacity: 0; transform: translate3d(0, 20px, 0); transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1) var(--d, 0ms), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) var(--d, 0ms); }
