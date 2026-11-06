@@ -50,9 +50,9 @@ const SERVICES: Service[] = [
     lead: 'Strange noise or weak brakes? Drop by and our own mechanics will look after your bike, often the same day.',
     cta: 'Book a slot',
     href: '/book-service',
-    image: '/hero/service-banner.jpg',
-    focus: '100% 50%',
-    alt: 'A red Honda Grazia scooter in a bright showroom',
+    image: '/hero/service-workshop.jpg',
+    focus: '50% 50%',
+    alt: 'Hamro G&G Auto mechanics repairing scooters and motorcycles in the workshop under the G&G sign',
   },
   {
     tab: 'Ownership transfer',
