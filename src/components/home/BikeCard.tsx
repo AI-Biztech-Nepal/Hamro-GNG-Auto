@@ -151,7 +151,7 @@ export function BikeCard({ vehicle, badge, isPriority = false, keepRatio = false
                 data-vehicle-id={vehicle.id}
                 data-vehicle-title={vehicle.title}
                 aria-label="Call the showroom"
-                className="flex h-10 items-center justify-center gap-1.5 rounded-lg bg-blue-600 text-sm font-bold text-white shadow-sm transition-colors hover:bg-blue-700"
+                className="flex h-10 items-center justify-center gap-1.5 rounded-lg border-2 border-brand bg-background text-sm font-bold text-brand shadow-sm transition-colors hover:bg-brand hover:text-brand-foreground"
               >
                 <Phone className="h-4 w-4" /> Call
               </a>
