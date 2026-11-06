@@ -77,9 +77,9 @@ const SERVICES: Service[] = [
     lead: 'Curious what your bike is worth? Send a few photos and we will tell you the same day. Free, no strings attached.',
     cta: 'Value my bike',
     href: '/sell',
-    image: '/hero/valuation-street.jpg',
-    focus: '50% 45%',
-    alt: 'A Hamro G&G Auto team member chatting with a customer about his scooter outside the Nayabasti shop',
+    image: '/hero/valuation-showroom.jpg',
+    focus: '50% 35%',
+    alt: 'A smiling Hamro G&G Auto team member welcoming you inside the showroom, with bikes and the service counter behind her',
   },
 ];
 
