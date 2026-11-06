@@ -59,8 +59,8 @@ const SERVICES: Service[] = [
     lead: 'Bought a bike from us? We guide you through every form, so it is in your name by the day you ride home.',
     cta: 'Talk to us',
     href: WHATSAPP_URL,
-    image: '/hero/ownership-transfer.jpg',
-    focus: '50% 30%',
+    image: '/hero/ownership-wide.jpg',
+    focus: '100% 50%',
     alt: 'A Hamro G&G Auto team member handing a customer the ownership transfer papers inside the showroom',
   },
   {
@@ -77,9 +77,9 @@ const SERVICES: Service[] = [
     lead: 'Curious what your bike is worth? Send a few photos and we will tell you the same day. Free, no strings attached.',
     cta: 'Value my bike',
     href: '/sell',
-    image: '/hero/valuation-showroom.jpg',
-    focus: '50% 35%',
-    alt: 'A smiling Hamro G&G Auto team member welcoming you inside the showroom, with bikes and the service counter behind her',
+    image: '/hero/valuation-wide.jpg',
+    focus: '100% 50%',
+    alt: 'A Hamro G&G Auto team member going through a valuation checklist with a customer beside his motorcycle in the showroom',
   },
 ];
 
