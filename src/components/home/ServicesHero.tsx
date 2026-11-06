@@ -64,10 +64,10 @@ const SERVICES: Service[] = [
     alt: 'A light blue Vespa scooter in a bright showroom',
   },
   {
-    tab: 'Ownership transfer',
-    lead: 'Bought a bike from us? We guide you through every form, so it is in your name by the day you ride home.',
-    cta: 'Talk to us',
-    href: WHATSAPP_URL,
+    tab: 'Our inventory',
+    lead: 'Honda, Yamaha, Suzuki, Hero, Bajaj, TVS and more, all under one roof. Pick the brand you trust and find the bike or scooter that fits your ride and your budget.',
+    cta: 'See all bikes',
+    href: '/inventory',
     image: '/hero/showroom-yard.jpg',
     focus: '50% 60%',
     alt: 'Rows of used bikes and scooters in the Hamro G&G Auto yard in Nayabasti',
@@ -77,9 +77,9 @@ const SERVICES: Service[] = [
     lead: 'Curious what your bike is worth? Send a few photos and we will tell you the same day. Free, no strings attached.',
     cta: 'Value my bike',
     href: '/sell',
-    image: '/hero/valuation-banner.jpg',
-    focus: '100% 50%',
-    alt: 'A black and gold Honda Dio scooter in a bright showroom',
+    image: '/hero/valuation-street.jpg',
+    focus: '50% 45%',
+    alt: 'A Hamro G&G Auto team member chatting with a customer about his scooter outside the Nayabasti shop',
   },
 ];
 
