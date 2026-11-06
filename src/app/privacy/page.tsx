@@ -28,7 +28,7 @@ const sections: LegalSection[] = [
           'Google sign-in. If you choose to sign in on the Account page, Google gives us your name, email address and profile photo. We save your name and email as an account record for our team. We never see your Google password.',
           'Your phone number. If you add it when you create an account (on the Account page, or in the prompt that appears before the Call and WhatsApp buttons), we save it together with your name, your email and anything you tell us you are looking for, as an enquiry for our team.',
           'Offers. If you join an offer such as the Dashain gift wheel, we receive the contact details you enter and the result of your spin.',
-          'Visit data. We note which pages are opened, using a random visit ID stored in your browser, and we use Google Analytics to see how the site is used. Neither identifies you by name.',
+          'Visit data. We note which pages are opened, using a random visit ID stored in your browser, and we use Google Analytics to see how the site is used. If you are signed in with Google, our team can also see which account (your email) opened which pages, so we can help you better. Guests are not identified.',
         ],
       },
       'We do not ask for payment card details, banking details or citizenship numbers on this website.',
