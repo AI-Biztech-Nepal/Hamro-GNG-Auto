@@ -18,7 +18,7 @@ export function ShowroomMap() {
     const io = new IntersectionObserver(async ([entry]) => {
       if (!entry.isIntersecting) return;
       io.disconnect();
-      const maplibregl = (await import('maplibre-gl')).default;
+      const maplibregl = await import('maplibre-gl'); // v6 has named exports only, no default
       if (cancelled) return;
       const m = new maplibregl.Map({
         container: el,
