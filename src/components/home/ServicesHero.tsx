@@ -73,8 +73,8 @@ const SERVICES: Service[] = [
     alt: 'Rows of used bikes and scooters in the Hamro G&G Auto yard in Nayabasti',
   },
   {
-    tab: 'Free valuation',
-    lead: 'Curious what your bike is worth? Send a few photos and we will tell you the same day. Free, no strings attached.',
+    tab: 'Free valuation and exchange',
+    lead: 'Not sure what your bike is worth? Send a few photos and get a fair valuation the same day, free. Happy with it? Put that value toward any bike on our floor and ride home upgraded.',
     cta: 'Value my bike',
     href: '/sell',
     image: '/hero/valuation-wide.jpg',
