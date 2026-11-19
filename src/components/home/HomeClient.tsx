@@ -8,8 +8,7 @@ import type { Vehicle } from '@/types/vehicle';
 import type { SiteSettings } from '@/lib/inventory-api';
 import { BrandGrid } from '@/components/home/BrandGrid';
 import { BikeSectionRail } from '@/components/home/BikeSectionRail';
-import { BikeCard } from '@/components/home/BikeCard';
-import { buildRails, formatNpr, BUDGET_CAP, MID_CAP, UPPER_CAP } from '@/components/home/home-data';
+import { buildRails, formatNpr, BUDGET_CAP, UPPER_CAP } from '@/components/home/home-data';
 import { ServicesHero } from '@/components/home/ServicesHero';
 
 const elsewhere = [
@@ -20,20 +19,12 @@ const elsewhere = [
 export function HomeClient({ vehicles }: { vehicles: Vehicle[]; settings: SiteSettings }) {
   const inStock = useMemo(() => vehicles.filter(v => v.has_photos), [vehicles]);
   const rails = useMemo(() => buildRails(inStock), [inStock]);
-  // A bike lives in one place: Fresh arrivals for its first month, Available stock after.
-  const freshIds = useMemo(() => new Set(rails.fresh.map(v => v.id)), [rails]);
 
   return (
     <>
     <ServicesHero />
     <div className="max-w-7xl mx-auto px-4 pt-0 pb-24">
       <BrandGrid vehicles={inStock.filter(v => v.status !== 'sold')} />
-
-      <p className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
-        Browse:
-        <Link href="/second-hand-scooters-nepal" className="font-semibold text-brand hover:underline">Second hand scooters in Nepal</Link>
-        <Link href="/second-hand-bikes-nepal" className="font-semibold text-brand hover:underline">Second hand bikes in Nepal</Link>
-      </p>
 
       {inStock.length === 0 ? (
         <p className="py-16 text-center text-sm text-muted-foreground">No bikes are listed right now. Please check back soon.</p>
@@ -56,37 +47,26 @@ export function HomeClient({ vehicles }: { vehicles: Vehicle[]; settings: SiteSe
             viewAllLink="/inventory?sort=price-low"
           />
           <BikeSectionRail
-            title={`Budget deals: ${formatNpr(BUDGET_CAP)} to ${formatNpr(MID_CAP)}`}
+            title={`Budget deals: under ${formatNpr(UPPER_CAP)}`}
             subtitle="Step up a little, cheapest first"
-            bikes={rails.budgetMid}
+            bikes={rails.budget2}
             badges={rails.badges}
             viewAllLink="/inventory?sort=price-low"
           />
           <BikeSectionRail
-            title={`Budget deals: ${formatNpr(MID_CAP)} to ${formatNpr(UPPER_CAP)}`}
-            subtitle="More bike for the money, cheapest first"
-            bikes={rails.budgetUpper}
+            title="Second hand scooters"
+            subtitle="Inspected scooters on our showroom floor, newest first"
+            bikes={rails.scooters}
             badges={rails.badges}
-            viewAllLink="/inventory?sort=price-low"
+            viewAllLink="/second-hand-scooters-nepal"
           />
           <BikeSectionRail
-            title="Fresh arrivals"
-            subtitle="The newest bikes added to the showroom"
-            bikes={rails.fresh}
+            title="Second hand bikes"
+            subtitle="Inspected motorcycles on our showroom floor, newest first"
+            bikes={rails.bikes}
             badges={rails.badges}
-            viewAllLink="/inventory?sort=latest"
+            viewAllLink="/second-hand-bikes-nepal"
           />
-          <section className="py-6">
-            <div className="mb-4 border-b border-border pb-2">
-              <h2 className="font-headline text-xl font-bold tracking-tight text-foreground md:text-2xl">Available stock</h2>
-              <p className="mt-0.5 text-xs text-muted-foreground md:text-sm">A look at what is on the showroom floor right now</p>
-            </div>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {inStock.filter(v => !freshIds.has(v.id)).sort((a, b) => Number(a.status === 'sold') - Number(b.status === 'sold')).slice(0, 20).map(bike => (
-                <BikeCard key={bike.id} vehicle={bike} badge={rails.badges.get(bike.id)} />
-              ))}
-            </div>
-          </section>
         </>
       )}
 

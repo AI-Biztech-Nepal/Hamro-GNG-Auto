@@ -74,12 +74,22 @@ export function buildRails(all: Vehicle[]) {
 
   const fresh = list.filter(v => daysOld(v) <= FRESH_DAYS).sort(newestFirst).slice(0, 12);
 
+  // Everything at or under UPPER_CAP (so it includes the cheaper bikes too), cheapest first.
+  const budget2 = list
+    .filter(v => v.price > 0 && v.price <= UPPER_CAP)
+    .sort((a, b) => a.price - b.price)
+    .slice(0, 12);
+
+  // The newest scooters and bikes: the rails that lead to the second hand scooter / bike pages.
+  const scooters = list.filter(v => v.type === 'scooter').sort(newestFirst).slice(0, 12);
+  const bikes = list.filter(v => v.type === 'bike').sort(newestFirst).slice(0, 12);
+
   const badges = new Map<string, Badge>();
   popular.slice(0, 3).forEach(v => badges.set(v.id, 'Most Viewed'));
   fresh.filter(v => daysOld(v) <= 7).forEach(v => { if (!badges.has(v.id)) badges.set(v.id, 'Fresh Arrival'); });
   budget.slice(0, 3).forEach(v => { if (!badges.has(v.id)) badges.set(v.id, 'Lowest Price'); });
 
-  return { popular, budget, budgetMid, budgetUpper, fresh, badges, total: list.length };
+  return { popular, budget, budgetMid, budgetUpper, budget2, fresh, scooters, bikes, badges, total: list.length };
 }
 
 /** "1,65,000" style, matching how prices are written elsewhere on the site. */
