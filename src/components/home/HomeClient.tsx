@@ -29,6 +29,12 @@ export function HomeClient({ vehicles }: { vehicles: Vehicle[]; settings: SiteSe
     <div className="max-w-7xl mx-auto px-4 pt-0 pb-24">
       <BrandGrid vehicles={inStock.filter(v => v.status !== 'sold')} />
 
+      <p className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
+        Browse:
+        <Link href="/second-hand-scooters-nepal" className="font-semibold text-brand hover:underline">Second hand scooters in Nepal</Link>
+        <Link href="/second-hand-bikes-nepal" className="font-semibold text-brand hover:underline">Second hand bikes in Nepal</Link>
+      </p>
+
       {inStock.length === 0 ? (
         <p className="py-16 text-center text-sm text-muted-foreground">No bikes are listed right now. Please check back soon.</p>
       ) : (

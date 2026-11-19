@@ -44,6 +44,8 @@ export function Footer({ settings }: { settings: SiteSettings }) {
           <h4 className="text-xs font-semibold mb-4 uppercase tracking-[0.14em] text-white/50">Quick Links</h4>
           <ul className="space-y-2.5 text-sm text-white/75 font-medium">
             <li><Link href="/inventory" className="hover:text-white transition-colors">All Inventory</Link></li>
+            <li><Link href="/second-hand-scooters-nepal" className="hover:text-white transition-colors">Second Hand Scooters</Link></li>
+            <li><Link href="/second-hand-bikes-nepal" className="hover:text-white transition-colors">Second Hand Bikes</Link></li>
             <li><Link href="/sell" className="hover:text-white transition-colors">Sell Your Bike</Link></li>
             <li><Link href="/exchange" className="hover:text-white transition-colors">Exchange Offers</Link></li>
             <li><Link href="/faq" className="hover:text-white transition-colors">FAQ</Link></li>

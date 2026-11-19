@@ -34,7 +34,8 @@ const SORTS = [
 export function VehicleBrowser({ vehicles, priorityCount = 0, layout = 'bar' }: VehicleBrowserProps) {
   const params = useSearchParams();
   const [search, setSearch] = useState(() => (params.get('q') || '').slice(0, 60));
-  const [typeFilter, setTypeFilter] = useState('all');
+  // /inventory?type=scooter (or bike) opens on that tab.
+  const [typeFilter, setTypeFilter] = useState(() => (['bike', 'scooter'].includes(params.get('type') || '') ? (params.get('type') as string) : 'all'));
   const [yearFilter, setYearFilter] = useState('all');
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
