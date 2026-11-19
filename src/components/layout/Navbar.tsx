@@ -38,8 +38,6 @@ export function Navbar({ settings }: { settings: SiteSettings }) {
   const links = [
     { name: 'Home', href: '/' },
     { name: 'Inventory', href: '/inventory' },
-    { name: 'Scooters', href: '/second-hand-scooters-nepal', title: 'Second hand scooters in Nepal' },
-    { name: 'Bikes', href: '/second-hand-bikes-nepal', title: 'Second hand bikes in Nepal' },
     { name: 'Sell Bike', href: '/sell' },
     { name: 'Exchange', href: '/exchange' },
     { name: 'Offers', href: '/offers' },
@@ -67,7 +65,6 @@ export function Navbar({ settings }: { settings: SiteSettings }) {
               <Link
                 key={link.name}
                 href={link.href}
-                title={'title' in link ? link.title : undefined}
                 className={`text-sm font-semibold transition-colors ${
                   pathname === link.href
                     ? 'text-foreground underline underline-offset-8 decoration-2 decoration-brand'
@@ -113,7 +110,6 @@ export function Navbar({ settings }: { settings: SiteSettings }) {
             <Link
               key={link.name}
               href={link.href}
-              title={'title' in link ? link.title : undefined}
               aria-current={active ? 'page' : undefined}
               className={`shrink-0 whitespace-nowrap px-3 py-3 text-sm font-semibold transition-colors ${
                 active
