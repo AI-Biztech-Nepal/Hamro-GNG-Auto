@@ -18,6 +18,9 @@ interface VehicleBrowserProps {
   layout?: 'bar' | 'sidebar';
 }
 
+/** A bike number reduced to its letters and digits, so "62/7224", "62-7224" and "627224" all match. */
+const plateKey = (s: string) => s.toLowerCase().replace(/[^\p{L}\p{N}]/gu, '');
+
 const SORTS = [
   { value: 'latest', label: 'Newest first' },
   { value: 'price-low', label: 'Price: low to high' },
@@ -56,7 +59,10 @@ export function VehicleBrowser({ vehicles, priorityCount = 0, layout = 'bar' }: 
     const min = minPrice ? Number(minPrice) : 0;
     const max = maxPrice ? Number(maxPrice) : Infinity;
     return vehicles.filter(v => {
-      const matchesSearch = !q || [v.title, v.brand, v.model].some(s => s.toLowerCase().includes(q));
+      // The bike number is searched only when what was typed looks like one (3+ characters with a digit).
+      const plate = plateKey(q);
+      const matchesSearch = !q || [v.title, v.brand, v.model].some(s => s.toLowerCase().includes(q))
+        || (plate.length >= 3 && /\d/.test(plate) && plateKey(v.registration_number || '').includes(plate));
       const matchesYear = yearFilter === 'all' || v.year === Number(yearFilter);
       const matchesPrice = v.price >= min && v.price <= max;
       const matchesType = typeFilter === 'all' || v.type === typeFilter;
@@ -115,8 +121,8 @@ export function VehicleBrowser({ vehicles, priorityCount = 0, layout = 'bar' }: 
       <Input
         type="search"
         data-inventory-search
-        placeholder="Search by brand or model..."
-        aria-label="Search by brand or model"
+        placeholder="Brand, model or bike no."
+        aria-label="Search by brand, model or bike number"
         className="h-11 rounded-md pl-10"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
